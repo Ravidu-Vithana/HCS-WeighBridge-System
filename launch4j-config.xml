@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+    <dontWrapJar>false</dontWrapJar>
+    <headerType>gui</headerType>
+    <jar>target\WeighBridge-1.0.0.jar</jar>
+    <outfile>target\WeighBridge.exe</outfile>
+    <errTitle>WeighBridge System Error</errTitle>
+    <cmdLine></cmdLine>
+    <chdir>.</chdir>
+    <priority>normal</priority>
+    <downloadUrl>https://www.java.com/download</downloadUrl>
+    <supportUrl></supportUrl>
+    <stayAlive>false</stayAlive>
+    <restartOnCrash>false</restartOnCrash>
+    <manifest></manifest>
+    <icon></icon>
+    <classPath>
+        <mainClass>com.hcs.weighbridge.Launcher</mainClass>
+        <cp>WeighBridge-1.0.0.jar</cp>
+    </classPath>
+    <jre>
+        <path></path>
+        <bundledJre64Bit>false</bundledJre64Bit>
+        <bundledJreAsFallback>false</bundledJreAsFallback>
+        <minVersion>1.8.0</minVersion>
+        <maxVersion>1.8.999</maxVersion>
+        <jdkPreference>preferJre</jdkPreference>
+        <runtimeBits>64/32</runtimeBits>
+        <initialHeapSize>128</initialHeapSize>
+        <maxHeapSize>512</maxHeapSize>
+        <opt>-Dfile.encoding=UTF-8</opt>
+    </jre>
+    <versionInfo>
+        <fileVersion>1.0.0.0</fileVersion>
+        <txtFileVersion>1.0.0</txtFileVersion>
+        <fileDescription>WeighBridge Management System</fileDescription>
+        <copyright>© 2026 HCS. All rights reserved.</copyright>
+        <productVersion>1.0.0.0</productVersion>
+        <txtProductVersion>1.0.0</txtProductVersion>
+        <productName>WeighBridge System</productName>
+        <companyName>HCS</companyName>
+        <internalName>weighbridge</internalName>
+        <originalFilename>WeighBridge.exe</originalFilename>
+    </versionInfo>
+    <messages>
+        <startupErr>Java Runtime Environment (JRE) not found. Please install Java 8 from java.com</startupErr>
+        <jreNotFoundErr>The bundled JRE is corrupted. Please reinstall the application.</jreNotFoundErr>
+        <jreVersionErr>This application requires Java 8. Please update your Java installation.</jreVersionErr>
+        <launcherErr>An error occurred while launching the application.</launcherErr>
+        <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
+    </messages>
+</launch4jConfig>

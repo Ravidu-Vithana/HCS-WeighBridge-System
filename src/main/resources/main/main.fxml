@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<?import java.net.URL?>
+<BorderPane fx:id="rootPane"
+            xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.hcs.weighbridge.ui.MainController"
+            prefWidth="1600"
+            prefHeight="720"
+            style="-fx-background-color: linear-gradient(to bottom right, #f8fafc, #dbeafe, #f1f5f9);">
+
+    <stylesheets>
+        <URL value="@../styles.css"/>
+    </stylesheets>
+
+    <!-- ================= TOP HEADER ================= -->
+    <top>
+        <HBox spacing="10"
+              alignment="CENTER_LEFT"
+              style="-fx-background-color: linear-gradient(to right, #334155, #475569); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
+            <padding>
+                <Insets top="10" right="30" bottom="10" left="30"/>
+            </padding>
+
+            <VBox spacing="1">
+                <Label text="HCS Weighbridge System"
+                       styleClass="header-title" />
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Label text="📞 0763738202"
+                               styleClass="header-contact" />
+                    </HBox>
+
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Label text="✉ raviduyashith123@gmail.com"
+                               styleClass="header-contact" />
+                    </HBox>
+                </HBox>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Settings and Exit Buttons -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="settingsButton"
+                        text="Settings"
+                        styleClass="settings-button">
+                </Button>
+
+                <Button fx:id="exitButton"
+                        text="Exit"
+                        styleClass="exit-button">
+                </Button>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- ================= CENTER CONTENT WITH SCROLL ================= -->
+    <center>
+        <ScrollPane fx:id="mainScrollPane"
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    style="-fx-background: transparent;
+                           -fx-background-color: transparent;
+                           -fx-border-width: 0;">
+            <content>
+                <VBox spacing="6" alignment="TOP_CENTER">
+                    <padding>
+                        <Insets top="8" right="20" bottom="8" left="20"/>
+                    </padding>
+
+                    <!-- Main Grid: Left (Weight/Form) and Right (Table/Actions) -->
+                    <GridPane hgap="6" vgap="6">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="35"/>
+                            <ColumnConstraints percentWidth="65"/>
+                        </columnConstraints>
+
+                        <!-- ========= LEFT COLUMN: Weight Display and Input Form ========= -->
+                        <VBox spacing="6" GridPane.columnIndex="0">
+                            <!-- Current Weight Display -->
+                            <VBox spacing="5"
+                                  style="-fx-background-color: linear-gradient(to bottom right, #d1fae5, #ccfbf1);
+                                         -fx-background-radius: 8;
+                                         -fx-border-color: #a7f3d0;
+                                         -fx-border-radius: 8;
+                                         -fx-border-width: 1;
+                                         -fx-padding: 12;
+                                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);">
+
+                                <Label text="Current Weight (kg)"
+                                       styleClass="weight-label" />
+
+                                <VBox alignment="CENTER"
+                                      style="-fx-background-color: #1e293b;
+                                             -fx-background-radius: 8;
+                                             -fx-padding: 18;
+                                             -fx-effect: innershadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 0);">
+                                    <Label fx:id="liveWeightLabel"
+                                           text="0"
+                                           styleClass="weight-value" />
+
+                                    <Label text="Kilograms"
+                                           styleClass="weight-unit" />
+                                </VBox>
+
+                                <Label fx:id="statusLabel"
+                                       text="STABLE"
+                                       styleClass="status-label" />
+                            </VBox>
+
+                            <!-- Input Form -->
+                            <VBox spacing="6"
+                                  style="-fx-background-color: rgba(255, 255, 255, 0.8);
+                                         -fx-background-radius: 8;
+                                         -fx-padding: 12;
+                                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+
+                                <!-- Lorry Number -->
+                                <VBox spacing="2">
+                                    <Label text="Lorry Number"
+                                           styleClass="form-label" />
+                                    <TextField fx:id="lorryField"
+                                               promptText="Enter lorry number"
+                                               styleClass="form-field" />
+                                </VBox>
+
+                                <!-- Customer Name -->
+                                <VBox spacing="2">
+                                    <Label text="Customer Name"
+                                           styleClass="form-label" />
+                                    <TextField fx:id="customerField"
+                                               promptText="Enter customer name"
+                                               styleClass="form-field" />
+                                </VBox>
+
+                                <!-- Product Name -->
+                                <VBox spacing="2">
+                                    <Label text="Product Name"
+                                           styleClass="form-label" />
+                                    <TextField fx:id="productField"
+                                               promptText="Enter product name"
+                                               styleClass="form-field" />
+                                </VBox>
+
+                                <!-- Driver Name -->
+                                <VBox spacing="2">
+                                    <Label text="Driver Name"
+                                           styleClass="form-label" />
+                                    <TextField fx:id="driverField"
+                                               promptText="Enter driver name"
+                                               styleClass="form-field" />
+                                </VBox>
+                            </VBox>
+                        </VBox>
+
+                        <!-- ========= RIGHT COLUMN: Recent Weighings and Actions ========= -->
+                        <VBox spacing="6" GridPane.columnIndex="1">
+                            <!-- Recent First Weighings Table -->
+                            <VBox style="-fx-background-color: rgba(255, 255, 255, 0.95);
+                                         -fx-background-radius: 8;
+                                         -fx-padding: 10;
+                                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);"
+                                  VBox.vgrow="ALWAYS">
+
+                                <Label text="Recent First Weighings"
+                                       styleClass="section-header" />
+
+                                <!-- Table View for Recent Weighings -->
+                                <TableView fx:id="recentWeighingsTable"
+                                           styleClass="table-view"
+                                           VBox.vgrow="ALWAYS">
+
+                                    <columns>
+                                        <TableColumn text="Date" prefWidth="100"/>
+                                        <TableColumn text="Time" prefWidth="80"/>
+                                        <TableColumn text="Receipt No" prefWidth="100"/>
+                                        <TableColumn text="Lorry Number" prefWidth="120"/>
+                                        <TableColumn text="First Weight (kg)" prefWidth="120"/>
+                                    </columns>
+
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    </columnResizePolicy>
+                                </TableView>
+                            </VBox>
+
+                            <!-- Action Buttons -->
+                            <HBox spacing="6"
+                                  alignment="CENTER"
+                                  style="-fx-background-color: rgba(255, 255, 255, 0.8);
+                                         -fx-background-radius: 8;
+                                         -fx-padding: 12;
+                                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+
+                                <Button fx:id="newButton"
+                                        text="New"
+                                        styleClass="new-button">
+                                </Button>
+
+                                <Button fx:id="saveButton"
+                                        text="Save"
+                                        styleClass="save-button">
+                                </Button>
+
+                                <Button fx:id="printFirstButton"
+                                        text="Print First Ticket"
+                                        styleClass="print-first-button">
+                                </Button>
+
+                                <Button fx:id="printFullButton"
+                                        text="Print Full Ticket"
+                                        styleClass="print-full-button">
+                                </Button>
+                            </HBox>
+                        </VBox>
+                    </GridPane>
+
+                    <!-- Complete Records Table -->
+                    <VBox style="-fx-background-color: rgba(255, 255, 255, 0.95);
+                                 -fx-background-radius: 8;
+                                 -fx-padding: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+
+                        <Label text="Complete Records"
+                               styleClass="section-header" />
+
+                        <!-- Table View for Complete Records -->
+                        <TableView fx:id="completeRecordsTable"
+                                   styleClass="table-view">
+
+                            <columns>
+                                <TableColumn text="Date In" prefWidth="80"/>
+                                <TableColumn text="Date Out" prefWidth="80"/>
+                                <TableColumn text="Time In" prefWidth="70"/>
+                                <TableColumn text="Time Out" prefWidth="70"/>
+                                <TableColumn text="Receipt No" prefWidth="90"/>
+                                <TableColumn text="Lorry Number" prefWidth="100"/>
+                                <TableColumn text="First Weight" prefWidth="90"/>
+                                <TableColumn text="Second Weight" prefWidth="90"/>
+                                <TableColumn text="Net Weight" prefWidth="90"/>
+                                <TableColumn text="Customer Name" prefWidth="120"/>
+                                <TableColumn text="Product Name" prefWidth="120"/>
+                                <TableColumn text="Driver Name" prefWidth="120"/>
+                            </columns>
+
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                        </TableView>
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

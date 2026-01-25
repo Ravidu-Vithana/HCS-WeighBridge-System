@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="15"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.hcs.weighbridge.ui.SettingsController"
+      prefWidth="450"
+      prefHeight="400"
+      styleClass="settings-container">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="Settings" styleClass="settings-title" />
+
+    <Separator />
+
+    <!-- Serial Port Settings Section -->
+    <Label text="Serial Port Settings" styleClass="settings-section-title" />
+
+    <GridPane hgap="15" vgap="12">
+        <columnConstraints>
+            <ColumnConstraints minWidth="100" />
+            <ColumnConstraints minWidth="200" />
+        </columnConstraints>
+
+        <Label text="COM Port:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <ComboBox fx:id="portCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity"/>
+
+        <Label text="Baud Rate:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <ComboBox fx:id="baudCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity"/>
+
+        <Label text="Data Bits:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <ComboBox fx:id="dataBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
+
+        <Label text="Stop Bits:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <ComboBox fx:id="stopBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" maxWidth="Infinity"/>
+
+        <Label text="Parity:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <ComboBox fx:id="parityCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" maxWidth="Infinity"/>
+    </GridPane>
+
+    <Separator />
+
+    <!-- UI Scale Settings Section -->
+    <Label text="User Interface Settings" styleClass="settings-section-title" />
+
+    <VBox spacing="8">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="UI Scale:" minWidth="100"/>
+            <Slider fx:id="scaleSlider"
+                    min="0.5"
+                    max="2.0"
+                    value="1.0"
+                    showTickLabels="true"
+                    showTickMarks="true"
+                    majorTickUnit="0.5"
+                    minorTickCount="4"
+                    prefWidth="200"
+                    HBox.hgrow="ALWAYS"/>
+            <Label fx:id="scaleLabel"
+                   text="1.0x"
+                   minWidth="50"
+                   styleClass="scale-value-label"/>
+        </HBox>
+
+        <Label text="Adjust the UI size to fit your screen resolution. Requires restart to take full effect."
+               styleClass="settings-hint"
+               wrapText="true"/>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <!-- Action Buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Save"
+                onAction="#save"
+                styleClass="settings-save-button"/>
+        <Button text="Cancel"
+                onAction="#close"
+                styleClass="settings-cancel-button"/>
+    </HBox>
+
+</VBox>
