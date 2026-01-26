@@ -18,9 +18,6 @@ public class WeighService {
         this.dao = dao;
     }
 
-    /**
-     * Starts a new weigh transaction and saves initial record to database
-     */
     public Record startTransaction(String lorryNo, String customerName,
                                    String productName, String driverName) {
 
@@ -33,9 +30,6 @@ public class WeighService {
         return activeRecord;
     }
 
-    /**
-     * Saves the first weight for the active transaction
-     */
     public void saveFirstWeight(int weight) {
         if (activeRecord == null) {
             throw new IllegalStateException("No active transaction");
@@ -52,9 +46,6 @@ public class WeighService {
         dao.saveFirstWeight(activeRecord.getId(), weight, date, time);
     }
 
-    /**
-     * Saves the second weight and completes the transaction
-     */
     public Record saveSecondWeight(int weight) {
         if (activeRecord == null) {
             throw new IllegalStateException("No active transaction");
@@ -80,28 +71,17 @@ public class WeighService {
         return completedRecord;
     }
 
-    /**
-     * Loads a record by ID for editing or completion
-     */
     public Record loadRecord(long id) {
         activeRecord = dao.findById(id);
         return activeRecord;
     }
 
-    public Boolean isPendingRecordAvailble(String lorryNo) {
-        return dao.isPendingRecordAvailable(lorryNo);
-    }
+    public Boolean isPendingRecordAvailble(String lorryNo) { return dao.isPendingRecordAvailable(lorryNo); }
 
-    /**
-     * Gets the current active record
-     */
     public Record getActiveRecord() {
         return activeRecord;
     }
 
-    /**
-     * Clears the active record without completing it
-     */
     public void clearActiveRecord() {
         activeRecord = null;
     }
@@ -110,9 +90,6 @@ public class WeighService {
         fullRecord = null;
     }
 
-    /**
-     * Checks if active transaction has first weight
-     */
     public boolean hasFirstWeight() {
         return activeRecord != null && activeRecord.getFirstWeight() > 0;
     }
@@ -129,10 +106,8 @@ public class WeighService {
         fullRecord = record;
     }
 
-    /**
-     * Checks if active transaction is completed
-     */
     public boolean isCompleted() {
         return activeRecord != null && activeRecord.getSecondWeight() > 0;
     }
+
 }

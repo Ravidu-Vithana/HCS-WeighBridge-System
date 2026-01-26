@@ -10,7 +10,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -29,7 +28,6 @@ public class SettingsController implements Initializable {
     private ConfigDao configDao;
     private MainController mainController;
 
-    // Use this method to set dependencies
     public void setDependencies(ConfigDao dao, MainController mainController) {
         this.configDao = dao;
         this.mainController = mainController;
@@ -38,7 +36,6 @@ public class SettingsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialize UI components
         try{
             setupComboBoxes();
             setupScaleSlider();
@@ -58,17 +55,37 @@ public class SettingsController implements Initializable {
     }
 
     private void setupScaleSlider() {
-        scaleSlider.setMin(0.5);
-        scaleSlider.setMax(2.0);
+        scaleSlider.setMin(1.0);
+        scaleSlider.setMax(3.0);
         scaleSlider.setMajorTickUnit(0.5);
-        scaleSlider.setMinorTickCount(4);
+        scaleSlider.setMinorTickCount(0);
         scaleSlider.setShowTickLabels(true);
         scaleSlider.setShowTickMarks(true);
         scaleSlider.setSnapToTicks(true);
 
+        scaleSlider.setValue(2.0);
+
         scaleSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            scaleLabel.setText(String.format("%.1fx", newVal.doubleValue()));
+            updateScaleLabel(newVal.doubleValue());
         });
+
+        updateScaleLabel(scaleSlider.getValue());
+    }
+
+    private void updateScaleLabel(double value) {
+        String label;
+        if (value <= 1.0) {
+            label = "Very Small";
+        } else if (value <= 1.5) {
+            label = "Small";
+        } else if (value <= 2.0) {
+            label = "Normal";
+        } else if (value <= 2.5) {
+            label = "Large";
+        } else {
+            label = "Very Large";
+        }
+        scaleLabel.setText(label);
     }
 
     private void loadData() {
@@ -76,8 +93,13 @@ public class SettingsController implements Initializable {
 
         try {
             double currentScale = configDao.getUiScaleFactor();
+
+            if (currentScale < 1.0 || currentScale > 3.0) {
+                currentScale = 2.0;
+            }
+
             scaleSlider.setValue(currentScale);
-            scaleLabel.setText(String.format("%.1fx", currentScale));
+            updateScaleLabel(currentScale);
 
             SerialConfig cfg = configDao.loadSerialConfig();
 

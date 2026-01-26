@@ -136,6 +136,12 @@
     -fx-padding: 0;
 }
 
+.complete-records-table {
+    -fx-pref-height: 200px;
+    -fx-min-height: 100px;
+    -fx-max-height: 300px;
+}
+
 .table-view .column-header-background {
     -fx-background-color: #f8fafc;
     -fx-border-color: #e2e8f0;
@@ -313,238 +319,324 @@
 
 /* ========== SCALE-SPECIFIC OVERRIDES ========== */
 
-/* SCALE: MEDIUM (1.25x) */
-.scale-md .header-title {
-    -fx-font-size: 24px;
+/* SCALE: VERY SMALL (0.5 - Scale factor 1.0) */
+.scale-xs .header-title {
+    -fx-font-size: 16px;
 }
 
-.scale-md .header-contact {
-    -fx-font-size: 11px;
+.scale-xs .header-contact {
+    -fx-font-size: 8px;
 }
 
-.scale-md .weight-label {
-    -fx-font-size: 13px;
+.scale-xs .weight-label {
+    -fx-font-size: 10px;
 }
 
-.scale-md .weight-value {
-    -fx-font-size: 44px;
-}
-
-.scale-md .weight-unit {
-    -fx-font-size: 11px;
-}
-
-.scale-md .status-label {
-    -fx-font-size: 13px;
-}
-
-.scale-md .form-label {
-    -fx-font-size: 12px;
-}
-
-.scale-md .section-header {
-    -fx-font-size: 14px;
-}
-
-.scale-md .table-view .column-header .label {
-    -fx-font-size: 12px;
-}
-
-.scale-md .table-view .table-cell {
-    -fx-font-size: 12px;
-}
-
-.scale-md .form-field {
-    -fx-font-size: 13px;
-}
-
-.scale-md .settings-button,
-.scale-md .exit-button {
-    -fx-font-size: 13px;
-}
-
-.scale-md .new-button,
-.scale-md .save-button,
-.scale-md .print-first-button,
-.scale-md .print-full-button {
-    -fx-font-size: 14px;
-}
-
-/* SCALE: LARGE (1.5x) */
-.scale-lg .header-title {
-    -fx-font-size: 28px;
-}
-
-.scale-lg .header-contact {
-    -fx-font-size: 12px;
-}
-
-.scale-lg .weight-label {
-    -fx-font-size: 14px;
-}
-
-.scale-lg .weight-value {
-    -fx-font-size: 48px;
-}
-
-.scale-lg .weight-unit {
-    -fx-font-size: 12px;
-}
-
-.scale-lg .status-label {
-    -fx-font-size: 14px;
-}
-
-.scale-lg .form-label {
-    -fx-font-size: 13px;
-}
-
-.scale-lg .section-header {
-    -fx-font-size: 15px;
-}
-
-.scale-lg .table-view .column-header .label {
-    -fx-font-size: 13px;
-}
-
-.scale-lg .table-view .table-cell {
-    -fx-font-size: 13px;
-}
-
-.scale-lg .form-field {
-    -fx-font-size: 14px;
-}
-
-.scale-lg .settings-button,
-.scale-lg .exit-button {
-    -fx-font-size: 14px;
-}
-
-.scale-lg .new-button,
-.scale-lg .save-button,
-.scale-lg .print-first-button,
-.scale-lg .print-full-button {
-    -fx-font-size: 15px;
-}
-
-/* SCALE: EXTRA LARGE (1.75x) */
-.scale-xl .header-title {
+.scale-xs .weight-value {
     -fx-font-size: 32px;
 }
 
-.scale-xl .header-contact {
+.scale-xs .weight-unit {
+    -fx-font-size: 8px;
+}
+
+.scale-xs .status-label {
+    -fx-font-size: 10px;
+}
+
+.scale-xs .form-label {
+    -fx-font-size: 9px;
+}
+
+.scale-xs .section-header {
+    -fx-font-size: 11px;
+}
+
+.scale-xs .table-view .column-header .label {
+    -fx-font-size: 9px;
+}
+
+.scale-xs .table-view .table-cell {
+    -fx-font-size: 9px;
+}
+
+.scale-xs .form-field {
+    -fx-font-size: 10px;
+    -fx-padding: 5 7;
+}
+
+.scale-xs .settings-button,
+.scale-xs .exit-button {
+    -fx-font-size: 10px;
+    -fx-padding: 5 10;
+}
+
+.scale-xs .new-button,
+.scale-xs .save-button,
+.scale-xs .print-first-button,
+.scale-xs .print-full-button {
+    -fx-font-size: 11px;
+    -fx-padding: 8 16;
+}
+
+.scale-xs .table-view .table-row-cell {
+    -fx-cell-size: 24px;
+}
+
+/* SCALE: SMALL (1.0 - Scale factor 1.5) */
+.scale-sm .header-title {
+    -fx-font-size: 18px;
+}
+
+.scale-sm .header-contact {
+    -fx-font-size: 9px;
+}
+
+.scale-sm .weight-label {
+    -fx-font-size: 11px;
+}
+
+.scale-sm .weight-value {
+    -fx-font-size: 36px;
+}
+
+.scale-sm .weight-unit {
+    -fx-font-size: 9px;
+}
+
+.scale-sm .status-label {
+    -fx-font-size: 11px;
+}
+
+.scale-sm .form-label {
+    -fx-font-size: 10px;
+}
+
+.scale-sm .section-header {
+    -fx-font-size: 12px;
+}
+
+.scale-sm .table-view .column-header .label {
+    -fx-font-size: 10px;
+}
+
+.scale-sm .table-view .table-cell {
+    -fx-font-size: 10px;
+}
+
+.scale-sm .form-field {
+    -fx-font-size: 11px;
+    -fx-padding: 5.5 7.5;
+}
+
+.scale-sm .settings-button,
+.scale-sm .exit-button {
+    -fx-font-size: 11px;
+    -fx-padding: 5.5 11;
+}
+
+.scale-sm .new-button,
+.scale-sm .save-button,
+.scale-sm .print-first-button,
+.scale-sm .print-full-button {
+    -fx-font-size: 12px;
+    -fx-padding: 9 18;
+}
+
+.scale-sm .table-view .table-row-cell {
+    -fx-cell-size: 27px;
+}
+
+/* SCALE: NORMAL (1.5 - Scale factor 2.0) - This is your current 2.0x settings */
+.scale-md .header-title {
+    -fx-font-size: 32px;
+}
+
+.scale-md .header-contact {
     -fx-font-size: 13px;
 }
 
-.scale-xl .weight-label {
+.scale-md .weight-label {
     -fx-font-size: 15px;
 }
 
-.scale-xl .weight-value {
+.scale-md .weight-value {
     -fx-font-size: 52px;
 }
 
-.scale-xl .weight-unit {
+.scale-md .weight-unit {
     -fx-font-size: 13px;
 }
 
-.scale-xl .status-label {
+.scale-md .status-label {
     -fx-font-size: 15px;
 }
 
-.scale-xl .form-label {
+.scale-md .form-label {
     -fx-font-size: 14px;
 }
 
-.scale-xl .section-header {
+.scale-md .section-header {
     -fx-font-size: 16px;
 }
 
-.scale-xl .table-view .column-header .label {
+.scale-md .table-view .column-header .label {
     -fx-font-size: 14px;
 }
 
-.scale-xl .table-view .table-cell {
+.scale-md .table-view .table-cell {
     -fx-font-size: 14px;
 }
 
-.scale-xl .form-field {
-    -fx-font-size: 15px;
-}
-
-.scale-xl .settings-button,
-.scale-xl .exit-button {
-    -fx-font-size: 15px;
-}
-
-.scale-xl .new-button,
-.scale-xl .save-button,
-.scale-xl .print-first-button,
-.scale-xl .print-full-button {
-    -fx-font-size: 16px;
-}
-
-/* ========== TABLE ROW HEIGHT SCALING ========== */
-.scale-md .table-view .table-row-cell {
-    -fx-cell-size: 33px;
-}
-
-.scale-lg .table-view .table-row-cell {
-    -fx-cell-size: 36px;
-}
-
-.scale-xl .table-view .table-row-cell {
-    -fx-cell-size: 39px;
-}
-
-/* ========== FORM FIELD PADDING SCALING ========== */
 .scale-md .form-field {
-    -fx-padding: 7 9;
-}
-
-.scale-lg .form-field {
-    -fx-padding: 8 10;
-}
-
-.scale-xl .form-field {
+    -fx-font-size: 15px;
     -fx-padding: 9 11;
 }
 
-/* ========== BUTTON PADDING SCALING ========== */
 .scale-md .settings-button,
 .scale-md .exit-button {
-    -fx-padding: 7 13;
+    -fx-font-size: 15px;
+    -fx-padding: 9 15;
 }
 
 .scale-md .new-button,
 .scale-md .save-button,
 .scale-md .print-first-button,
 .scale-md .print-full-button {
-    -fx-padding: 11 22;
+    -fx-font-size: 16px;
+    -fx-padding: 13 26;
+}
+
+.scale-md .table-view .table-row-cell {
+    -fx-cell-size: 39px;
+}
+
+/* SCALE: LARGE (2.0 - Scale factor 2.5) */
+.scale-lg .header-title {
+    -fx-font-size: 36px;
+}
+
+.scale-lg .header-contact {
+    -fx-font-size: 14px;
+}
+
+.scale-lg .weight-label {
+    -fx-font-size: 17px;
+}
+
+.scale-lg .weight-value {
+    -fx-font-size: 60px;
+}
+
+.scale-lg .weight-unit {
+    -fx-font-size: 14px;
+}
+
+.scale-lg .status-label {
+    -fx-font-size: 17px;
+}
+
+.scale-lg .form-label {
+    -fx-font-size: 15px;
+}
+
+.scale-lg .section-header {
+    -fx-font-size: 18px;
+}
+
+.scale-lg .table-view .column-header .label {
+    -fx-font-size: 15px;
+}
+
+.scale-lg .table-view .table-cell {
+    -fx-font-size: 15px;
+}
+
+.scale-lg .form-field {
+    -fx-font-size: 16px;
+    -fx-padding: 10 12;
 }
 
 .scale-lg .settings-button,
 .scale-lg .exit-button {
-    -fx-padding: 8 14;
+    -fx-font-size: 16px;
+    -fx-padding: 10 16;
 }
 
 .scale-lg .new-button,
 .scale-lg .save-button,
 .scale-lg .print-first-button,
 .scale-lg .print-full-button {
-    -fx-padding: 12 24;
+    -fx-font-size: 18px;
+    -fx-padding: 14 28;
+}
+
+.scale-lg .table-view .table-row-cell {
+    -fx-cell-size: 45px;
+}
+
+/* SCALE: VERY LARGE (2.5 - Scale factor 3.0) */
+.scale-xl .header-title {
+    -fx-font-size: 40px;
+}
+
+.scale-xl .header-contact {
+    -fx-font-size: 15px;
+}
+
+.scale-xl .weight-label {
+    -fx-font-size: 19px;
+}
+
+.scale-xl .weight-value {
+    -fx-font-size: 68px;
+}
+
+.scale-xl .weight-unit {
+    -fx-font-size: 15px;
+}
+
+.scale-xl .status-label {
+    -fx-font-size: 19px;
+}
+
+.scale-xl .form-label {
+    -fx-font-size: 16px;
+}
+
+.scale-xl .section-header {
+    -fx-font-size: 20px;
+}
+
+.scale-xl .table-view .column-header .label {
+    -fx-font-size: 16px;
+}
+
+.scale-xl .table-view .table-cell {
+    -fx-font-size: 16px;
+}
+
+.scale-xl .form-field {
+    -fx-font-size: 17px;
+    -fx-padding: 11 13;
 }
 
 .scale-xl .settings-button,
 .scale-xl .exit-button {
-    -fx-padding: 9 15;
+    -fx-font-size: 17px;
+    -fx-padding: 11 17;
 }
 
 .scale-xl .new-button,
 .scale-xl .save-button,
 .scale-xl .print-first-button,
 .scale-xl .print-full-button {
-    -fx-padding: 13 26;
+    -fx-font-size: 20px;
+    -fx-padding: 15 30;
+}
+
+.scale-xl .table-view .table-row-cell {
+    -fx-cell-size: 51px;
 }
 
 /* ========== SETTINGS DIALOG STYLES ========== */
@@ -589,38 +681,62 @@
 }
 
 /* Scale overrides for settings dialog */
-.scale-md .settings-title {
-    -fx-font-size: 20px;
+.scale-xs .settings-title {
+    -fx-font-size: 14px;
 }
 
-.scale-md .settings-section-title {
-    -fx-font-size: 15px;
-}
-
-.scale-md .settings-hint {
+.scale-xs .settings-section-title {
     -fx-font-size: 11px;
 }
 
-.scale-lg .settings-title {
-    -fx-font-size: 22px;
+.scale-xs .settings-hint {
+    -fx-font-size: 8px;
 }
 
-.scale-lg .settings-section-title {
+.scale-sm .settings-title {
     -fx-font-size: 16px;
 }
 
-.scale-lg .settings-hint {
+.scale-sm .settings-section-title {
     -fx-font-size: 12px;
 }
 
-.scale-xl .settings-title {
+.scale-sm .settings-hint {
+    -fx-font-size: 9px;
+}
+
+.scale-md .settings-title {
     -fx-font-size: 24px;
 }
 
-.scale-xl .settings-section-title {
+.scale-md .settings-section-title {
     -fx-font-size: 17px;
 }
 
-.scale-xl .settings-hint {
+.scale-md .settings-hint {
     -fx-font-size: 13px;
+}
+
+.scale-lg .settings-title {
+    -fx-font-size: 28px;
+}
+
+.scale-lg .settings-section-title {
+    -fx-font-size: 19px;
+}
+
+.scale-lg .settings-hint {
+    -fx-font-size: 14px;
+}
+
+.scale-xl .settings-title {
+    -fx-font-size: 32px;
+}
+
+.scale-xl .settings-section-title {
+    -fx-font-size: 21px;
+}
+
+.scale-xl .settings-hint {
+    -fx-font-size: 15px;
 }

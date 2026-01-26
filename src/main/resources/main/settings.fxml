@@ -53,22 +53,23 @@
         <HBox spacing="10" alignment="CENTER_LEFT">
             <Label text="UI Scale:" minWidth="100"/>
             <Slider fx:id="scaleSlider"
-                    min="0.5"
-                    max="2.0"
-                    value="1.0"
+                    min="1.0"
+                    max="3.0"
+                    value="2.0"
                     showTickLabels="true"
                     showTickMarks="true"
                     majorTickUnit="0.5"
-                    minorTickCount="4"
+                    minorTickCount="0"
+                    snapToTicks="true"
                     prefWidth="200"
                     HBox.hgrow="ALWAYS"/>
             <Label fx:id="scaleLabel"
-                   text="1.0x"
-                   minWidth="50"
+                   text="Normal"
+                   minWidth="80"
                    styleClass="scale-value-label"/>
         </HBox>
 
-        <Label text="Adjust the UI size to fit your screen resolution. Requires restart to take full effect."
+        <Label text="Choose UI size: Very Small (1.0) | Small (1.5) | Normal (2.0) | Large (2.5) | Very Large (3.0)"
                styleClass="settings-hint"
                wrapText="true"/>
     </VBox>

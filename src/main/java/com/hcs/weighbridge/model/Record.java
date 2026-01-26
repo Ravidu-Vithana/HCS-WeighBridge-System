@@ -16,8 +16,6 @@ public class Record {
     private final IntegerProperty secondWeight = new SimpleIntegerProperty();
     private final IntegerProperty netWeight = new SimpleIntegerProperty();
 
-    // Getters and setters
-
     public Record(String lorryNumber) {
         this.lorryNumber.set(lorryNumber);
     }

@@ -1,11 +1,6 @@
 package com.hcs.weighbridge.util;
 
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.Region;
-import java.util.*;
 
 public class UiScaler {
 
@@ -23,7 +18,7 @@ public class UiScaler {
         if (root == null) return;
 
         root.getStyleClass().removeAll(
-                "scale-sm", "scale-md", "scale-lg", "scale-xl"
+                "scale-xs", "scale-sm", "scale-md", "scale-lg", "scale-xl"
         );
 
         String scaleClass = getScaleClass();
@@ -31,15 +26,15 @@ public class UiScaler {
             root.getStyleClass().add(scaleClass);
         }
 
-        // Apply CSS ONCE
         root.applyCss();
         root.requestLayout();
     }
 
     private String getScaleClass() {
-        if (scaleFactor <= 1.0) return "";
-        if (scaleFactor <= 1.25) return "scale-md";
-        if (scaleFactor <= 1.5) return "scale-lg";
+        if (scaleFactor <= 1.0) return "scale-xs";
+        if (scaleFactor <= 1.5) return "scale-sm";
+        if (scaleFactor <= 2.0) return "scale-md";
+        if (scaleFactor <= 2.5) return "scale-lg";
         return "scale-xl";
     }
 }

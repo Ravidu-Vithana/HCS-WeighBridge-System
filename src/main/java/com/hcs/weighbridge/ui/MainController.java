@@ -16,9 +16,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 public class MainController {
 
     // ---------- FXML Components ----------
@@ -41,7 +38,6 @@ public class MainController {
     @FXML private Button settingsButton;
     @FXML private Button exitButton;
 
-    // ---------- State ----------
     private UiModel model;
     private WeighService weighService;
     private ConfigDao configDao;
@@ -55,9 +51,6 @@ public class MainController {
         FIRST_WEIGHT_DONE,
         COMPLETED
     }
-
-    private Phase phase = Phase.IDLE;
-    private int receiptCounter = 3;
 
     public void init(UiModel model,
                      WeighService weighService,
@@ -106,7 +99,6 @@ public class MainController {
 
         completeRecordsTable.setItems(completeRecords);
 
-        // Configure columns for complete records table
         TableColumn<Record, String> dateInCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(0);
         TableColumn<Record, String> dateOutCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(1);
         TableColumn<Record, String> timeInCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(2);

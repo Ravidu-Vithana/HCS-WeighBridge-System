@@ -32,12 +32,12 @@
 
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <HBox spacing="5" alignment="CENTER_LEFT">
-                        <Label text="📞 0763738202"
+                        <Label text="0763738202"
                                styleClass="header-contact" />
                     </HBox>
 
                     <HBox spacing="5" alignment="CENTER_LEFT">
-                        <Label text="✉ raviduyashith123@gmail.com"
+                        <Label text="raviduyashith123@gmail.com"
                                styleClass="header-contact" />
                     </HBox>
                 </HBox>
@@ -70,20 +70,20 @@
                            -fx-background-color: transparent;
                            -fx-border-width: 0;">
             <content>
-                <VBox spacing="6" alignment="TOP_CENTER">
+                <VBox spacing="10" alignment="TOP_CENTER">
                     <padding>
-                        <Insets top="8" right="20" bottom="8" left="20"/>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
                     </padding>
 
                     <!-- Main Grid: Left (Weight/Form) and Right (Table/Actions) -->
-                    <GridPane hgap="6" vgap="6">
+                    <GridPane hgap="10" vgap="10">
                         <columnConstraints>
                             <ColumnConstraints percentWidth="35"/>
                             <ColumnConstraints percentWidth="65"/>
                         </columnConstraints>
 
                         <!-- ========= LEFT COLUMN: Weight Display and Input Form ========= -->
-                        <VBox spacing="6" GridPane.columnIndex="0">
+                        <VBox spacing="10" GridPane.columnIndex="0">
                             <!-- Current Weight Display -->
                             <VBox spacing="5"
                                   style="-fx-background-color: linear-gradient(to bottom right, #d1fae5, #ccfbf1);
@@ -161,7 +161,7 @@
                         </VBox>
 
                         <!-- ========= RIGHT COLUMN: Recent Weighings and Actions ========= -->
-                        <VBox spacing="6" GridPane.columnIndex="1">
+                        <VBox spacing="10" GridPane.columnIndex="1">
                             <!-- Recent First Weighings Table -->
                             <VBox style="-fx-background-color: rgba(255, 255, 255, 0.95);
                                          -fx-background-radius: 8;
@@ -192,7 +192,7 @@
                             </VBox>
 
                             <!-- Action Buttons -->
-                            <HBox spacing="6"
+                            <HBox spacing="15"
                                   alignment="CENTER"
                                   style="-fx-background-color: rgba(255, 255, 255, 0.8);
                                          -fx-background-radius: 8;
@@ -233,7 +233,7 @@
 
                         <!-- Table View for Complete Records -->
                         <TableView fx:id="completeRecordsTable"
-                                   styleClass="table-view">
+                                   styleClass="table-view, complete-records-table">
 
                             <columns>
                                 <TableColumn text="Date In" prefWidth="80"/>
