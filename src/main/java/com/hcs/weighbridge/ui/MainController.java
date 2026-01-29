@@ -323,7 +323,7 @@ public class MainController {
             recentRecords.remove(weighService.getActiveRecord());
             resetRecord();
             showAlert("Second Weight saved successfully!");
-        }else if (weighService.isPendingRecordAvailble(lorry) && !weighService.hasFirstWeight()){
+        }else if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()){
             showAlert("Please select the lorry from the table!");
             resetRecord();
         }else{
