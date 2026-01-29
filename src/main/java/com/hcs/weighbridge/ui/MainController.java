@@ -16,6 +16,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class MainController {
 
     // ---------- FXML Components ----------
@@ -28,7 +30,7 @@ public class MainController {
     @FXML private TextField productField;
     @FXML private TextField driverField;
 
-    @FXML private TableView<Record> recentWeighingsTable;
+    @FXML private TableView<Record> recentRecordsTable;
     @FXML private TableView<Record> completeRecordsTable;
 
     @FXML private Button newButton;
@@ -43,8 +45,8 @@ public class MainController {
     private ConfigDao configDao;
     private UiScaler uiScaler;
 
-    private ObservableList<Record> recentWeighings = FXCollections.observableArrayList();
-    private ObservableList<Record> completeRecords = FXCollections.observableArrayList();
+    private final ObservableList<Record> recentRecords = FXCollections.observableArrayList();
+    private final ObservableList<Record> completeRecords = FXCollections.observableArrayList();
 
     private enum Phase {
         IDLE,
@@ -64,6 +66,7 @@ public class MainController {
         this.uiScaler = new UiScaler(scaleFactor);
 
         setupTables();
+        loadTables();
         bindUi();
         javafx.application.Platform.runLater(() -> {
             applyScaling();
@@ -72,7 +75,7 @@ public class MainController {
             }
         });
 
-        initializeSampleData();
+//        initializeSampleData();
 
         settingsButton.setOnAction(e -> openSettings());
         newButton.setOnAction(e -> resetRecord());
@@ -83,13 +86,13 @@ public class MainController {
     }
 
     private void setupTables() {
-        recentWeighingsTable.setItems(recentWeighings);
+        recentRecordsTable.setItems(recentRecords);
 
-        TableColumn<Record, String> dateCol = (TableColumn<Record, String>) recentWeighingsTable.getColumns().get(0);
-        TableColumn<Record, String> timeCol = (TableColumn<Record, String>) recentWeighingsTable.getColumns().get(1);
-        TableColumn<Record, String> receiptCol = (TableColumn<Record, String>) recentWeighingsTable.getColumns().get(2);
-        TableColumn<Record, String> lorryCol = (TableColumn<Record, String>) recentWeighingsTable.getColumns().get(3);
-        TableColumn<Record, String> weightCol = (TableColumn<Record, String>) recentWeighingsTable.getColumns().get(4);
+        TableColumn<Record, String> dateCol = (TableColumn<Record, String>) recentRecordsTable.getColumns().get(0);
+        TableColumn<Record, String> timeCol = (TableColumn<Record, String>) recentRecordsTable.getColumns().get(1);
+        TableColumn<Record, String> receiptCol = (TableColumn<Record, String>) recentRecordsTable.getColumns().get(2);
+        TableColumn<Record, String> lorryCol = (TableColumn<Record, String>) recentRecordsTable.getColumns().get(3);
+        TableColumn<Record, String> weightCol = (TableColumn<Record, String>) recentRecordsTable.getColumns().get(4);
 
         dateCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDateIn()));
         timeCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTimeIn()));
@@ -125,7 +128,7 @@ public class MainController {
         productCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProductName()));
         driverCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDriverName()));
 
-        recentWeighingsTable.getSelectionModel().selectedItemProperty().addListener(
+        recentRecordsTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSelection, newSelection) -> {
                     if (newSelection != null) {
                         handleRecentWeighingClick(newSelection);
@@ -140,12 +143,25 @@ public class MainController {
                 });
     }
 
+    private void loadTables(){
+        ArrayList<Record> pendingRecords = weighService.getAllPendingRecords();
+        ArrayList<Record> completedRecords = weighService.getAllCompletedRecords();
+        recentRecords.clear();
+        completeRecords.clear();
+        recentRecords.addAll(pendingRecords);
+        completeRecords.addAll(completedRecords);
+    }
+
     private void handleRecentWeighingClick(Record newSelection) {
+        completeRecordsTable.getSelectionModel().clearSelection();
+        loadRecordToFields(newSelection);
         weighService.setFirstWeightRecord(newSelection);
     }
 
     private void handleCompleteRecordClick(Record newSelection) {
+        recentRecordsTable.getSelectionModel().clearSelection();
         weighService.setFullRecord(newSelection);
+        clearAllFields();
     }
 
     private void initializeSampleData() {
@@ -158,7 +174,7 @@ public class MainController {
             record.setLorryNumber(new String[]{"ABC-1234", "XYZ-5678", "LMN-9012", "PQR-3456",
                     "STU-7890", "VWX-2345", "YZA-6789", "BCD-0123"}[i-1]);
             record.setFirstWeight(15000 - (i * 300));
-            recentWeighings.add(record);
+            recentRecords.add(record);
         }
 
         Record record1 = new Record("DEF-9012");
@@ -248,7 +264,7 @@ public class MainController {
             if (weighService.isCompleted()) {
                 Record completed = weighService.getActiveRecord();
                 completeRecords.add(completed);
-                recentWeighings.remove(completed);
+                recentRecords.remove(completed);
                 weighService.clearActiveRecord();
             }
         }
@@ -257,22 +273,23 @@ public class MainController {
     private void resetRecord(){
         weighService.clearActiveRecord();
         weighService.clearFullRecord();
-        recentWeighingsTable.getSelectionModel().clearSelection();
+        recentRecordsTable.getSelectionModel().clearSelection();
         completeRecordsTable.getSelectionModel().clearSelection();
         clearAllFields();
     }
 
     private void clearAllFields() {
         lorryField.clear();
+        lorryField.setEditable(true);
         customerField.clear();
         productField.clear();
         driverField.clear();
     }
 
-    private void loadRecord(long id) {
-        Record record = weighService.loadRecord(id);
+    private void loadRecordToFields(Record record) {
         if (record != null) {
             lorryField.setText(record.getLorryNumber());
+            lorryField.setEditable(false);
             customerField.setText(record.getCustomerName());
             productField.setText(record.getProductName());
             driverField.setText(record.getDriverName());
@@ -303,8 +320,12 @@ public class MainController {
         if(weighService.isPendingRecordAvailble(lorry) && weighService.hasFirstWeight()){
             weighService.saveSecondWeight(currentWeight);
             printFullTicket();
+            recentRecords.remove(weighService.getActiveRecord());
             resetRecord();
             showAlert("Second Weight saved successfully!");
+        }else if (weighService.isPendingRecordAvailble(lorry) && !weighService.hasFirstWeight()){
+            showAlert("Please select the lorry from the table!");
+            resetRecord();
         }else{
             weighService.startTransaction(lorry, customer, product, driver);
             weighService.saveFirstWeight(currentWeight);
@@ -312,6 +333,7 @@ public class MainController {
             resetRecord();
             showAlert("First Weight saved successfully!");
         }
+        loadTables();
 
     }
 

@@ -173,7 +173,7 @@
                                        styleClass="section-header" />
 
                                 <!-- Table View for Recent Weighings -->
-                                <TableView fx:id="recentWeighingsTable"
+                                <TableView fx:id="recentRecordsTable"
                                            styleClass="table-view"
                                            VBox.vgrow="ALWAYS">
 

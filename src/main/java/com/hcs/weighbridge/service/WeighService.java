@@ -1,10 +1,12 @@
 package com.hcs.weighbridge.service;
 
+import com.hcs.weighbridge.constants.RecordStatus;
 import com.hcs.weighbridge.dao.WeighDataDao;
 import com.hcs.weighbridge.model.Record;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class WeighService {
 
@@ -71,6 +73,14 @@ public class WeighService {
         return completedRecord;
     }
 
+    public ArrayList<Record> getAllPendingRecords() {
+        return dao.getAllRecordsFromStatus(RecordStatus.PENDING);
+    }
+
+    public ArrayList<Record> getAllCompletedRecords() {
+        return dao.getAllRecordsFromStatus(RecordStatus.COMPLETED);
+    }
+
     public Record loadRecord(long id) {
         activeRecord = dao.findById(id);
         return activeRecord;
@@ -91,7 +101,7 @@ public class WeighService {
     }
 
     public boolean hasFirstWeight() {
-        return activeRecord != null && activeRecord.getFirstWeight() > 0;
+        return activeRecord != null;
     }
 
     public void setFirstWeightRecord(Record record) {
