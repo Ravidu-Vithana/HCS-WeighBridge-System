@@ -317,7 +317,7 @@ public class MainController {
         }
         int currentWeight = model.liveWeightProperty().get();
 
-        if(weighService.isPendingRecordAvailble(lorry) && weighService.hasFirstWeight()){
+        if(weighService.isPendingRecordAvailable(lorry) && weighService.hasFirstWeight()){
             weighService.saveSecondWeight(currentWeight);
             printFullTicket();
             recentRecords.remove(weighService.getActiveRecord());
