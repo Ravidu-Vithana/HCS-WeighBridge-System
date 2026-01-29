@@ -18,8 +18,8 @@ public class WeighService {
         this.dao = dao;
     }
 
-    public Record startTransaction(String lorryNo, String customerName,
-                                   String productName, String driverName) {
+    public void startTransaction(String lorryNo, String customerName,
+                                 String productName, String driverName) {
 
         activeRecord = new Record(lorryNo);
         activeRecord.setCustomerName(customerName);
@@ -27,7 +27,6 @@ public class WeighService {
         activeRecord.setDriverName(driverName);
         dao.createTransaction(activeRecord);
 
-        return activeRecord;
     }
 
     public void saveFirstWeight(int weight) {
@@ -64,7 +63,6 @@ public class WeighService {
 
         dao.saveSecondWeightAndComplete(activeRecord.getId(), weight, dateOut, timeOut);
 
-        Record completedRecord = activeRecord;
         fullRecord = activeRecord;
         activeRecord = null;
     }
