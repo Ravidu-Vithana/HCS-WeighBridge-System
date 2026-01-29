@@ -13,7 +13,7 @@ public class WeighDataDao {
     }
 
     public void createTransaction(Record record) {
-        String sql = "INSERT INTO weigh_data (lorry_no, customer_name, product_name, driver_name) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO weigh_data (lorry_no, customer_name, product_name, driver_name) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, record.getLorryNumber());
