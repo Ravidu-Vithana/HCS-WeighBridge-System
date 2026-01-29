@@ -202,7 +202,7 @@ public final class DatabaseConfig {
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('data_bits', '7')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('stop_bits', '"+ SerialPort.ONE_STOP_BIT +"')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('parity', '"+SerialPort.EVEN_PARITY+"')",
-                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('ui_scale_factor', '1.0')",
+                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('ui_scale_factor', '2.0')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('receipt_counter', '1')"
         };
 

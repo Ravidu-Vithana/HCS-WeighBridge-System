@@ -136,12 +136,6 @@
     -fx-padding: 0;
 }
 
-.complete-records-table {
-    -fx-pref-height: 200px;
-    -fx-min-height: 100px;
-    -fx-max-height: 300px;
-}
-
 .table-view .column-header-background {
     -fx-background-color: #f8fafc;
     -fx-border-color: #e2e8f0;
