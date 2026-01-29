@@ -32,7 +32,7 @@ public class WeighService {
 
     public void saveFirstWeight(int weight) {
         if (activeRecord == null) {
-            throw new IllegalStateException("No active transaction");
+            return;
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -46,9 +46,9 @@ public class WeighService {
         dao.saveFirstWeight(activeRecord.getId(), weight, date, time);
     }
 
-    public Record saveSecondWeight(int weight) {
+    public void saveSecondWeight(int weight) {
         if (activeRecord == null) {
-            throw new IllegalStateException("No active transaction");
+            return;
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -67,8 +67,6 @@ public class WeighService {
         Record completedRecord = activeRecord;
         fullRecord = activeRecord;
         activeRecord = null;
-
-        return completedRecord;
     }
 
     public Record loadRecord(long id) {
