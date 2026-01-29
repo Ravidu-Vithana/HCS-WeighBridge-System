@@ -150,7 +150,7 @@ public final class DatabaseConfig {
 
         String createWeighDataTable = "CREATE TABLE IF NOT EXISTS weigh_data (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY," +
-                "lorry_no VARCHAR(50) UNIQUE NOT NULL," +
+                "lorry_no VARCHAR(50) NOT NULL," +
                 "first_weight INT," +
                 "second_weight INT," +
                 "net_weight INT," +
