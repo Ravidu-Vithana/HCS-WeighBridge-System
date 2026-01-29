@@ -76,7 +76,7 @@ public class WeighService {
         return activeRecord;
     }
 
-    public Boolean isPendingRecordAvailble(String lorryNo) { return dao.isPendingRecordAvailable(lorryNo); }
+    public Boolean isPendingRecordAvailable(String lorryNo) { return dao.isPendingRecordAvailable(lorryNo); }
 
     public Record getActiveRecord() {
         return activeRecord;
