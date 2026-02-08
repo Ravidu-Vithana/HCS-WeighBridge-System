@@ -92,7 +92,10 @@ public class PrintService {
             // 2. Prepare Parameters
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("PrintMode", mode.name());
-            // Add any other scalar parameters if needed
+            parameters.put("CompanyName", "HORAWADUNNA COPRA STORES WEIGHBRIDGE");
+            parameters.put("CompanyContactNumber1", "0776136447");
+            parameters.put("CompanyContactNumber2", "0372246292");
+            parameters.put("Technology", "Technology Provided by HCS Solutions +94 76 3738202");
 
             // 3. Prepare Data Source
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(Collections.singletonList(record));

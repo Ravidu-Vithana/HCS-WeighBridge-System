@@ -8,13 +8,17 @@
               columnWidth="555"
               leftMargin="20"
               rightMargin="20"
-              topMargin="40"
+              topMargin="30"
               bottomMargin="20"
               uuid="d2729124-766a-4638-be64-672522778734">
 
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 
     <parameter name="PrintMode" class="java.lang.String"/>
+    <parameter name="CompanyName" class="java.lang.String"/>
+    <parameter name="CompanyContactNumber1" class="java.lang.String"/>
+    <parameter name="CompanyContactNumber2" class="java.lang.String"/>
+    <parameter name="Technology" class="java.lang.String"/>
 
     <field name="id" class="java.lang.Long"/>
     <field name="lorryNumber" class="java.lang.String"/>
@@ -36,20 +40,20 @@
                 <reportElement x="0" y="0" width="555" height="40" uuid="702c2193-4700-410a-b333-7284f3ccb119">
                     <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
                 </reportElement>
-                <staticText>
+                <textField isBlankWhenNull="true">
                     <reportElement x="0" y="0" width="555" height="20" uuid="071a0670-3889-4e00-8304-7a32943343bd"/>
                     <textElement textAlignment="Center" verticalAlignment="Middle">
                         <font size="14" isBold="true"/>
                     </textElement>
-                    <text><![CDATA[HCS WEIGH BRIDGE]]></text>
-                </staticText>
-                <staticText>
+                    <textFieldExpression><![CDATA[$P{CompanyName}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
                     <reportElement x="0" y="20" width="555" height="15" uuid="55c65507-68fc-4c22-9c17-640a2df3bed4"/>
                     <textElement textAlignment="Center" verticalAlignment="Middle">
                         <font size="10"/>
                     </textElement>
-                    <text><![CDATA[Tel: 0771234567 | info@hcs.lk]]></text>
-                </staticText>
+                    <textFieldExpression><![CDATA["Tel: " + $P{CompanyContactNumber1} + " / " + $P{CompanyContactNumber2}]]></textFieldExpression>
+                </textField>
                 <line>
                     <reportElement x="0" y="38" width="555" height="1" uuid="c2f02953-ad2a-4316-9571-0498b3f88921"/>
                 </line>
@@ -179,6 +183,25 @@
                     <textElement textAlignment="Center"/>
                     <text><![CDATA[______________________]]></text>
                 </staticText>
+            </frame>
+
+            <!-- ROW 6: TECHNOLOGY FOOTER -->
+            <frame>
+                <reportElement x="0" y="350" width="555" height="30" uuid="a1b2c3d4-e5f6-4748-9a10-b1c2d3e4f5a6">
+                    <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
+                </reportElement>
+
+                <line>
+                    <reportElement x="0" y="0" width="555" height="1" uuid="e1f2a3b4-c5d6-4748-9a10-b1c2d3e4f5a6"/>
+                </line>
+
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="5" width="555" height="20" uuid="f5e4d3c2-b1a0-4958-8a12-c1d2e3f4a5b6"/>
+                    <textElement textAlignment="Center" verticalAlignment="Middle">
+                        <font size="8" isItalic="true"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA[$P{Technology}]]></textFieldExpression>
+                </textField>
             </frame>
         </band>
     </detail>
