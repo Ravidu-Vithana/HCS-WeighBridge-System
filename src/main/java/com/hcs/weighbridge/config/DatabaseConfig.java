@@ -72,7 +72,8 @@ public final class DatabaseConfig {
             CHARACTER_ENCODING = props.getProperty("db.characterEncoding", CHARACTER_ENCODING);
 
             logger.info("Configuration loaded successfully from file");
-            logger.debug("Database settings - Host: {}, Port: {}, Database: {}, User: {}, SSL: {}, Unicode: {}, Encoding: {}",
+            logger.debug(
+                    "Database settings - Host: {}, Port: {}, Database: {}, User: {}, SSL: {}, Unicode: {}, Encoding: {}",
                     DB_HOST, DB_PORT, DB_NAME, DB_USER, USE_SSL, USE_UNICODE, CHARACTER_ENCODING);
             System.out.println("Database configuration loaded successfully.");
 
@@ -112,12 +113,10 @@ public final class DatabaseConfig {
 
             try (
                     Connection baseConn = DriverManager.getConnection(getBaseUrl(), DB_USER, DB_PASSWORD);
-                    Statement stmt = baseConn.createStatement()
-            ) {
+                    Statement stmt = baseConn.createStatement()) {
                 String createDBSQL = String.format(
                         "CREATE DATABASE IF NOT EXISTS %s CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-                        DB_NAME
-                );
+                        DB_NAME);
                 logger.debug("Executing database creation SQL: {}", createDBSQL);
                 stmt.executeUpdate(createDBSQL);
                 logger.info("Database '{}' checked/created successfully", DB_NAME);
@@ -176,6 +175,15 @@ public final class DatabaseConfig {
                 "INDEX idx_config_key (config_key)" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
+        String createUsersTable = "CREATE TABLE IF NOT EXISTS users (" +
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "username VARCHAR(50) NOT NULL UNIQUE," +
+                "password VARCHAR(100) NOT NULL," +
+                "role VARCHAR(20) DEFAULT 'USER'," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "INDEX idx_username (username)" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
         try (Statement stmt = connection.createStatement()) {
             logger.debug("Creating 'weigh_data' table if not exists");
             stmt.executeUpdate(createWeighDataTable);
@@ -186,6 +194,11 @@ public final class DatabaseConfig {
             stmt.executeUpdate(createAppConfigTable);
             logger.info("Table 'app_config' checked/created successfully");
             System.out.println("Table 'app_config' checked/created successfully.");
+
+            logger.debug("Creating 'users' table if not exists");
+            stmt.executeUpdate(createUsersTable);
+            logger.info("Table 'users' checked/created successfully");
+            System.out.println("Table 'users' checked/created successfully.");
 
             insertDefaultConfigurations();
         } catch (SQLException e) {
@@ -200,11 +213,15 @@ public final class DatabaseConfig {
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('com_port', 'COM1')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('baud_rate', '2400')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('data_bits', '7')",
-                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('stop_bits', '"+ SerialPort.ONE_STOP_BIT +"')",
-                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('parity', '"+SerialPort.EVEN_PARITY+"')",
+                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('stop_bits', '"
+                        + SerialPort.ONE_STOP_BIT + "')",
+                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('parity', '" + SerialPort.EVEN_PARITY
+                        + "')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('ui_scale_factor', '2.0')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('receipt_counter', '1')"
         };
+
+        String insertDefaultUser = "INSERT IGNORE INTO users (username, password, role) VALUES ('root', 'admin', 'ADMIN')";
 
         try (Statement stmt = connection.createStatement()) {
             int successCount = 0;
@@ -221,6 +238,20 @@ public final class DatabaseConfig {
             }
             logger.info("Inserted {} default configurations into app_config", successCount);
             System.out.println("Default configurations inserted/checked.");
+
+            // Insert default user
+            try {
+                int userRows = stmt.executeUpdate(insertDefaultUser);
+                if (userRows > 0) {
+                    logger.info("Default admin user 'root' created successfully");
+                    System.out.println("Default admin user 'root' created.");
+                } else {
+                    logger.debug("Default admin user 'root' already exists");
+                }
+            } catch (SQLException e) {
+                logger.warn("Failed to insert default user: {}", e.getMessage());
+            }
+
         } catch (SQLException e) {
             logger.warn("Could not insert default configurations: {}", e.getMessage(), e);
             System.err.println("Warning: Could not insert default configurations: " + e.getMessage());

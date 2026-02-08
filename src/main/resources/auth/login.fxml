@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import java.net.URL?>
+
+<BorderPane fx:id="rootPane"
+            xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.hcs.weighbridge.ui.LoginController"
+            prefWidth="800"
+            prefHeight="600"
+            style="-fx-background-color: linear-gradient(to bottom right, #f8fafc, #dbeafe, #f1f5f9);">
+
+    <stylesheets>
+        <URL value="@../styles.css"/>
+    </stylesheets>
+
+    <!-- ================= TOP HEADER (Copied from main.fxml) ================= -->
+    <top>
+        <HBox spacing="10"
+              alignment="CENTER_LEFT"
+              style="-fx-background-color: linear-gradient(to right, #334155, #475569); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
+            <padding>
+                <Insets top="10" right="30" bottom="10" left="30"/>
+            </padding>
+
+            <VBox spacing="1">
+                <Label text="HCS Weighbridge System"
+                       styleClass="header-title" />
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Label text="0763738202"
+                               styleClass="header-contact" />
+                    </HBox>
+
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Label text="raviduyashith123@gmail.com"
+                               styleClass="header-contact" />
+                    </HBox>
+                </HBox>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+             <Button fx:id="exitButton"
+                        text="Exit"
+                        styleClass="exit-button">
+             </Button>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox alignment="CENTER" spacing="20">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <VBox spacing="15" alignment="CENTER"
+                  maxWidth="400"
+                  style="-fx-background-color: rgba(255, 255, 255, 0.9);
+                         -fx-background-radius: 10;
+                         -fx-padding: 30;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+
+                <Label text="Login" styleClass="section-header" style="-fx-font-size: 24px;"/>
+
+                <VBox spacing="5">
+                    <Label text="Username" styleClass="form-label"/>
+                    <TextField fx:id="usernameField" promptText="Enter username" styleClass="form-field"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Password" styleClass="form-label"/>
+                    <PasswordField fx:id="passwordField" promptText="Enter password" styleClass="form-field"/>
+                </VBox>
+
+                <Label fx:id="errorLabel" text="Invalid credentials" textFill="red" visible="false"/>
+
+                <Button fx:id="loginButton" text="Login" styleClass="print-first-button" maxWidth="Infinity"/>
+
+            </VBox>
+        </VBox>
+    </center>
+
+</BorderPane>
