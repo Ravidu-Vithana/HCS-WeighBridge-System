@@ -6,6 +6,7 @@ import com.hcs.weighbridge.model.Record;
 import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.UiScaler;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -120,6 +121,8 @@ public class MainController {
         printFullButton.setOnAction(e -> printFullTicket());
         logoutButton.setOnAction(e -> handleLogout());
         exitButton.setOnAction(e -> handleExit());
+
+        Platform.runLater(() -> lorryField.requestFocus());
     }
 
     private void setupKeyboardShortcuts() {
@@ -416,6 +419,7 @@ public class MainController {
         recentRecordsTable.getSelectionModel().clearSelection();
         completeRecordsTable.getSelectionModel().clearSelection();
         clearAllFields();
+        Platform.runLater(() -> lorryField.requestFocus());
     }
 
     private void clearAllFields() {
