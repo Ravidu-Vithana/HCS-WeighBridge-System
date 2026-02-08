@@ -93,6 +93,7 @@ public class PrintService {
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("PrintMode", mode.name());
             parameters.put("CompanyName", "HORAWADUNNA COPRA STORES WEIGHBRIDGE");
+            parameters.put("CompanyAddress", "283/1, Bammanna Road, Kudalupoththa, Narangoda.");
             parameters.put("CompanyContactNumber1", "0776136447");
             parameters.put("CompanyContactNumber2", "0372246292");
             parameters.put("Technology", "Technology Provided by HCS Solutions +94 76 3738202");

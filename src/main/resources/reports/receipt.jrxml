@@ -16,6 +16,7 @@
 
     <parameter name="PrintMode" class="java.lang.String"/>
     <parameter name="CompanyName" class="java.lang.String"/>
+    <parameter name="CompanyAddress" class="java.lang.String"/>
     <parameter name="CompanyContactNumber1" class="java.lang.String"/>
     <parameter name="CompanyContactNumber2" class="java.lang.String"/>
     <parameter name="Technology" class="java.lang.String"/>
@@ -37,7 +38,7 @@
         <band height="380" splitType="Stretch">
             <!-- ROW 1: HEADER -->
             <frame>
-                <reportElement x="0" y="0" width="555" height="40" uuid="702c2193-4700-410a-b333-7284f3ccb119">
+                <reportElement x="0" y="0" width="555" height="55" uuid="702c2193-4700-410a-b333-7284f3ccb119">
                     <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
                 </reportElement>
                 <textField isBlankWhenNull="true">
@@ -48,20 +49,27 @@
                     <textFieldExpression><![CDATA[$P{CompanyName}]]></textFieldExpression>
                 </textField>
                 <textField isBlankWhenNull="true">
-                    <reportElement x="0" y="20" width="555" height="15" uuid="55c65507-68fc-4c22-9c17-640a2df3bed4"/>
+                    <reportElement x="0" y="20" width="555" height="12" uuid="a2b3c4d5-e6f7-4849-9a11-b2c3d4e5f6a7"/>
                     <textElement textAlignment="Center" verticalAlignment="Middle">
-                        <font size="10"/>
+                        <font size="9"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA[$P{CompanyAddress}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="32" width="555" height="12" uuid="55c65507-68fc-4c22-9c17-640a2df3bed4"/>
+                    <textElement textAlignment="Center" verticalAlignment="Middle">
+                        <font size="9"/>
                     </textElement>
                     <textFieldExpression><![CDATA["Tel: " + $P{CompanyContactNumber1} + " / " + $P{CompanyContactNumber2}]]></textFieldExpression>
                 </textField>
                 <line>
-                    <reportElement x="0" y="38" width="555" height="1" uuid="c2f02953-ad2a-4316-9571-0498b3f88921"/>
+                    <reportElement x="0" y="53" width="555" height="1" uuid="c2f02953-ad2a-4316-9571-0498b3f88921"/>
                 </line>
             </frame>
 
             <!-- ROW 2: MAIN DATA -->
             <frame>
-                <reportElement x="0" y="50" width="555" height="100" uuid="67664539-75a7-47b6-b088-725bf6e2bc61">
+                <reportElement x="0" y="65" width="555" height="100" uuid="67664539-75a7-47b6-b088-725bf6e2bc61">
                     <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
                 </reportElement>
 
@@ -98,7 +106,7 @@
 
             <!-- ROW 3: OUT DATA -->
             <frame>
-                <reportElement x="0" y="160" width="555" height="50" uuid="0e82c81e-84cb-4560-b6f1-a1286c954e60">
+                <reportElement x="0" y="175" width="555" height="45" uuid="0e82c81e-84cb-4560-b6f1-a1286c954e60">
                     <printWhenExpression><![CDATA[$P{PrintMode}.equals("SECOND_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
                 </reportElement>
 
@@ -120,7 +128,7 @@
 
             <!-- ROW 4: NET WEIGHT -->
             <frame>
-                <reportElement x="0" y="220" width="555" height="40" uuid="cdbf8f47-8cf1-450f-a931-c052be534927">
+                <reportElement x="0" y="220" width="555" height="30" uuid="cdbf8f47-8cf1-450f-a931-c052be534927">
                     <printWhenExpression><![CDATA[$P{PrintMode}.equals("SECOND_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
                 </reportElement>
 
@@ -146,7 +154,7 @@
 
             <!-- ROW 5: SIGNATURES -->
             <frame>
-                <reportElement x="0" y="280" width="555" height="60" uuid="3c1145ea-de0c-4573-b3c9-047e1bd23046">
+                <reportElement x="0" y="270" width="555" height="60" uuid="3c1145ea-de0c-4573-b3c9-047e1bd23046">
                     <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
                 </reportElement>
 
@@ -187,7 +195,7 @@
 
             <!-- ROW 6: TECHNOLOGY FOOTER -->
             <frame>
-                <reportElement x="0" y="350" width="555" height="30" uuid="a1b2c3d4-e5f6-4748-9a10-b1c2d3e4f5a6">
+                <reportElement x="0" y="340" width="555" height="30" uuid="a1b2c3d4-e5f6-4748-9a10-b1c2d3e4f5a6">
                     <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
                 </reportElement>
 
