@@ -1,7 +1,9 @@
 package com.hcs.weighbridge.ui;
 
+import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.UiScaler;
 import javafx.beans.property.SimpleStringProperty;
@@ -319,7 +321,7 @@ public class MainController {
 
         if(weighService.isPendingRecordAvailable(lorry) && weighService.hasFirstWeight()){
             weighService.saveSecondWeight(currentWeight);
-            printFullTicket();
+            printSecondTicket();
             recentRecords.remove(weighService.getActiveRecord());
             resetRecord();
             showAlert("Second Weight saved successfully!");
@@ -338,26 +340,50 @@ public class MainController {
     }
 
     private void printFirstTicket() {
-        Record selectedRecord = weighService.getActiveRecord();
-        if(selectedRecord == null){
-            showAlert("Select a record first!");
+        Record record = weighService.getActiveRecord();
+
+        if (record == null) {
+            showAlert("No active record to print");
             return;
         }
 
-        showAlert("First ticket sent to printer");
-        System.out.println("Printing first ticket...");
+        printReceipt(record, PrintMode.FIRST_WEIGHT);
+    }
+
+    private void printSecondTicket() {
+        Record record = weighService.getFullRecord();
+
+        if (record == null) {
+            showAlert("No completed record to print");
+            return;
+        }
+
+        printReceipt(record, PrintMode.SECOND_WEIGHT);
     }
 
     private void printFullTicket() {
-        Record selectedRecord = weighService.getFullRecord();
-        if(selectedRecord == null){
-            showAlert("Select a record first!");
+        Record record = weighService.getFullRecord();
+
+        if (record == null) {
+            showAlert("No completed record selected");
             return;
         }
 
-        showAlert("Full ticket sent to printer");
-        System.out.println("Printing full ticket...");
+        printReceipt(record, PrintMode.FULL);
     }
+
+    private void printReceipt(Record record, PrintMode mode) {
+
+        try {
+            PrintService printService = new PrintService();
+            printService.printReceiptSilent(record, mode);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Print failed: " + e.getMessage());
+        }
+    }
+
 
     private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

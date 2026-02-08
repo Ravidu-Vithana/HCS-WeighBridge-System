@@ -1,0 +1,216 @@
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="receipt"
+              pageWidth="595"
+              pageHeight="842"
+              orientation="Portrait"
+              columnWidth="555"
+              leftMargin="20"
+              rightMargin="20"
+              topMargin="20"
+              bottomMargin="20"
+              uuid="d2729124-766a-4638-be64-672522778734">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+
+    <parameter name="PrintMode" class="java.lang.String"/>
+    <parameter name="CompanyName" class="java.lang.String"/>
+    <parameter name="CompanyAddress" class="java.lang.String"/>
+    <parameter name="CompanyContactNumber1" class="java.lang.String"/>
+    <parameter name="CompanyContactNumber2" class="java.lang.String"/>
+    <parameter name="Technology" class="java.lang.String"/>
+
+    <field name="id" class="java.lang.Long"/>
+    <field name="lorryNumber" class="java.lang.String"/>
+    <field name="customerName" class="java.lang.String"/>
+    <field name="productName" class="java.lang.String"/>
+    <field name="driverName" class="java.lang.String"/>
+    <field name="dateIn" class="java.lang.String"/>
+    <field name="timeIn" class="java.lang.String"/>
+    <field name="dateOut" class="java.lang.String"/>
+    <field name="timeOut" class="java.lang.String"/>
+    <field name="firstWeight" class="java.lang.Integer"/>
+    <field name="secondWeight" class="java.lang.Integer"/>
+    <field name="netWeight" class="java.lang.Integer"/>
+
+    <detail>
+        <band height="380" splitType="Stretch">
+            <!-- ROW 1: HEADER -->
+            <frame>
+                <reportElement x="0" y="0" width="555" height="55" uuid="702c2193-4700-410a-b333-7284f3ccb119">
+                    <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
+                </reportElement>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="0" width="555" height="20" uuid="071a0670-3889-4e00-8304-7a32943343bd"/>
+                    <textElement textAlignment="Center" verticalAlignment="Middle">
+                        <font size="14" isBold="true"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA[$P{CompanyName}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="20" width="555" height="12" uuid="a2b3c4d5-e6f7-4849-9a11-b2c3d4e5f6a7"/>
+                    <textElement textAlignment="Center" verticalAlignment="Middle">
+                        <font size="9"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA[$P{CompanyAddress}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="32" width="555" height="12" uuid="55c65507-68fc-4c22-9c17-640a2df3bed4"/>
+                    <textElement textAlignment="Center" verticalAlignment="Middle">
+                        <font size="9"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA["Tel: " + $P{CompanyContactNumber1} + " / " + $P{CompanyContactNumber2}]]></textFieldExpression>
+                </textField>
+                <line>
+                    <reportElement x="0" y="53" width="555" height="1" uuid="c2f02953-ad2a-4316-9571-0498b3f88921"/>
+                </line>
+            </frame>
+
+            <!-- ROW 2: MAIN DATA -->
+            <frame>
+                <reportElement x="0" y="65" width="555" height="100" uuid="67664539-75a7-47b6-b088-725bf6e2bc61">
+                    <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
+                </reportElement>
+
+                <!-- LEFT COLUMN : Shifted Right by 40px -->
+                <staticText><reportElement x="50" y="0" width="80" height="20" uuid="f90246a4-8451-4191-8488-842475e81d76"/><text><![CDATA[Date In:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="140" y="0" width="150" height="20" uuid="ad619d08-a5b8-443b-871d-15eec7d7c18f"/><textFieldExpression><![CDATA[$F{dateIn}]]></textFieldExpression></textField>
+
+                <staticText><reportElement x="50" y="25" width="80" height="20" uuid="ce1df41a-e99d-4293-8408-0bf4581f182c"/><text><![CDATA[Time In:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="140" y="25" width="150" height="20" uuid="29339739-ba18-4e89-a2a1-fa1d4e022378"/><textFieldExpression><![CDATA[$F{timeIn}]]></textFieldExpression></textField>
+
+                <staticText><reportElement x="50" y="50" width="80" height="20" uuid="7e58df9b-c8c3-4d43-987d-81523924f7e2"/><text><![CDATA[Vehicle No:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="140" y="50" width="150" height="20" uuid="ef8c3461-f090-4824-a28c-0359bdfd2062"/><textFieldExpression><![CDATA[$F{lorryNumber}]]></textFieldExpression></textField>
+
+                <staticText><reportElement x="50" y="75" width="80" height="20" uuid="f0464f15-325d-40d0-be74-83957eb03c14"/><text><![CDATA[First Weight:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="140" y="75" width="150" height="20" uuid="b194fb84-1845-423c-a901-db263fc02183"/><textFieldExpression><![CDATA[$F{firstWeight} + " kg"]]></textFieldExpression></textField>
+
+                <!-- RIGHT COLUMN : Shifted Left by 5px -->
+                <staticText><reportElement x="275" y="0" width="80" height="20" uuid="55e9ba7c-7835-43a0-9e6e-21ef655079a4"/><text><![CDATA[Receipt No:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="365" y="0" width="150" height="20" uuid="c121e25e-044f-4d93-9c59-f14d8d472288"/><textFieldExpression><![CDATA[$F{id}]]></textFieldExpression></textField>
+
+                <staticText><reportElement x="275" y="25" width="80" height="20" uuid="0944063c-3837-4f6c-85a7-951590fb69e6"/><text><![CDATA[Customer:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="365" y="25" width="150" height="20" uuid="ec30e060-f111-4712-ba9a-e274a742a0fe"/><textFieldExpression><![CDATA[$F{customerName}]]></textFieldExpression></textField>
+
+                <staticText><reportElement x="275" y="50" width="80" height="20" uuid="88439396-e17f-4424-9b04-f57db5b7e3e4"/><text><![CDATA[Product:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="365" y="50" width="150" height="20" uuid="169c4f14-5d51-46ca-a5bf-8f2c00dd2274"/><textFieldExpression><![CDATA[$F{productName}]]></textFieldExpression></textField>
+
+                <staticText><reportElement x="275" y="75" width="80" height="20" uuid="a7102061-0d3a-4467-8af2-8c1d53350165"/><text><![CDATA[Driver:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="365" y="75" width="150" height="20" uuid="b5c46e01-2e63-4fc1-bec3-0e31bd2810cd"/><textFieldExpression><![CDATA[$F{driverName}]]></textFieldExpression></textField>
+
+                <line>
+                    <reportElement x="0" y="98" width="555" height="1" uuid="6e4ec6df-fc7c-471b-a496-d2ef84a70b43"/>
+                </line>
+            </frame>
+
+            <!-- ROW 3: OUT DATA -->
+            <frame>
+                <reportElement x="0" y="175" width="555" height="45" uuid="0e82c81e-84cb-4560-b6f1-a1286c954e60">
+                    <printWhenExpression><![CDATA[$P{PrintMode}.equals("SECOND_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
+                </reportElement>
+
+                <!-- Shifted Right by 40px -->
+                <staticText><reportElement x="50" y="0" width="80" height="20" uuid="766a5e1d-392c-4b67-8735-e65b75ad07cd"/><text><![CDATA[Date Out:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="140" y="0" width="150" height="20" uuid="4088a531-97b7-4c3d-8e6c-0e78c8c41ec3"/><textFieldExpression><![CDATA[$F{dateOut}]]></textFieldExpression></textField>
+
+                <staticText><reportElement x="50" y="25" width="80" height="20" uuid="2a0fb11b-fb09-41a4-998f-ab2711d9f046"/><text><![CDATA[Time Out:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="140" y="25" width="150" height="20" uuid="55e00318-6f17-4fd7-8975-d143c748c081"/><textFieldExpression><![CDATA[$F{timeOut}]]></textFieldExpression></textField>
+
+                <!-- Shifted Left by 5px -->
+                <staticText><reportElement x="275" y="0" width="80" height="20" uuid="b245a6c3-9828-4448-b4bd-ba503b44b257"/><text><![CDATA[Second Weight:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="365" y="0" width="150" height="20" uuid="4001d944-e224-4f0f-bb93-af215682845c"/><textFieldExpression><![CDATA[$F{secondWeight} + " kg"]]></textFieldExpression></textField>
+
+                <line>
+                    <reportElement x="0" y="48" width="555" height="1" uuid="6d5f7f2b-7c15-46aa-bf36-b52b34a53032"/>
+                </line>
+            </frame>
+
+            <!-- ROW 4: NET WEIGHT -->
+            <frame>
+                <reportElement x="0" y="220" width="555" height="30" uuid="cdbf8f47-8cf1-450f-a931-c052be534927">
+                    <printWhenExpression><![CDATA[$P{PrintMode}.equals("SECOND_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
+                </reportElement>
+
+                <staticText>
+                    <reportElement x="0" y="0" width="270" height="40" uuid="c2525164-cd25-4c01-afed-689531853f6c"/>
+                    <textElement textAlignment="Right" verticalAlignment="Middle">
+                        <font size="14" isBold="true"/>
+                    </textElement>
+                    <text><![CDATA[NET WEIGHT : ]]></text>
+                </staticText>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="280" y="0" width="270" height="40" uuid="a632e18b-821d-44aa-bd8d-71b9c704c7da"/>
+                    <textElement verticalAlignment="Middle">
+                        <font size="18" isBold="true"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA[$F{netWeight} + " kg"]]></textFieldExpression>
+                </textField>
+
+                <line>
+                    <reportElement x="0" y="38" width="555" height="1" uuid="378417c8-9f33-4f93-8ef4-6f34e2b02f5a"/>
+                </line>
+            </frame>
+
+            <!-- ROW 5: SIGNATURES -->
+            <frame>
+                <reportElement x="0" y="270" width="555" height="60" uuid="3c1145ea-de0c-4573-b3c9-047e1bd23046">
+                    <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
+                </reportElement>
+
+                <!-- Shifted to align better -->
+                <staticText>
+                    <reportElement x="30" y="40" width="150" height="20" uuid="9395f87b-4497-4767-be75-77ad9f848520"/>
+                    <textElement textAlignment="Center"/>
+                    <text><![CDATA[Weighbridge Operator]]></text>
+                </staticText>
+                <staticText>
+                    <reportElement x="30" y="25" width="150" height="15" uuid="1635848c-d2c6-474d-a2c7-03e5c7072559"/>
+                    <textElement textAlignment="Center"/>
+                    <text><![CDATA[______________________]]></text>
+                </staticText>
+
+                <staticText>
+                    <reportElement x="202" y="40" width="150" height="20" uuid="4ec8229b-7ec7-418b-ac24-6997a480436d"/>
+                    <textElement textAlignment="Center"/>
+                    <text><![CDATA[Security]]></text>
+                </staticText>
+                <staticText>
+                    <reportElement x="202" y="25" width="150" height="15" uuid="96c310fb-c003-4f11-bba4-c5ea4913217d"/>
+                    <textElement textAlignment="Center"/>
+                    <text><![CDATA[______________________]]></text>
+                </staticText>
+
+                <staticText>
+                    <reportElement x="375" y="40" width="150" height="20" uuid="60100650-657e-40e1-ad4e-5de68f5c3529"/>
+                    <textElement textAlignment="Center"/>
+                    <text><![CDATA[Driver]]></text>
+                </staticText>
+                <staticText>
+                    <reportElement x="375" y="25" width="150" height="15" uuid="7cf20f67-85b5-4139-952b-3127814b73b6"/>
+                    <textElement textAlignment="Center"/>
+                    <text><![CDATA[______________________]]></text>
+                </staticText>
+            </frame>
+
+            <!-- ROW 6: TECHNOLOGY FOOTER -->
+            <frame>
+                <reportElement x="0" y="340" width="555" height="30" uuid="a1b2c3d4-e5f6-4748-9a10-b1c2d3e4f5a6">
+                    <printWhenExpression><![CDATA[$P{PrintMode}.equals("FIRST_WEIGHT") || $P{PrintMode}.equals("FULL")]]></printWhenExpression>
+                </reportElement>
+
+                <line>
+                    <reportElement x="0" y="0" width="555" height="1" uuid="e1f2a3b4-c5d6-4748-9a10-b1c2d3e4f5a6"/>
+                </line>
+
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="5" width="555" height="20" uuid="f5e4d3c2-b1a0-4958-8a12-c1d2e3f4a5b6"/>
+                    <textElement textAlignment="Center" verticalAlignment="Middle">
+                        <font size="8" isItalic="true"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA[$P{Technology}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </detail>
+</jasperReport>
