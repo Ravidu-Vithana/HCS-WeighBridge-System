@@ -100,6 +100,7 @@ public class MainController {
             applyScaling();
             if (rootPane != null && rootPane.getScene() != null) {
                 rootPane.getScene().getRoot().applyCss();
+                setupKeyboardShortcuts();
             }
         });
 
@@ -119,6 +120,29 @@ public class MainController {
         printFullButton.setOnAction(e -> printFullTicket());
         logoutButton.setOnAction(e -> handleLogout());
         exitButton.setOnAction(e -> handleExit());
+    }
+
+    private void setupKeyboardShortcuts() {
+        rootPane.getScene().setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case F9:
+                    resetRecord();
+                    event.consume();
+                    break;
+                case F12:
+                    saveRecord();
+                    event.consume();
+                    break;
+                case F10:
+                    printFirstTicket();
+                    event.consume();
+                    break;
+                case F11:
+                    printFullTicket();
+                    event.consume();
+                    break;
+            }
+        });
     }
 
     private void handleExit() {

@@ -216,22 +216,22 @@
                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
 
                                 <Button fx:id="newButton"
-                                        text="New"
+                                        text="New (F9)"
                                         styleClass="new-button">
                                 </Button>
 
                                 <Button fx:id="saveButton"
-                                        text="Save"
+                                        text="Save (F12)"
                                         styleClass="save-button">
                                 </Button>
 
                                 <Button fx:id="printFirstButton"
-                                        text="Print First Ticket"
+                                        text="Print First Ticket (F10)"
                                         styleClass="print-first-button">
                                 </Button>
 
                                 <Button fx:id="printFullButton"
-                                        text="Print Full Ticket"
+                                        text="Print Full Ticket (F11)"
                                         styleClass="print-full-button">
                                 </Button>
                             </HBox>
