@@ -14,7 +14,7 @@
             style="-fx-background-color: linear-gradient(to bottom right, #f8fafc, #dbeafe, #f1f5f9);">
 
     <stylesheets>
-        <URL value="@../../styles.css"/>
+        <URL value="@../styles.css"/>
     </stylesheets>
 
     <!-- ================= TOP HEADER (Copied from main.fxml) ================= -->
