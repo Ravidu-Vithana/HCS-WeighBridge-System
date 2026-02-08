@@ -57,6 +57,8 @@ public class MainController {
     @FXML
     private Button exitButton;
     @FXML
+    private Button logoutButton;
+    @FXML
     private Button backupButton; // Can be null if not yet in FXML, but we will add it
 
     private UiModel model;
@@ -114,7 +116,34 @@ public class MainController {
         saveButton.setOnAction(e -> saveRecord());
         printFirstButton.setOnAction(e -> printFirstTicket());
         printFullButton.setOnAction(e -> printFullTicket());
+        logoutButton.setOnAction(e -> handleLogout());
         exitButton.setOnAction(e -> System.exit(0));
+    }
+
+    private void handleLogout() {
+        try {
+            // Stop components
+            if (weighService != null) {
+                // weighService.stop(); // If needed
+            }
+            com.hcs.weighbridge.serial.WeighReader reader = com.hcs.weighbridge.MainApp.getWeighReader();
+            if (reader != null) {
+                reader.stop();
+            }
+
+            // Close current window
+            Stage currentStage = (Stage) rootPane.getScene().getWindow();
+            currentStage.close();
+
+            // Open Login Window
+            Stage loginStage = new Stage();
+            loginStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            com.hcs.weighbridge.MainApp.getInstance().showLoginView(loginStage);
+
+        } catch (Exception e) {
+            System.err.println("Logout failed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void openBackupSettings() {
