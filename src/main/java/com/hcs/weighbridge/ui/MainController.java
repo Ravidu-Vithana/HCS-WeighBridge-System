@@ -126,7 +126,7 @@ public class MainController {
     }
 
     private void setupKeyboardShortcuts() {
-        rootPane.getScene().setOnKeyPressed(event -> {
+        rootPane.getScene().addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
             switch (event.getCode()) {
                 case F9:
                     resetRecord();
