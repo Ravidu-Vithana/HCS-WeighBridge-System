@@ -69,7 +69,8 @@ public class LoginController {
             UserDao userDao = new UserDao(connection);
 
             if (userDao.validateUser(username, password)) {
-                loadMainApp();
+                com.hcs.weighbridge.model.User user = userDao.findByUsername(username);
+                loadMainApp(user);
             } else {
                 errorLabel.setText("Invalid username or password.");
                 errorLabel.setVisible(true);
@@ -81,10 +82,10 @@ public class LoginController {
         }
     }
 
-    private void loadMainApp() {
+    private void loadMainApp(com.hcs.weighbridge.model.User user) {
         try {
             if (MainApp.getInstance() != null) {
-                MainApp.getInstance().showMainView();
+                MainApp.getInstance().showMainView(user);
                 // Close login window
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 stage.close();

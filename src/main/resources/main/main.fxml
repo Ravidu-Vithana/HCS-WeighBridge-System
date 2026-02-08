@@ -47,6 +47,14 @@
 
             <!-- Settings and Exit Buttons -->
             <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="backupButton"
+                        text="Backup"
+                        styleClass="settings-button"
+                        visible="false"
+                        managed="false">
+                    <!-- Reusing settings-button style for now, or create new one -->
+                </Button>
+
                 <Button fx:id="settingsButton"
                         text="Settings"
                         styleClass="settings-button">

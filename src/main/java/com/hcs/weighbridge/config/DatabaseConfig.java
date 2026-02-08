@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -340,6 +341,62 @@ public final class DatabaseConfig {
             }
         } catch (SQLException e) {
             logger.error("Error checking connection status: {}", e.getMessage(), e);
+        }
+    }
+
+    public static boolean isTableEmpty(String tableName) {
+        String query = "SELECT COUNT(*) FROM " + tableName;
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
+        } catch (SQLException e) {
+            logger.error("Error checking if table {} is empty: {}", tableName, e.getMessage());
+        }
+        return false;
+    }
+
+    public static void executeScript(String scriptPath) throws IOException, SQLException {
+        logger.info("Executing SQL script from: {}", scriptPath);
+        File file = new File(scriptPath);
+        if (!file.exists()) {
+            throw new IOException("Script file not found: " + scriptPath);
+        }
+
+        StringBuilder script = new StringBuilder();
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                script.append(line).append("\n");
+            }
+        }
+
+        String[] statements = script.toString().split(";");
+        try (Statement stmt = connection.createStatement()) {
+            int count = 0;
+            for (String sql : statements) {
+                String trimmed = sql.trim();
+                if (!trimmed.isEmpty()) {
+                    try {
+                        // Skip INSERTs for weigh_data if it already has data?
+                        // Actually, the BackupService will handle the logic of deciding WHAT to run or
+                        // if to run at all.
+                        // This method just executes blindly.
+                        // However, strictly speaking, the BackupService might need to parse this
+                        // manually to skip specific tables.
+                        // But for now, let's keep a generic execute method.
+                        stmt.execute(trimmed);
+                        count++;
+                    } catch (SQLException e) {
+                        // Log but maybe don't stop everything? Or should we?
+                        // For auto-restore, we probably want to continue on non-fatal errors (like
+                        // duplicate keys)
+                        logger.warn("Error executing statement: {} - Error: {}", trimmed, e.getMessage());
+                    }
+                }
+            }
+            logger.info("Executed {} SQL statements from script", count);
         }
     }
 }

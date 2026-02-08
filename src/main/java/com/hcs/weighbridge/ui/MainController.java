@@ -23,28 +23,47 @@ import java.util.ArrayList;
 public class MainController {
 
     // ---------- FXML Components ----------
-    @FXML private BorderPane rootPane;
-    @FXML private Label liveWeightLabel;
-    @FXML private Label statusLabel;
+    @FXML
+    private BorderPane rootPane;
+    @FXML
+    private Label liveWeightLabel;
+    @FXML
+    private Label statusLabel;
 
-    @FXML private TextField lorryField;
-    @FXML private TextField customerField;
-    @FXML private TextField productField;
-    @FXML private TextField driverField;
+    @FXML
+    private TextField lorryField;
+    @FXML
+    private TextField customerField;
+    @FXML
+    private TextField productField;
+    @FXML
+    private TextField driverField;
 
-    @FXML private TableView<Record> recentRecordsTable;
-    @FXML private TableView<Record> completeRecordsTable;
+    @FXML
+    private TableView<Record> recentRecordsTable;
+    @FXML
+    private TableView<Record> completeRecordsTable;
 
-    @FXML private Button newButton;
-    @FXML private Button saveButton;
-    @FXML private Button printFirstButton;
-    @FXML private Button printFullButton;
-    @FXML private Button settingsButton;
-    @FXML private Button exitButton;
+    @FXML
+    private Button newButton;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button printFirstButton;
+    @FXML
+    private Button printFullButton;
+    @FXML
+    private Button settingsButton;
+    @FXML
+    private Button exitButton;
+    @FXML
+    private Button backupButton; // Can be null if not yet in FXML, but we will add it
 
     private UiModel model;
     private WeighService weighService;
     private ConfigDao configDao;
+    private com.hcs.weighbridge.service.BackupService backupService;
+    private com.hcs.weighbridge.model.User currentUser;
     private UiScaler uiScaler;
 
     private final ObservableList<Record> recentRecords = FXCollections.observableArrayList();
@@ -57,12 +76,16 @@ public class MainController {
     }
 
     public void init(UiModel model,
-                     WeighService weighService,
-                     ConfigDao configDao) {
+            WeighService weighService,
+            ConfigDao configDao,
+            com.hcs.weighbridge.service.BackupService backupService,
+            com.hcs.weighbridge.model.User currentUser) {
 
         this.model = model;
         this.weighService = weighService;
         this.configDao = configDao;
+        this.backupService = backupService;
+        this.currentUser = currentUser;
 
         double scaleFactor = configDao.getUiScaleFactor();
         this.uiScaler = new UiScaler(scaleFactor);
@@ -77,14 +100,44 @@ public class MainController {
             }
         });
 
-//        initializeSampleData();
+        // initializeSampleData();
 
         settingsButton.setOnAction(e -> openSettings());
+        if (backupButton != null) {
+            boolean isAdmin = currentUser != null && "ADMIN".equalsIgnoreCase(currentUser.getRole());
+            backupButton.setVisible(isAdmin);
+            backupButton.setManaged(isAdmin);
+            backupButton.setOnAction(e -> openBackupSettings());
+        }
+
         newButton.setOnAction(e -> resetRecord());
         saveButton.setOnAction(e -> saveRecord());
         printFirstButton.setOnAction(e -> printFirstTicket());
         printFullButton.setOnAction(e -> printFullTicket());
         exitButton.setOnAction(e -> System.exit(0));
+    }
+
+    private void openBackupSettings() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/backup_view.fxml"));
+            Parent root = loader.load();
+
+            BackupController controller = loader.getController();
+            controller.init(configDao, backupService, this);
+
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setTitle("Backup & Restore Settings");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("Failed to open backup settings: " + e.getMessage());
+            e.printStackTrace();
+            showAlert("Failed to open backup settings: " + e.getMessage());
+        }
     }
 
     private void setupTables() {
@@ -98,9 +151,11 @@ public class MainController {
 
         dateCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDateIn()));
         timeCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTimeIn()));
-        receiptCol.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getId())));
+        receiptCol
+                .setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getId())));
         lorryCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLorryNumber()));
-        weightCol.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getFirstWeight())));
+        weightCol.setCellValueFactory(
+                cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getFirstWeight())));
 
         completeRecordsTable.setItems(completeRecords);
 
@@ -108,24 +163,32 @@ public class MainController {
         TableColumn<Record, String> dateOutCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(1);
         TableColumn<Record, String> timeInCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(2);
         TableColumn<Record, String> timeOutCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(3);
-        TableColumn<Record, String> receiptNoCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(4);
+        TableColumn<Record, String> receiptNoCol = (TableColumn<Record, String>) completeRecordsTable.getColumns()
+                .get(4);
         TableColumn<Record, String> lorryNoCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(5);
         TableColumn<Record, String> firstWtCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(6);
-        TableColumn<Record, String> secondWtCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(7);
+        TableColumn<Record, String> secondWtCol = (TableColumn<Record, String>) completeRecordsTable.getColumns()
+                .get(7);
         TableColumn<Record, String> netWtCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(8);
-        TableColumn<Record, String> customerCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(9);
-        TableColumn<Record, String> productCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(10);
+        TableColumn<Record, String> customerCol = (TableColumn<Record, String>) completeRecordsTable.getColumns()
+                .get(9);
+        TableColumn<Record, String> productCol = (TableColumn<Record, String>) completeRecordsTable.getColumns()
+                .get(10);
         TableColumn<Record, String> driverCol = (TableColumn<Record, String>) completeRecordsTable.getColumns().get(11);
 
         dateInCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDateIn()));
         dateOutCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDateOut()));
         timeInCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTimeIn()));
         timeOutCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTimeOut()));
-        receiptNoCol.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getId())));
+        receiptNoCol
+                .setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getId())));
         lorryNoCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLorryNumber()));
-        firstWtCol.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getFirstWeight())));
-        secondWtCol.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getSecondWeight())));
-        netWtCol.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getNetWeight())));
+        firstWtCol.setCellValueFactory(
+                cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getFirstWeight())));
+        secondWtCol.setCellValueFactory(
+                cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getSecondWeight())));
+        netWtCol.setCellValueFactory(
+                cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getNetWeight())));
         customerCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCustomerName()));
         productCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProductName()));
         driverCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDriverName()));
@@ -145,7 +208,7 @@ public class MainController {
                 });
     }
 
-    private void loadTables(){
+    private void loadTables() {
         ArrayList<Record> pendingRecords = weighService.getAllPendingRecords();
         ArrayList<Record> completedRecords = weighService.getAllCompletedRecords();
         recentRecords.clear();
@@ -168,13 +231,13 @@ public class MainController {
 
     private void initializeSampleData() {
         for (int i = 1; i <= 8; i++) {
-            Record record = new Record(new String[]{"ABC-1234", "XYZ-5678", "LMN-9012", "PQR-3456",
-                    "STU-7890", "VWX-2345", "YZA-6789", "BCD-0123"}[i-1]);
+            Record record = new Record(new String[] { "ABC-1234", "XYZ-5678", "LMN-9012", "PQR-3456",
+                    "STU-7890", "VWX-2345", "YZA-6789", "BCD-0123" }[i - 1]);
             record.setId(i);
             record.setDateIn("2026-01-25");
             record.setTimeIn(String.format("%02d:%02d", 8 + i, (i * 15) % 60));
-            record.setLorryNumber(new String[]{"ABC-1234", "XYZ-5678", "LMN-9012", "PQR-3456",
-                    "STU-7890", "VWX-2345", "YZA-6789", "BCD-0123"}[i-1]);
+            record.setLorryNumber(new String[] { "ABC-1234", "XYZ-5678", "LMN-9012", "PQR-3456",
+                    "STU-7890", "VWX-2345", "YZA-6789", "BCD-0123" }[i - 1]);
             record.setFirstWeight(15000 - (i * 300));
             recentRecords.add(record);
         }
@@ -212,8 +275,7 @@ public class MainController {
 
     private void bindUi() {
         liveWeightLabel.textProperty().bind(
-                model.liveWeightProperty().asString("%d")
-        );
+                model.liveWeightProperty().asString("%d"));
         statusLabel.textProperty().bind(model.statusProperty());
     }
 
@@ -272,7 +334,7 @@ public class MainController {
         }
     }
 
-    private void resetRecord(){
+    private void resetRecord() {
         weighService.clearActiveRecord();
         weighService.clearFullRecord();
         recentRecordsTable.getSelectionModel().clearSelection();
@@ -319,16 +381,16 @@ public class MainController {
         }
         int currentWeight = model.liveWeightProperty().get();
 
-        if(weighService.isPendingRecordAvailable(lorry) && weighService.hasFirstWeight()){
+        if (weighService.isPendingRecordAvailable(lorry) && weighService.hasFirstWeight()) {
             weighService.saveSecondWeight(currentWeight);
             printSecondTicket();
             recentRecords.remove(weighService.getActiveRecord());
             resetRecord();
             showAlert("Second Weight saved successfully!");
-        }else if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()){
+        } else if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()) {
             showAlert("Please select the lorry from the table!");
             resetRecord();
-        }else{
+        } else {
             weighService.startTransaction(lorry, customer, product, driver);
             weighService.saveFirstWeight(currentWeight);
             printFirstTicket();
@@ -383,7 +445,6 @@ public class MainController {
             showAlert("Print failed: " + e.getMessage());
         }
     }
-
 
     private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
