@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -117,10 +118,30 @@ public class MainController {
         printFirstButton.setOnAction(e -> printFirstTicket());
         printFullButton.setOnAction(e -> printFullTicket());
         logoutButton.setOnAction(e -> handleLogout());
-        exitButton.setOnAction(e -> System.exit(0));
+        exitButton.setOnAction(e -> handleExit());
+    }
+
+    private void handleExit() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure you want to exit the application?");
+
+        if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            System.exit(0);
+        }
     }
 
     private void handleLogout() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Logout Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure you want to logout?");
+
+        if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+
         try {
             // Stop components
             if (weighService != null) {
