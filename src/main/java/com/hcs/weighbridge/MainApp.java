@@ -32,6 +32,19 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        try {
+            Connection connection = DatabaseConfig.getConnection();
+            ConfigDao configDao = new ConfigDao(connection);
+            com.hcs.weighbridge.service.BackupService backupService = new com.hcs.weighbridge.service.BackupService(
+                    connection, configDao);
+
+            backupService.autoRestoreIfEnabled();
+            backupService.checkAndRunScheduledBackup();
+        } catch (Exception e) {
+            System.err.println("Startup database initialization failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         stage.initStyle(StageStyle.UNDECORATED);
         showLoginView(stage);
     }
@@ -64,15 +77,6 @@ public class MainApp extends Application {
             ConfigDao configDao = new ConfigDao(connection);
             com.hcs.weighbridge.service.BackupService backupService = new com.hcs.weighbridge.service.BackupService(
                     connection, configDao);
-
-            // Run auto checks
-            try {
-                backupService.autoRestoreIfEnabled();
-                backupService.checkAndRunScheduledBackup();
-            } catch (Exception e) {
-                System.err.println("Backup service auto-check failed: " + e.getMessage());
-                e.printStackTrace();
-            }
 
             controller.init(uiModel, weighService, configDao, backupService, currentUser);
             SerialConfig serialConfig = configDao.loadSerialConfig();
