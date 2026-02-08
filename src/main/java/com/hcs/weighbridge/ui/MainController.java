@@ -6,6 +6,7 @@ import com.hcs.weighbridge.model.Record;
 import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.UiScaler;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -100,6 +101,7 @@ public class MainController {
             applyScaling();
             if (rootPane != null && rootPane.getScene() != null) {
                 rootPane.getScene().getRoot().applyCss();
+                setupKeyboardShortcuts();
             }
         });
 
@@ -119,6 +121,31 @@ public class MainController {
         printFullButton.setOnAction(e -> printFullTicket());
         logoutButton.setOnAction(e -> handleLogout());
         exitButton.setOnAction(e -> handleExit());
+
+        Platform.runLater(() -> lorryField.requestFocus());
+    }
+
+    private void setupKeyboardShortcuts() {
+        rootPane.getScene().addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
+            switch (event.getCode()) {
+                case F9:
+                    resetRecord();
+                    event.consume();
+                    break;
+                case F12:
+                    saveRecord();
+                    event.consume();
+                    break;
+                case F10:
+                    printFirstTicket();
+                    event.consume();
+                    break;
+                case F11:
+                    printFullTicket();
+                    event.consume();
+                    break;
+            }
+        });
     }
 
     private void handleExit() {
@@ -392,6 +419,7 @@ public class MainController {
         recentRecordsTable.getSelectionModel().clearSelection();
         completeRecordsTable.getSelectionModel().clearSelection();
         clearAllFields();
+        Platform.runLater(() -> lorryField.requestFocus());
     }
 
     private void clearAllFields() {
