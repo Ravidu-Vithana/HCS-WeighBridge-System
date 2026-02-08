@@ -1,7 +1,7 @@
 package com.hcs.weighbridge.service;
 
+import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.model.Record;
-import com.hcs.weighbridge.ui.ReceiptController;
 import com.hcs.weighbridge.util.LogUtil;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -42,7 +42,7 @@ public class PrintService {
      * @param mode   The print mode (FIRST_WEIGHT, SECOND_WEIGHT, or FULL)
      * @return true if printing was successful, false otherwise
      */
-    public boolean printReceipt(Record record, ReceiptController.PrintMode mode) {
+    public boolean printReceipt(Record record, PrintMode mode) {
         return printReceiptInternal(record, mode, null, true);
     }
 
@@ -54,7 +54,7 @@ public class PrintService {
      * @param mode   The print mode
      * @return true if successful
      */
-    public boolean printReceiptSilent(Record record, ReceiptController.PrintMode mode) {
+    public boolean printReceiptSilent(Record record, PrintMode mode) {
         return printReceiptInternal(record, mode, null, false);
     }
 
@@ -66,7 +66,7 @@ public class PrintService {
      * @param printerName Name of the printer to use
      * @return true if successful
      */
-    public boolean printReceiptWithPrinter(Record record, ReceiptController.PrintMode mode, String printerName) {
+    public boolean printReceiptWithPrinter(Record record, PrintMode mode, String printerName) {
         javax.print.PrintService selectedPrinter = findPrinter(printerName);
         if (selectedPrinter == null) {
             logger.error("Printer not found: {}", printerName);
@@ -75,7 +75,7 @@ public class PrintService {
         return printReceiptInternal(record, mode, selectedPrinter, false);
     }
 
-    private boolean printReceiptInternal(Record record, ReceiptController.PrintMode mode,
+    private boolean printReceiptInternal(Record record, PrintMode mode,
                                          javax.print.PrintService specificPrinter, boolean showDialog) {
         logger.info("=== Starting JasperReports print job ===");
         logger.info("Record ID: {}, Mode: {}", record.getId(), mode);
@@ -103,34 +103,23 @@ public class PrintService {
             // 4. Fill Report
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-            // 5. Print
             if (showDialog) {
-                // Use JasperPrintManager to show standard dialog
                 return JasperPrintManager.printReport(jasperPrint, true);
             } else {
-                // Silent printing
                 JRPrintServiceExporter exporter = new JRPrintServiceExporter();
                 exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
 
                 SimplePrintServiceExporterConfiguration configuration = new SimplePrintServiceExporterConfiguration();
 
-                // Configure Print Request Attributes for A4 Portrait (Hack for A5 paper treated
-                // as A4)
                 PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
                 printRequestAttributeSet.add(MediaSizeName.ISO_A4);
                 printRequestAttributeSet.add(OrientationRequested.PORTRAIT);
-                // We don't need to restrict printable area if the report design handles it.
-                // The report is designed to use only the top ~148mm (A5 height).
 
                 configuration.setPrintRequestAttributeSet(printRequestAttributeSet);
 
                 if (specificPrinter != null) {
                     configuration.setPrintService(specificPrinter);
                 } else {
-                    // Use default printer if 'specificPrinter' is null
-                    // However, JRPrintServiceExporter defaults to looking up default if not set?
-                    // Actually, if we don't set PrintService, it might fail or look for default.
-                    // Ideally we find the default printer explicitly if none provided.
                     javax.print.PrintService defaultPrinter = PrintServiceLookup.lookupDefaultPrintService();
                     if (defaultPrinter != null) {
                         configuration.setPrintService(defaultPrinter);

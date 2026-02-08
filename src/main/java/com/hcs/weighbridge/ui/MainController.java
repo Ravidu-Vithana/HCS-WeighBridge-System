@@ -1,5 +1,6 @@
 package com.hcs.weighbridge.ui;
 
+import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.model.Record;
 import com.hcs.weighbridge.service.PrintService;
@@ -346,7 +347,7 @@ public class MainController {
             return;
         }
 
-        printReceipt(record, ReceiptController.PrintMode.FIRST_WEIGHT);
+        printReceipt(record, PrintMode.FIRST_WEIGHT);
     }
 
     private void printSecondTicket() {
@@ -357,7 +358,7 @@ public class MainController {
             return;
         }
 
-        printReceipt(record, ReceiptController.PrintMode.SECOND_WEIGHT);
+        printReceipt(record, PrintMode.SECOND_WEIGHT);
     }
 
     private void printFullTicket() {
@@ -368,10 +369,10 @@ public class MainController {
             return;
         }
 
-        printReceipt(record, ReceiptController.PrintMode.FULL);
+        printReceipt(record, PrintMode.FULL);
     }
 
-    private void printReceipt(Record record, ReceiptController.PrintMode mode) {
+    private void printReceipt(Record record, PrintMode mode) {
 
         try {
             PrintService printService = new PrintService();
