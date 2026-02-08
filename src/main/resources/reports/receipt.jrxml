@@ -39,7 +39,7 @@
                 <staticText>
                     <reportElement x="0" y="0" width="555" height="20" uuid="071a0670-3889-4e00-8304-7a32943343bd"/>
                     <textElement textAlignment="Center" verticalAlignment="Middle">
-                        <font size="16" isBold="true"/>
+                        <font size="14" isBold="true"/>
                     </textElement>
                     <text><![CDATA[HCS WEIGH BRIDGE]]></text>
                 </staticText>
