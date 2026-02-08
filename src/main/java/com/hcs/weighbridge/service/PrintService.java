@@ -11,6 +11,11 @@ import net.sf.jasperreports.export.SimplePrintServiceExporterConfiguration;
 import org.apache.logging.log4j.Logger;
 
 import javax.print.PrintServiceLookup;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.MediaPrintableArea;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.OrientationRequested;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
@@ -106,6 +111,16 @@ public class PrintService {
                 exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
 
                 SimplePrintServiceExporterConfiguration configuration = new SimplePrintServiceExporterConfiguration();
+
+                // Configure Print Request Attributes for A4 Portrait (Hack for A5 paper treated
+                // as A4)
+                PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
+                printRequestAttributeSet.add(MediaSizeName.ISO_A4);
+                printRequestAttributeSet.add(OrientationRequested.PORTRAIT);
+                // We don't need to restrict printable area if the report design handles it.
+                // The report is designed to use only the top ~148mm (A5 height).
+
+                configuration.setPrintRequestAttributeSet(printRequestAttributeSet);
 
                 if (specificPrinter != null) {
                     configuration.setPrintService(specificPrinter);
