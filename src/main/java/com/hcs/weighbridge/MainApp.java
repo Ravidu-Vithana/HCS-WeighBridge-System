@@ -40,6 +40,7 @@ public class MainApp extends Application {
             Scene scene = new Scene(loader.load());
             stage.setTitle("WeighBridge System - Login");
             stage.setScene(scene);
+            stage.setMaximized(true);
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
