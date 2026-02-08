@@ -2,13 +2,14 @@ package com.hcs.weighbridge.ui;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.hcs.weighbridge.dao.ConfigDao;
+import com.hcs.weighbridge.dao.UserDao;
+import com.hcs.weighbridge.model.Role;
 import com.hcs.weighbridge.model.SerialConfig;
+import com.hcs.weighbridge.model.User;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -16,27 +17,49 @@ import java.util.ResourceBundle;
 
 public class SettingsController implements Initializable {
 
-    @FXML private ComboBox<String> portCombo;
-    @FXML private ComboBox<Integer> baudCombo;
-    @FXML private ComboBox<Integer> dataBitsCombo;
-    @FXML private ComboBox<Integer> stopBitsCombo;
-    @FXML private ComboBox<String> parityCombo;
+    @FXML
+    private ComboBox<String> portCombo;
+    @FXML
+    private ComboBox<Integer> baudCombo;
+    @FXML
+    private ComboBox<Integer> dataBitsCombo;
+    @FXML
+    private ComboBox<Integer> stopBitsCombo;
+    @FXML
+    private ComboBox<String> parityCombo;
 
-    @FXML private Slider scaleSlider;
-    @FXML private Label scaleLabel;
+    @FXML
+    private Slider scaleSlider;
+    @FXML
+    private Label scaleLabel;
+
+    @FXML
+    private VBox serialSettingsContainer;
+    @FXML
+    private VBox userManagementContainer;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private ComboBox<Role> roleCombo;
 
     private ConfigDao configDao;
+    private UserDao userDao;
     private MainController mainController;
+    private User currentUser;
 
-    public void setDependencies(ConfigDao dao, MainController mainController) {
-        this.configDao = dao;
+    public void setDependencies(ConfigDao configDao, UserDao userDao, MainController mainController, User currentUser) {
+        this.configDao = configDao;
+        this.userDao = userDao;
         this.mainController = mainController;
+        this.currentUser = currentUser;
         loadData();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try{
+        try {
             setupComboBoxes();
             setupScaleSlider();
         } catch (Exception e) {
@@ -52,6 +75,9 @@ public class SettingsController implements Initializable {
         dataBitsCombo.getItems().addAll(7, 8);
         stopBitsCombo.getItems().addAll(1, 2);
         parityCombo.getItems().addAll("NONE", "EVEN", "ODD");
+
+        roleCombo.getItems().setAll(Role.values());
+        roleCombo.setValue(Role.USER);
     }
 
     private void setupScaleSlider() {
@@ -89,7 +115,19 @@ public class SettingsController implements Initializable {
     }
 
     private void loadData() {
-        if (configDao == null) return;
+        if (configDao == null)
+            return;
+
+        // Apply Access Control
+        boolean isAdmin = currentUser != null && currentUser.getRole() == Role.ADMIN;
+        if (serialSettingsContainer != null) {
+            serialSettingsContainer.setVisible(isAdmin);
+            serialSettingsContainer.setManaged(isAdmin);
+        }
+        if (userManagementContainer != null) {
+            userManagementContainer.setVisible(isAdmin);
+            userManagementContainer.setManaged(isAdmin);
+        }
 
         try {
             double currentScale = configDao.getUiScaleFactor();
@@ -119,14 +157,50 @@ public class SettingsController implements Initializable {
                 stopBitsCombo.setValue(cfg.getStopBits());
             }
 
-            String parityValue = cfg.getParity() == SerialPort.EVEN_PARITY ? "EVEN" :
-                    cfg.getParity() == SerialPort.ODD_PARITY ? "ODD" : "NONE";
+            String parityValue = cfg.getParity() == SerialPort.EVEN_PARITY ? "EVEN"
+                    : cfg.getParity() == SerialPort.ODD_PARITY ? "ODD" : "NONE";
             parityCombo.setValue(parityValue);
 
         } catch (Exception e) {
             System.err.println("Failed to load settings: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void addUser() {
+        if (!isAdmin()) {
+            showAlert("Access Denied: You do not have permission to add users.");
+            return;
+        }
+
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+        Role role = roleCombo.getValue();
+
+        if (username.isEmpty() || password.isEmpty() || role == null) {
+            showAlert("Please fill in all user fields.");
+            return;
+        }
+
+        if (userDao.findByUsername(username) != null) {
+            showAlert("User already exists!");
+            return;
+        }
+
+        User newUser = new User(0, username, password, role);
+        if (userDao.createUser(newUser)) {
+            showAlert("User created successfully!");
+            usernameField.clear();
+            passwordField.clear();
+            roleCombo.setValue(Role.USER);
+        } else {
+            showAlert("Failed to create user.");
+        }
+    }
+
+    private boolean isAdmin() {
+        return currentUser != null && currentUser.getRole() == Role.ADMIN;
     }
 
     @FXML
@@ -137,31 +211,34 @@ public class SettingsController implements Initializable {
         }
 
         try {
-            SerialConfig cfg = new SerialConfig();
-            cfg.setPortName(portCombo.getValue());
+            // Only save Serial config if visible/admin
+            if (isAdmin()) {
+                SerialConfig cfg = new SerialConfig();
+                cfg.setPortName(portCombo.getValue());
 
-            if (baudCombo.getValue() != null) {
-                cfg.setBaudRate(baudCombo.getValue());
+                if (baudCombo.getValue() != null) {
+                    cfg.setBaudRate(baudCombo.getValue());
+                }
+
+                if (dataBitsCombo.getValue() != null) {
+                    cfg.setDataBits(dataBitsCombo.getValue());
+                }
+
+                if (stopBitsCombo.getValue() != null) {
+                    cfg.setStopBits(stopBitsCombo.getValue());
+                }
+
+                String parity = parityCombo.getValue();
+                if ("EVEN".equals(parity)) {
+                    cfg.setParity(SerialPort.EVEN_PARITY);
+                } else if ("ODD".equals(parity)) {
+                    cfg.setParity(SerialPort.ODD_PARITY);
+                } else {
+                    cfg.setParity(SerialPort.NO_PARITY);
+                }
+
+                configDao.saveSerialConfig(cfg);
             }
-
-            if (dataBitsCombo.getValue() != null) {
-                cfg.setDataBits(dataBitsCombo.getValue());
-            }
-
-            if (stopBitsCombo.getValue() != null) {
-                cfg.setStopBits(stopBitsCombo.getValue());
-            }
-
-            String parity = parityCombo.getValue();
-            if ("EVEN".equals(parity)) {
-                cfg.setParity(SerialPort.EVEN_PARITY);
-            } else if ("ODD".equals(parity)) {
-                cfg.setParity(SerialPort.ODD_PARITY);
-            } else {
-                cfg.setParity(SerialPort.NO_PARITY);
-            }
-
-            configDao.saveSerialConfig(cfg);
 
             double scaleFactor = scaleSlider.getValue();
             configDao.saveUiScaleFactor(scaleFactor);
@@ -170,7 +247,8 @@ public class SettingsController implements Initializable {
                 mainController.reloadWithScale(scaleFactor);
                 showAlert("Settings saved successfully!\nUI scale has been applied.");
             } else {
-                showAlert("Settings saved successfully!\nPlease restart the application for UI scale to take full effect.");
+                showAlert(
+                        "Settings saved successfully!\nPlease restart the application for UI scale to take full effect.");
             }
 
             close();
@@ -184,7 +262,7 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void close() {
-        Stage stage = (Stage) portCombo.getScene().getWindow();
+        Stage stage = (Stage) scaleSlider.getScene().getWindow(); // Changed root reference
         stage.close();
     }
 

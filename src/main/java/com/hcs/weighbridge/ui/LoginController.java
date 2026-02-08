@@ -9,10 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -43,7 +40,7 @@ public class LoginController {
     @FXML
     public void initialize() {
         loginButton.setOnAction(event -> handleLogin());
-        exitButton.setOnAction(event -> Platform.exit());
+        exitButton.setOnAction(event -> handleExit());
         usernameField.setOnAction(event -> passwordField.requestFocus());
         passwordField.setOnAction(event -> handleLogin());
 
@@ -52,6 +49,17 @@ public class LoginController {
         uiScaler.applyScaling(rootPane);
 
         Platform.runLater(() -> usernameField.requestFocus());
+    }
+
+    private void handleExit() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure you want to exit the application?");
+
+        if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            System.exit(0);
+        }
     }
 
     private void handleLogin() {

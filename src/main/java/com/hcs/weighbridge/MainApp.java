@@ -30,6 +30,10 @@ public class MainApp extends Application {
         return instance;
     }
 
+    public static WeighReader getWeighReader() {
+        return weighReader;
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         try {

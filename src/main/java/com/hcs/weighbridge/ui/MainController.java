@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -56,6 +57,8 @@ public class MainController {
     private Button settingsButton;
     @FXML
     private Button exitButton;
+    @FXML
+    private Button logoutButton;
     @FXML
     private Button backupButton; // Can be null if not yet in FXML, but we will add it
 
@@ -104,7 +107,7 @@ public class MainController {
 
         settingsButton.setOnAction(e -> openSettings());
         if (backupButton != null) {
-            boolean isAdmin = currentUser != null && "ADMIN".equalsIgnoreCase(currentUser.getRole());
+            boolean isAdmin = currentUser != null && currentUser.getRole() == com.hcs.weighbridge.model.Role.ADMIN;
             backupButton.setVisible(isAdmin);
             backupButton.setManaged(isAdmin);
             backupButton.setOnAction(e -> openBackupSettings());
@@ -114,7 +117,54 @@ public class MainController {
         saveButton.setOnAction(e -> saveRecord());
         printFirstButton.setOnAction(e -> printFirstTicket());
         printFullButton.setOnAction(e -> printFullTicket());
-        exitButton.setOnAction(e -> System.exit(0));
+        logoutButton.setOnAction(e -> handleLogout());
+        exitButton.setOnAction(e -> handleExit());
+    }
+
+    private void handleExit() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure you want to exit the application?");
+
+        if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            System.exit(0);
+        }
+    }
+
+    private void handleLogout() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Logout Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure you want to logout?");
+
+        if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+
+        try {
+            // Stop components
+            if (weighService != null) {
+                // weighService.stop(); // If needed
+            }
+            com.hcs.weighbridge.serial.WeighReader reader = com.hcs.weighbridge.MainApp.getWeighReader();
+            if (reader != null) {
+                reader.stop();
+            }
+
+            // Close current window
+            Stage currentStage = (Stage) rootPane.getScene().getWindow();
+            currentStage.close();
+
+            // Open Login Window
+            Stage loginStage = new Stage();
+            loginStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            com.hcs.weighbridge.MainApp.getInstance().showLoginView(loginStage);
+
+        } catch (Exception e) {
+            System.err.println("Logout failed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void openBackupSettings() {
@@ -285,7 +335,9 @@ public class MainController {
             Parent settingsRoot = loader.load();
 
             SettingsController controller = loader.getController();
-            controller.setDependencies(configDao, this);
+            com.hcs.weighbridge.dao.UserDao userDao = new com.hcs.weighbridge.dao.UserDao(
+                    com.hcs.weighbridge.config.DatabaseConfig.getConnection());
+            controller.setDependencies(configDao, userDao, this, currentUser);
 
             Scene scene = new Scene(settingsRoot);
 

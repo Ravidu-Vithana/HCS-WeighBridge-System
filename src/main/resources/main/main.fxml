@@ -60,6 +60,11 @@
                         styleClass="settings-button">
                 </Button>
 
+                <Button fx:id="logoutButton"
+                        text="Logout"
+                        styleClass="settings-button">
+                </Button>
+
                 <Button fx:id="exitButton"
                         text="Exit"
                         styleClass="exit-button">
