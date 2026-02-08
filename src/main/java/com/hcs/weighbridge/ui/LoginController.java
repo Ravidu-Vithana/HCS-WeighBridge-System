@@ -44,6 +44,8 @@ public class LoginController {
     public void initialize() {
         loginButton.setOnAction(event -> handleLogin());
         exitButton.setOnAction(event -> Platform.exit());
+        usernameField.setOnAction(event -> passwordField.requestFocus());
+        passwordField.setOnAction(event -> handleLogin());
 
         // Initialize scaler with default 2.0 or load from config
         uiScaler = new UiScaler(2.0);
