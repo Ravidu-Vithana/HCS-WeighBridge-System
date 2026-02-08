@@ -28,7 +28,7 @@ public class UserDao {
                             rs.getInt("id"),
                             rs.getString("username"),
                             rs.getString("password"),
-                            rs.getString("role"));
+                            com.hcs.weighbridge.model.Role.fromString(rs.getString("role")));
                 }
             }
         } catch (SQLException e) {
@@ -41,10 +41,22 @@ public class UserDao {
         User user = findByUsername(username);
         if (user != null) {
             // In a real application, you should hash passwords.
-            // For now, we are comparing plain text as per the request context implies
-            // simple auth.
             return user.getPassword().equals(password);
         }
         return false;
+    }
+
+    public boolean createUser(User user) {
+        String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, user.getPassword());
+            pstmt.setString(3, user.getRole().name());
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            logger.error("Error creating user: {}", user.getUsername(), e);
+            return false;
+        }
     }
 }

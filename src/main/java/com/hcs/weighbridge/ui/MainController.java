@@ -104,7 +104,7 @@ public class MainController {
 
         settingsButton.setOnAction(e -> openSettings());
         if (backupButton != null) {
-            boolean isAdmin = currentUser != null && "ADMIN".equalsIgnoreCase(currentUser.getRole());
+            boolean isAdmin = currentUser != null && currentUser.getRole() == com.hcs.weighbridge.model.Role.ADMIN;
             backupButton.setVisible(isAdmin);
             backupButton.setManaged(isAdmin);
             backupButton.setOnAction(e -> openBackupSettings());
@@ -285,7 +285,9 @@ public class MainController {
             Parent settingsRoot = loader.load();
 
             SettingsController controller = loader.getController();
-            controller.setDependencies(configDao, this);
+            com.hcs.weighbridge.dao.UserDao userDao = new com.hcs.weighbridge.dao.UserDao(
+                    com.hcs.weighbridge.config.DatabaseConfig.getConnection());
+            controller.setDependencies(configDao, userDao, this, currentUser);
 
             Scene scene = new Scene(settingsRoot);
 
