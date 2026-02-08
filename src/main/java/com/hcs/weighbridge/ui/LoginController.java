@@ -50,6 +50,8 @@ public class LoginController {
         // Initialize scaler with default 2.0 or load from config
         uiScaler = new UiScaler(2.0);
         uiScaler.applyScaling(rootPane);
+
+        Platform.runLater(() -> usernameField.requestFocus());
     }
 
     private void handleLogin() {
