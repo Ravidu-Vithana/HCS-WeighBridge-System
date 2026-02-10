@@ -70,6 +70,16 @@
                  <Button text="Add User" onAction="#addUser" styleClass="settings-button"/>
             </HBox>
         </GridPane>
+        
+        <!-- User List Table -->
+        <TableView fx:id="usersTable" prefHeight="200" VBox.vgrow="SOMETIMES">
+            <columns>
+                <TableColumn text="Username" prefWidth="150"/>
+                <TableColumn text="Role" prefWidth="100"/>
+                <TableColumn text="Actions" prefWidth="100"/>
+            </columns>
+        </TableView>
+        
         <Separator />
     </VBox>
 

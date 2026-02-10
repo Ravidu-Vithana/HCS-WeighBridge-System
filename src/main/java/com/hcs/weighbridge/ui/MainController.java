@@ -154,6 +154,11 @@ public class MainController {
         alert.setHeaderText(null);
         alert.setContentText("Are you sure you want to exit the application?");
 
+        // Set CANCEL as default button to prevent accidental confirmation with Enter
+        // key
+        ((javafx.scene.control.Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL)).setDefaultButton(true);
+        ((javafx.scene.control.Button) alert.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+
         if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             System.exit(0);
         }
@@ -164,6 +169,11 @@ public class MainController {
         alert.setTitle("Logout Confirmation");
         alert.setHeaderText(null);
         alert.setContentText("Are you sure you want to logout?");
+
+        // Set CANCEL as default button to prevent accidental confirmation with Enter
+        // key
+        ((javafx.scene.control.Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL)).setDefaultButton(true);
+        ((javafx.scene.control.Button) alert.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
 
         if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
             return;
@@ -213,7 +223,7 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Failed to open backup settings: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Failed to open backup settings: " + e.getMessage());
+            showToast("Failed to open backup settings: " + e.getMessage());
         }
     }
 
@@ -379,7 +389,7 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Failed to open settings: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Failed to open settings: " + e.getMessage());
+            showToast("Failed to open settings: " + e.getMessage());
         }
     }
 
@@ -447,7 +457,7 @@ public class MainController {
         String driver = driverField.getText().trim();
 
         if (lorry.isEmpty()) {
-            showAlert("Please enter the Lorry Number");
+            showToast("Please enter the Lorry Number");
             return;
         }
         if (product.isEmpty()) {
@@ -466,16 +476,16 @@ public class MainController {
             printSecondTicket();
             recentRecords.remove(weighService.getActiveRecord());
             resetRecord();
-            showAlert("Second Weight saved successfully!");
+            showToast("Second Weight saved successfully!");
         } else if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()) {
-            showAlert("Please select the lorry from the table!");
+            showToast("Please select the lorry from the table!");
             resetRecord();
         } else {
             weighService.startTransaction(lorry, customer, product, driver);
             weighService.saveFirstWeight(currentWeight);
             printFirstTicket();
             resetRecord();
-            showAlert("First Weight saved successfully!");
+            showToast("First Weight saved successfully!");
         }
         loadTables();
 
@@ -485,7 +495,7 @@ public class MainController {
         Record record = weighService.getActiveRecord();
 
         if (record == null) {
-            showAlert("No active record to print");
+            showToast("No active record to print");
             return;
         }
 
@@ -496,7 +506,7 @@ public class MainController {
         Record record = weighService.getFullRecord();
 
         if (record == null) {
-            showAlert("No completed record to print");
+            showToast("No completed record to print");
             return;
         }
 
@@ -507,7 +517,7 @@ public class MainController {
         Record record = weighService.getFullRecord();
 
         if (record == null) {
-            showAlert("No completed record selected");
+            showToast("No completed record selected");
             return;
         }
 
@@ -522,7 +532,66 @@ public class MainController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Print failed: " + e.getMessage());
+            showToast("Print failed: " + e.getMessage());
+        }
+    }
+
+    private void showToast(String msg) {
+        if (rootPane == null || rootPane.getScene() == null) {
+            return;
+        }
+
+        // Create toast label
+        Label toast = new Label(msg);
+        toast.setStyle(
+                "-fx-background-color: rgba(50, 50, 50, 0.9); " +
+                        "-fx-text-fill: white; " +
+                        "-fx-padding: 15px 20px; " +
+                        "-fx-background-radius: 5px; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0, 0, 2);");
+        toast.setWrapText(true);
+        toast.setMaxWidth(400);
+
+        // Get scene dimensions
+        javafx.scene.Scene scene = rootPane.getScene();
+        double sceneWidth = scene.getWidth();
+        double sceneHeight = scene.getHeight();
+
+        // Add toast to scene root (as overlay)
+        if (scene.getRoot() instanceof javafx.scene.layout.Pane) {
+            javafx.scene.layout.Pane root = (javafx.scene.layout.Pane) scene.getRoot();
+            root.getChildren().add(toast);
+
+            // Position at bottom-right
+            toast.setLayoutX(sceneWidth - toast.getWidth() - 30);
+            toast.setLayoutY(sceneHeight - 80);
+
+            // Ensure proper positioning after layout
+            Platform.runLater(() -> {
+                toast.setLayoutX(sceneWidth - toast.getWidth() - 30);
+                toast.setLayoutY(sceneHeight - 80);
+            });
+
+            // Fade in animation
+            javafx.animation.FadeTransition fadeIn = new javafx.animation.FadeTransition(
+                    javafx.util.Duration.millis(300), toast);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+
+            // Fade out animation after delay
+            javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(
+                    javafx.util.Duration.seconds(3));
+            javafx.animation.FadeTransition fadeOut = new javafx.animation.FadeTransition(
+                    javafx.util.Duration.millis(300), toast);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.setOnFinished(e -> root.getChildren().remove(toast));
+
+            // Play animations in sequence
+            javafx.animation.SequentialTransition sequence = new javafx.animation.SequentialTransition(
+                    fadeIn, delay, fadeOut);
+            sequence.play();
         }
     }
 

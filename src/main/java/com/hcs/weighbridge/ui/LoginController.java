@@ -57,6 +57,11 @@ public class LoginController {
         alert.setHeaderText(null);
         alert.setContentText("Are you sure you want to exit the application?");
 
+        // Set CANCEL as default button to prevent accidental confirmation with Enter
+        // key
+        ((javafx.scene.control.Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL)).setDefaultButton(true);
+        ((javafx.scene.control.Button) alert.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+
         if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             System.exit(0);
         }

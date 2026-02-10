@@ -43,6 +43,8 @@ public class SettingsController implements Initializable {
     private PasswordField passwordField;
     @FXML
     private ComboBox<Role> roleCombo;
+    @FXML
+    private TableView<User> usersTable;
 
     private ConfigDao configDao;
     private UserDao userDao;
@@ -129,6 +131,11 @@ public class SettingsController implements Initializable {
             userManagementContainer.setManaged(isAdmin);
         }
 
+        // Load users list if admin
+        if (isAdmin) {
+            loadUsersList();
+        }
+
         try {
             double currentScale = configDao.getUiScaleFactor();
 
@@ -194,8 +201,91 @@ public class SettingsController implements Initializable {
             usernameField.clear();
             passwordField.clear();
             roleCombo.setValue(Role.USER);
+            loadUsersList(); // Refresh the user list
         } else {
             showAlert("Failed to create user.");
+        }
+    }
+
+    private void loadUsersList() {
+        if (usersTable == null || userDao == null) {
+            return;
+        }
+
+        java.util.List<User> users = userDao.getAllUsers();
+        javafx.collections.ObservableList<User> usersList = javafx.collections.FXCollections.observableArrayList(users);
+        usersTable.setItems(usersList);
+
+        // Configure columns
+        if (usersTable.getColumns().size() >= 3) {
+            // Username column
+            javafx.scene.control.TableColumn<User, String> usernameCol = (javafx.scene.control.TableColumn<User, String>) usersTable
+                    .getColumns().get(0);
+            usernameCol.setCellValueFactory(
+                    cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getUsername()));
+
+            // Role column
+            javafx.scene.control.TableColumn<User, String> roleCol = (javafx.scene.control.TableColumn<User, String>) usersTable
+                    .getColumns().get(1);
+            roleCol.setCellValueFactory(
+                    cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getRole().name()));
+
+            // Actions column with delete button
+            javafx.scene.control.TableColumn<User, Void> actionsCol = (javafx.scene.control.TableColumn<User, Void>) usersTable
+                    .getColumns().get(2);
+            actionsCol.setCellFactory(param -> new javafx.scene.control.TableCell<>() {
+                private final javafx.scene.control.Button deleteButton = new javafx.scene.control.Button("Delete");
+
+                {
+                    deleteButton.setOnAction(event -> {
+                        User user = getTableView().getItems().get(getIndex());
+                        if (user != null) {
+                            deleteUser(user);
+                        }
+                    });
+                }
+
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(deleteButton);
+                    }
+                }
+            });
+        }
+    }
+
+    private void deleteUser(User user) {
+        // Prevent deleting current user
+        if (currentUser != null && currentUser.getId() == user.getId()) {
+            showAlert("Cannot delete the currently logged in user!");
+            return;
+        }
+
+        // Confirmation dialog
+        javafx.scene.control.Alert confirmAlert = new javafx.scene.control.Alert(
+                javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Delete User");
+        confirmAlert.setHeaderText(null);
+        confirmAlert.setContentText("Are you sure you want to delete user '" + user.getUsername() + "'?");
+
+        // Set CANCEL as default to prevent accidental deletion
+        ((javafx.scene.control.Button) confirmAlert.getDialogPane().lookupButton(
+                javafx.scene.control.ButtonType.CANCEL)).setDefaultButton(true);
+        ((javafx.scene.control.Button) confirmAlert.getDialogPane().lookupButton(
+                javafx.scene.control.ButtonType.OK)).setDefaultButton(false);
+
+        if (confirmAlert.showAndWait()
+                .orElse(javafx.scene.control.ButtonType.CANCEL) == javafx.scene.control.ButtonType.OK) {
+            if (userDao.deleteUser(user.getId())) {
+                showAlert("User deleted successfully!");
+                loadUsersList(); // Refresh the list
+            } else {
+                showAlert("Failed to delete user.");
+            }
         }
     }
 
