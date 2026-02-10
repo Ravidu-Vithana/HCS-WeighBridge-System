@@ -92,11 +92,11 @@ public class BackupController {
     private void handleBackupNow() {
         try {
             backupService.performBackup();
-            showAlert("Backup completed successfully!", Alert.AlertType.INFORMATION);
+            mainController.showToast("Backup completed successfully!", true);
             updateLatestBackupLabel();
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Backup failed: " + e.getMessage(), Alert.AlertType.ERROR);
+            mainController.showToast("Backup failed: " + e.getMessage(), false);
         }
     }
 
@@ -110,8 +110,8 @@ public class BackupController {
         if (selectedFile != null) {
             try {
                 backupService.restoreFromBackup(selectedFile);
-                showAlert("Restore completed! Some data might have been skipped if tables were not empty.",
-                        Alert.AlertType.INFORMATION);
+                mainController.showToast(
+                        "Restore completed! Some data might have been skipped if tables were not empty.", true);
                 // Ideally reload main UI data
                 // mainController.reloadTables() - assumes public or via callback
                 // But MainController tables are reloaded on init/save.
@@ -119,7 +119,7 @@ public class BackupController {
                 // Let's ignore for now or restart app recommendation.
             } catch (Exception e) {
                 e.printStackTrace();
-                showAlert("Restore failed: " + e.getMessage(), Alert.AlertType.ERROR);
+                mainController.showToast("Restore failed: " + e.getMessage(), false);
             }
         }
     }

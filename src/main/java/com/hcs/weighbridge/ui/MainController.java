@@ -223,7 +223,7 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Failed to open backup settings: " + e.getMessage());
             e.printStackTrace();
-            showToast("Failed to open backup settings: " + e.getMessage());
+            showToast("Failed to open backup settings: " + e.getMessage(), false);
         }
     }
 
@@ -389,7 +389,7 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Failed to open settings: " + e.getMessage());
             e.printStackTrace();
-            showToast("Failed to open settings: " + e.getMessage());
+            showToast("Failed to open settings: " + e.getMessage(), false);
         }
     }
 
@@ -457,7 +457,7 @@ public class MainController {
         String driver = driverField.getText().trim();
 
         if (lorry.isEmpty()) {
-            showToast("Please enter the Lorry Number");
+            showToast("Please enter the Lorry Number", false);
             return;
         }
         if (product.isEmpty()) {
@@ -476,16 +476,16 @@ public class MainController {
             printSecondTicket();
             recentRecords.remove(weighService.getActiveRecord());
             resetRecord();
-            showToast("Second Weight saved successfully!");
+            showToast("Second Weight saved successfully!", true);
         } else if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()) {
-            showToast("Please select the lorry from the table!");
+            showToast("Please select the lorry from the table!", false);
             resetRecord();
         } else {
             weighService.startTransaction(lorry, customer, product, driver);
             weighService.saveFirstWeight(currentWeight);
             printFirstTicket();
             resetRecord();
-            showToast("First Weight saved successfully!");
+            showToast("First Weight saved successfully!", true);
         }
         loadTables();
 
@@ -495,7 +495,7 @@ public class MainController {
         Record record = weighService.getActiveRecord();
 
         if (record == null) {
-            showToast("No active record to print");
+            showToast("No active record to print", false);
             return;
         }
 
@@ -506,7 +506,7 @@ public class MainController {
         Record record = weighService.getFullRecord();
 
         if (record == null) {
-            showToast("No completed record to print");
+            showToast("No completed record to print", false);
             return;
         }
 
@@ -517,7 +517,7 @@ public class MainController {
         Record record = weighService.getFullRecord();
 
         if (record == null) {
-            showToast("No completed record selected");
+            showToast("No completed record selected", false);
             return;
         }
 
@@ -532,67 +532,33 @@ public class MainController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showToast("Print failed: " + e.getMessage());
+            showToast("Print failed: " + e.getMessage(), false);
         }
     }
 
-    private void showToast(String msg) {
-        if (rootPane == null || rootPane.getScene() == null) {
+    public void showToast(String msg) {
+        showToast(msg, true);
+    }
+
+    public void showToast(String msg, boolean isSuccess) {
+        if (rootPane == null) {
             return;
         }
 
-        // Create toast label
-        Label toast = new Label(msg);
-        toast.setStyle(
-                "-fx-background-color: rgba(50, 50, 50, 0.9); " +
-                        "-fx-text-fill: white; " +
-                        "-fx-padding: 15px 20px; " +
-                        "-fx-background-radius: 5px; " +
-                        "-fx-font-size: 14px; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0, 0, 2);");
-        toast.setWrapText(true);
-        toast.setMaxWidth(400);
+        // Use ControlsFX Notifications for a professional, reliable implementation
+        Platform.runLater(() -> {
+            org.controlsfx.control.Notifications notification = org.controlsfx.control.Notifications.create()
+                    .text(msg)
+                    .hideAfter(javafx.util.Duration.seconds(3))
+                    .position(javafx.geometry.Pos.BOTTOM_RIGHT)
+                    .owner(rootPane);
 
-        // Get scene dimensions
-        javafx.scene.Scene scene = rootPane.getScene();
-        double sceneWidth = scene.getWidth();
-        double sceneHeight = scene.getHeight();
-
-        // Add toast to scene root (as overlay)
-        if (scene.getRoot() instanceof javafx.scene.layout.Pane) {
-            javafx.scene.layout.Pane root = (javafx.scene.layout.Pane) scene.getRoot();
-            root.getChildren().add(toast);
-
-            // Position at bottom-right
-            toast.setLayoutX(sceneWidth - toast.getWidth() - 30);
-            toast.setLayoutY(sceneHeight - 80);
-
-            // Ensure proper positioning after layout
-            Platform.runLater(() -> {
-                toast.setLayoutX(sceneWidth - toast.getWidth() - 30);
-                toast.setLayoutY(sceneHeight - 80);
-            });
-
-            // Fade in animation
-            javafx.animation.FadeTransition fadeIn = new javafx.animation.FadeTransition(
-                    javafx.util.Duration.millis(300), toast);
-            fadeIn.setFromValue(0.0);
-            fadeIn.setToValue(1.0);
-
-            // Fade out animation after delay
-            javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(
-                    javafx.util.Duration.seconds(3));
-            javafx.animation.FadeTransition fadeOut = new javafx.animation.FadeTransition(
-                    javafx.util.Duration.millis(300), toast);
-            fadeOut.setFromValue(1.0);
-            fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(e -> root.getChildren().remove(toast));
-
-            // Play animations in sequence
-            javafx.animation.SequentialTransition sequence = new javafx.animation.SequentialTransition(
-                    fadeIn, delay, fadeOut);
-            sequence.play();
-        }
+            if (isSuccess) {
+                notification.showConfirm();
+            } else {
+                notification.showError();
+            }
+        });
     }
 
     private void showAlert(String msg) {

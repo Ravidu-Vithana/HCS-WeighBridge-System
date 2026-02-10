@@ -177,7 +177,7 @@ public class SettingsController implements Initializable {
     @FXML
     private void addUser() {
         if (!isAdmin()) {
-            showAlert("Access Denied: You do not have permission to add users.");
+            mainController.showToast("Access Denied: You do not have permission to add users.", false);
             return;
         }
 
@@ -186,24 +186,24 @@ public class SettingsController implements Initializable {
         Role role = roleCombo.getValue();
 
         if (username.isEmpty() || password.isEmpty() || role == null) {
-            showAlert("Please fill in all user fields.");
+            mainController.showToast("Please fill in all user fields.", false);
             return;
         }
 
         if (userDao.findByUsername(username) != null) {
-            showAlert("User already exists!");
+            mainController.showToast("User already exists!", false);
             return;
         }
 
         User newUser = new User(0, username, password, role);
         if (userDao.createUser(newUser)) {
-            showAlert("User created successfully!");
+            mainController.showToast("User created successfully!", true);
             usernameField.clear();
             passwordField.clear();
             roleCombo.setValue(Role.USER);
             loadUsersList(); // Refresh the user list
         } else {
-            showAlert("Failed to create user.");
+            mainController.showToast("Failed to create user.", false);
         }
     }
 
@@ -261,7 +261,7 @@ public class SettingsController implements Initializable {
     private void deleteUser(User user) {
         // Prevent deleting current user
         if (currentUser != null && currentUser.getId() == user.getId()) {
-            showAlert("Cannot delete the currently logged in user!");
+            mainController.showToast("Cannot delete the currently logged in user!", false);
             return;
         }
 
@@ -281,10 +281,10 @@ public class SettingsController implements Initializable {
         if (confirmAlert.showAndWait()
                 .orElse(javafx.scene.control.ButtonType.CANCEL) == javafx.scene.control.ButtonType.OK) {
             if (userDao.deleteUser(user.getId())) {
-                showAlert("User deleted successfully!");
+                mainController.showToast("User deleted successfully!", true);
                 loadUsersList(); // Refresh the list
             } else {
-                showAlert("Failed to delete user.");
+                mainController.showToast("Failed to delete user.", false);
             }
         }
     }
@@ -296,7 +296,7 @@ public class SettingsController implements Initializable {
     @FXML
     private void save() {
         if (configDao == null) {
-            showAlert("Configuration DAO not initialized!");
+            mainController.showToast("Configuration DAO not initialized!", false);
             return;
         }
 
@@ -335,8 +335,9 @@ public class SettingsController implements Initializable {
 
             if (mainController != null) {
                 mainController.reloadWithScale(scaleFactor);
-                showAlert("Settings saved successfully!\nUI scale has been applied.");
+                mainController.showToast("Settings saved successfully!", true);
             } else {
+                // If no main controller, fallback to alert as a backup
                 showAlert(
                         "Settings saved successfully!\nPlease restart the application for UI scale to take full effect.");
             }
@@ -346,7 +347,7 @@ public class SettingsController implements Initializable {
         } catch (Exception e) {
             System.err.println("Failed to save settings: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Failed to save settings: " + e.getMessage());
+            mainController.showToast("Failed to save settings: " + e.getMessage(), false);
         }
     }
 
