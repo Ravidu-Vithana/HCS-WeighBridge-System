@@ -18,7 +18,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.ArrayList;
 
@@ -541,23 +544,81 @@ public class MainController {
     }
 
     public void showToast(String msg, boolean isSuccess) {
-        if (rootPane == null) {
+        if (rootPane == null || rootPane.getScene() == null) {
             return;
         }
 
-        // Use ControlsFX Notifications for a professional, reliable implementation
         Platform.runLater(() -> {
-            org.controlsfx.control.Notifications notification = org.controlsfx.control.Notifications.create()
-                    .text(msg)
-                    .hideAfter(javafx.util.Duration.seconds(3))
-                    .position(javafx.geometry.Pos.BOTTOM_RIGHT)
-                    .owner(rootPane);
+            Popup popup = new Popup();
 
-            if (isSuccess) {
-                notification.showConfirm();
-            } else {
-                notification.showError();
-            }
+            // Material Icon via Ikonli
+            FontIcon icon = new FontIcon();
+            icon.setIconLiteral(isSuccess ? "mdi-check-circle" : "mdi-alert-circle");
+            icon.setIconSize(22);
+            icon.setIconColor(javafx.scene.paint.Color.valueOf(isSuccess ? "#4CAF50" : "#F44336"));
+
+            Label messageLabel = new Label(msg);
+            messageLabel.setStyle(
+                    "-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-font-family: 'Segoe UI', system-ui;");
+            messageLabel.setWrapText(true);
+            messageLabel.setMaxWidth(320);
+
+            javafx.scene.layout.HBox content = new javafx.scene.layout.HBox(12, icon, messageLabel);
+            content.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+            // Premium Glassmorphism styling
+            content.setStyle(
+                    "-fx-background-color: rgba(35, 35, 35, 0.9); " +
+                            "-fx-background-radius: 10; " +
+                            "-fx-padding: 12 20; " +
+                            "-fx-border-color: rgba(255, 255, 255, 0.15); " +
+                            "-fx-border-width: 1; " +
+                            "-fx-border-radius: 10; " +
+                            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 15, 0, 0, 8);");
+
+            popup.getContent().add(content);
+            popup.setAutoHide(true);
+
+            javafx.stage.Window window = rootPane.getScene().getWindow();
+
+            // Set initial opacity for animation
+            content.setOpacity(0);
+
+            popup.setOnShown(e -> {
+                // Position at Bottom Right
+                double x = window.getX() + window.getWidth() - content.getWidth() - 30;
+                double y = window.getY() + window.getHeight() - content.getHeight() - 60;
+                popup.setX(x);
+                popup.setY(y);
+
+                // Entrance: Slide up and Fade in
+                javafx.animation.TranslateTransition slide = new javafx.animation.TranslateTransition(
+                        javafx.util.Duration.millis(350), content);
+                slide.setFromY(20);
+                slide.setToY(0);
+
+                javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(
+                        javafx.util.Duration.millis(350), content);
+                fade.setFromValue(0);
+                fade.setToValue(1);
+
+                new javafx.animation.ParallelTransition(slide, fade).play();
+            });
+
+            popup.show(window);
+
+            // Auto-hide after delay with smooth exit
+            javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(
+                    javafx.util.Duration.seconds(3.5));
+            pause.setOnFinished(e -> {
+                javafx.animation.FadeTransition fadeOut = new javafx.animation.FadeTransition(
+                        javafx.util.Duration.millis(400), content);
+                fadeOut.setFromValue(1);
+                fadeOut.setToValue(0);
+                fadeOut.setOnFinished(ev -> popup.hide());
+                fadeOut.play();
+            });
+            pause.play();
         });
     }
 
