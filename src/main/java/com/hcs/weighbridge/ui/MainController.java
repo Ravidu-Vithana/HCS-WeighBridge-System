@@ -11,6 +11,7 @@ import com.hcs.weighbridge.serial.WeighReader;
 import com.hcs.weighbridge.service.BackupService;
 import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
+import com.hcs.weighbridge.util.LogUtil;
 import com.hcs.weighbridge.util.UiScaler;
 import com.hcs.weighbridge.util.UiUtils;
 import javafx.application.Platform;
@@ -27,6 +28,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +37,7 @@ import java.util.List;
 import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class MainController {
+    private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
 
     // ---------- FXML Components ----------
     @FXML
@@ -203,7 +206,7 @@ public class MainController {
 
         } catch (Exception e) {
             System.err.println("Logout failed: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Failed to logout: {}", e.getMessage(), e);
         }
     }
 
@@ -225,7 +228,7 @@ public class MainController {
 
         } catch (Exception e) {
             System.err.println("Failed to open backup settings: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Failed to open backup settings: {}", e.getMessage(), e);
             showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Failed to open backup settings: " + e.getMessage(),
@@ -368,6 +371,7 @@ public class MainController {
 
         } catch (Exception e) {
             System.err.println("Failed to open settings: " + e.getMessage());
+            logger.error("Failed to open settings: {}", e.getMessage(), e);
             e.printStackTrace();
             showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,

@@ -1,11 +1,13 @@
 package com.hcs.weighbridge.ui;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.model.Role;
 import com.hcs.weighbridge.model.SerialConfig;
 import com.hcs.weighbridge.model.User;
+import com.hcs.weighbridge.util.LogUtil;
 import com.hcs.weighbridge.util.UiUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import com.hcs.weighbridge.MainApp;
+import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -25,6 +28,7 @@ import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class SettingsController implements Initializable {
 
+    private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
     @FXML
     private ComboBox<String> portCombo;
     @FXML
@@ -75,6 +79,7 @@ public class SettingsController implements Initializable {
             setupComboBoxes();
             setupScaleSlider();
         } catch (Exception e) {
+            logger.error("Failed to initialize settings: {}", e.getMessage(), e);
             System.out.println(e.getMessage());
         }
     }
