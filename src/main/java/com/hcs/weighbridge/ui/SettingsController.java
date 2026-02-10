@@ -233,7 +233,7 @@ public class SettingsController implements Initializable {
             // Actions column with delete button
             javafx.scene.control.TableColumn<User, Void> actionsCol = (javafx.scene.control.TableColumn<User, Void>) usersTable
                     .getColumns().get(2);
-            actionsCol.setCellFactory(param -> new javafx.scene.control.TableCell<>() {
+            actionsCol.setCellFactory(param -> new javafx.scene.control.TableCell<User, Void>() {
                 private final javafx.scene.control.Button deleteButton = new javafx.scene.control.Button("Delete");
 
                 {
