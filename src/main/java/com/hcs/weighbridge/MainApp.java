@@ -16,11 +16,14 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.sql.Connection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainApp extends Application {
 
     private static WeighReader weighReader; // Static to be accessible if needed, or better managed via instance
     private static MainApp instance;
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public MainApp() {
         instance = this;
@@ -32,6 +35,10 @@ public class MainApp extends Application {
 
     public static WeighReader getWeighReader() {
         return weighReader;
+    }
+
+    public static ExecutorService getExecutorService() {
+        return executorService;
     }
 
     @Override
@@ -122,6 +129,7 @@ public class MainApp extends Application {
         if (weighReader != null) {
             weighReader.stop();
         }
+        executorService.shutdown();
         DatabaseConfig.closeConnection();
         Platform.exit();
     }

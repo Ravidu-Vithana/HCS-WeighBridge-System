@@ -14,6 +14,7 @@ import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.UiScaler;
 import com.hcs.weighbridge.util.UiUtils;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,6 +29,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.hcs.weighbridge.util.UiUtils.showToast;
 
@@ -299,12 +302,31 @@ public class MainController {
     }
 
     private void loadTables() {
-        ArrayList<Record> pendingRecords = weighService.getAllPendingRecords();
-        ArrayList<Record> completedRecords = weighService.getAllCompletedRecords();
-        recentRecords.clear();
-        completeRecords.clear();
-        recentRecords.addAll(pendingRecords);
-        completeRecords.addAll(completedRecords);
+        Task<List<ArrayList<Record>>> task = new Task<List<ArrayList<Record>>>() {
+            @Override
+            protected List<ArrayList<Record>> call() throws Exception {
+                ArrayList<Record> pendingRecords = weighService.getAllPendingRecords();
+                ArrayList<Record> completedRecords = weighService.getAllCompletedRecords();
+                return Arrays.asList(pendingRecords, completedRecords);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            List<ArrayList<Record>> results = task.getValue();
+            recentRecords.setAll(results.get(0));
+            completeRecords.setAll(results.get(1));
+        });
+
+        task.setOnFailed(e -> {
+            Throwable ex = task.getException();
+            ex.printStackTrace();
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Failed to load data: " + ex.getMessage(),
+                    false);
+        });
+
+        MainApp.getExecutorService().submit(task);
     }
 
     private void handleRecentWeighingClick(Record newSelection) {
@@ -446,33 +468,55 @@ public class MainController {
             return;
         }
 
-        if (weighService.isPendingRecordAvailable(lorry) && weighService.hasFirstWeight()) {
-            weighService.saveSecondWeight(currentWeight);
-            printSecondTicket();
-            recentRecords.remove(weighService.getActiveRecord());
-            resetRecord();
-            showToast((Stage) rootPane.getScene().getWindow(),
-                    rootPane,
-                    "Second Weight saved successfully!",
-                    true);
-        } else if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()) {
-            showToast((Stage) rootPane.getScene().getWindow(),
-                    rootPane,
-                    "Please select the lorry from the table!",
-                    false);
-            resetRecord();
-        } else {
-            weighService.startTransaction(lorry, customer, product, driver);
-            weighService.saveFirstWeight(currentWeight);
-            printFirstTicket();
-            resetRecord();
-            showToast((Stage) rootPane.getScene().getWindow(),
-                    rootPane,
-                    "First Weight saved successfully!",
-                    true);
-        }
-        loadTables();
+        Task<Void> saveTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                if (weighService.isPendingRecordAvailable(lorry) && weighService.hasFirstWeight()) {
+                    weighService.saveSecondWeight(currentWeight);
+                    printSecondTicket();
+                    Platform.runLater(() -> {
+                        recentRecords.remove(weighService.getActiveRecord());
+                        resetRecord();
+                        showToast((Stage) rootPane.getScene().getWindow(),
+                                rootPane,
+                                "Second Weight saved successfully!",
+                                true);
+                    });
+                } else if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()) {
+                    Platform.runLater(() -> {
+                        showToast((Stage) rootPane.getScene().getWindow(),
+                                rootPane,
+                                "Please select the lorry from the table!",
+                                false);
+                        resetRecord();
+                    });
+                } else {
+                    weighService.startTransaction(lorry, customer, product, driver);
+                    weighService.saveFirstWeight(currentWeight);
+                    printFirstTicket();
+                    Platform.runLater(() -> {
+                        resetRecord();
+                        showToast((Stage) rootPane.getScene().getWindow(),
+                                rootPane,
+                                "First Weight saved successfully!",
+                                true);
+                    });
+                }
+                loadTables();
+                return null;
+            }
+        };
 
+        saveTask.setOnFailed(e -> {
+            Throwable ex = saveTask.getException();
+            ex.printStackTrace();
+            Platform.runLater(() -> showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Save failed: " + ex.getMessage(),
+                    false));
+        });
+
+        MainApp.getExecutorService().submit(saveTask);
     }
 
     private void printFirstTicket() {
@@ -518,19 +562,33 @@ public class MainController {
     }
 
     private void printReceipt(Record record, PrintMode mode) {
+        Task<Boolean> printTask = new Task<Boolean>() {
+            @Override
+            protected Boolean call() throws Exception {
+                PrintService printService = new PrintService();
+                return printService.printReceiptSilent(record, mode);
+            }
+        };
 
-        try {
-            PrintService printService = new PrintService();
-            printService.printReceiptSilent(record, mode);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showToast((Stage) rootPane.getScene().getWindow(),
+        printTask.setOnFailed(e -> {
+            Throwable ex = printTask.getException();
+            ex.printStackTrace();
+            Platform.runLater(() -> showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
-                    "Print failed: " + e.getMessage(),
-                    false
-            );
-        }
+                    "Print failed: " + ex.getMessage(),
+                    false));
+        });
+
+        printTask.setOnSucceeded(e -> {
+            if (!printTask.getValue()) {
+                showToast((Stage) rootPane.getScene().getWindow(),
+                        rootPane,
+                        "Print failed (see logs)",
+                        false);
+            }
+        });
+
+        MainApp.getExecutorService().submit(printTask);
     }
 
     public BorderPane getRootPane() {
