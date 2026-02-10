@@ -4,6 +4,7 @@ import com.hcs.weighbridge.MainApp;
 import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.util.UiScaler;
+import com.hcs.weighbridge.util.UiUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -52,17 +53,15 @@ public class LoginController {
     }
 
     private void handleExit() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Exit Confirmation");
-        alert.setHeaderText(null);
-        alert.setContentText("Are you sure you want to exit the application?");
+        Stage stage = (Stage) rootPane.getScene().getWindow();
 
-        // Set CANCEL as default button to prevent accidental confirmation with Enter
-        // key
-        ((javafx.scene.control.Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL)).setDefaultButton(true);
-        ((javafx.scene.control.Button) alert.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+        boolean confirmed = UiUtils.showConfirmation(
+                stage,
+                "Exit Confirmation",
+                "Are you sure you want to exit the application?"
+        );
 
-        if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+        if (confirmed) {
             System.exit(0);
         }
     }
