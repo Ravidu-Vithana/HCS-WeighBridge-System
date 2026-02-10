@@ -6,14 +6,19 @@ import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.model.Role;
 import com.hcs.weighbridge.model.SerialConfig;
 import com.hcs.weighbridge.model.User;
+import com.hcs.weighbridge.util.UiUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static com.hcs.weighbridge.util.UiUtils.showAlert;
+import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class SettingsController implements Initializable {
 
@@ -43,16 +48,20 @@ public class SettingsController implements Initializable {
     private PasswordField passwordField;
     @FXML
     private ComboBox<Role> roleCombo;
+    @FXML
+    private TableView<User> usersTable;
 
     private ConfigDao configDao;
     private UserDao userDao;
     private MainController mainController;
+    private BorderPane mainControllerRootPane;
     private User currentUser;
 
     public void setDependencies(ConfigDao configDao, UserDao userDao, MainController mainController, User currentUser) {
         this.configDao = configDao;
         this.userDao = userDao;
         this.mainController = mainController;
+        this.mainControllerRootPane = mainController.getRootPane();
         this.currentUser = currentUser;
         loadData();
     }
@@ -129,6 +138,11 @@ public class SettingsController implements Initializable {
             userManagementContainer.setManaged(isAdmin);
         }
 
+        // Load users list if admin
+        if (isAdmin) {
+            loadUsersList();
+        }
+
         try {
             double currentScale = configDao.getUiScaleFactor();
 
@@ -170,7 +184,10 @@ public class SettingsController implements Initializable {
     @FXML
     private void addUser() {
         if (!isAdmin()) {
-            showAlert("Access Denied: You do not have permission to add users.");
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "Access Denied: You do not have permission to add users.", 
+                    false);
             return;
         }
 
@@ -179,23 +196,121 @@ public class SettingsController implements Initializable {
         Role role = roleCombo.getValue();
 
         if (username.isEmpty() || password.isEmpty() || role == null) {
-            showAlert("Please fill in all user fields.");
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "Please fill in all user fields.", 
+                    false);
             return;
         }
 
         if (userDao.findByUsername(username) != null) {
-            showAlert("User already exists!");
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "User already exists!", 
+                    false);
             return;
         }
 
         User newUser = new User(0, username, password, role);
         if (userDao.createUser(newUser)) {
-            showAlert("User created successfully!");
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "User created successfully!", 
+                    true);
             usernameField.clear();
             passwordField.clear();
             roleCombo.setValue(Role.USER);
+            loadUsersList(); // Refresh the user list
         } else {
-            showAlert("Failed to create user.");
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "Failed to create user.", 
+                    false);
+        }
+    }
+
+    private void loadUsersList() {
+        if (usersTable == null || userDao == null) {
+            return;
+        }
+
+        java.util.List<User> users = userDao.getAllUsers();
+        javafx.collections.ObservableList<User> usersList = javafx.collections.FXCollections.observableArrayList(users);
+        usersTable.setItems(usersList);
+
+        // Configure columns
+        if (usersTable.getColumns().size() >= 3) {
+            // Username column
+            javafx.scene.control.TableColumn<User, String> usernameCol = (javafx.scene.control.TableColumn<User, String>) usersTable
+                    .getColumns().get(0);
+            usernameCol.setCellValueFactory(
+                    cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getUsername()));
+
+            // Role column
+            javafx.scene.control.TableColumn<User, String> roleCol = (javafx.scene.control.TableColumn<User, String>) usersTable
+                    .getColumns().get(1);
+            roleCol.setCellValueFactory(
+                    cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getRole().name()));
+
+            // Actions column with delete button
+            javafx.scene.control.TableColumn<User, Void> actionsCol = (javafx.scene.control.TableColumn<User, Void>) usersTable
+                    .getColumns().get(2);
+            actionsCol.setCellFactory(param -> new javafx.scene.control.TableCell<User, Void>() {
+                private final javafx.scene.control.Button deleteButton = new javafx.scene.control.Button("Delete");
+
+                {
+                    deleteButton.setOnAction(event -> {
+                        User user = getTableView().getItems().get(getIndex());
+                        if (user != null) {
+                            deleteUser(user);
+                        }
+                    });
+                }
+
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(deleteButton);
+                    }
+                }
+            });
+        }
+    }
+
+    private void deleteUser(User user) {
+        // Prevent deleting current user
+        if (currentUser != null && currentUser.getId() == user.getId()) {
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "Cannot delete the currently logged in user!",
+                    false);
+            return;
+        }
+
+        Stage stage = (Stage) mainControllerRootPane.getScene().getWindow();
+
+        boolean confirmed = UiUtils.showConfirmation(
+                stage,
+                "Delete User",
+                "Are you sure you want to delete user '" + user.getUsername() + "'?"
+        );
+
+        if (confirmed) {
+            if (userDao.deleteUser(user.getId())) {
+                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                        "User deleted successfully!",
+                        true);
+                loadUsersList(); // Refresh the list
+            } else {
+                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                        "Failed to delete user.",
+                        false);
+            }
         }
     }
 
@@ -206,12 +321,14 @@ public class SettingsController implements Initializable {
     @FXML
     private void save() {
         if (configDao == null) {
-            showAlert("Configuration DAO not initialized!");
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "Configuration DAO not initialized!",
+                    false);
             return;
         }
 
         try {
-            // Only save Serial config if visible/admin
             if (isAdmin()) {
                 SerialConfig cfg = new SerialConfig();
                 cfg.setPortName(portCombo.getValue());
@@ -245,10 +362,12 @@ public class SettingsController implements Initializable {
 
             if (mainController != null) {
                 mainController.reloadWithScale(scaleFactor);
-                showAlert("Settings saved successfully!\nUI scale has been applied.");
+                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                        "Settings saved successfully!",
+                        true);
             } else {
-                showAlert(
-                        "Settings saved successfully!\nPlease restart the application for UI scale to take full effect.");
+                showAlert("Settings","Settings saved successfully!\nPlease restart the application for UI scale to take full effect.");
             }
 
             close();
@@ -256,21 +375,16 @@ public class SettingsController implements Initializable {
         } catch (Exception e) {
             System.err.println("Failed to save settings: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Failed to save settings: " + e.getMessage());
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "Failed to save settings: " + e.getMessage(),
+                    false);
         }
     }
 
     @FXML
     private void close() {
-        Stage stage = (Stage) scaleSlider.getScene().getWindow(); // Changed root reference
+        Stage stage = (Stage) scaleSlider.getScene().getWindow();
         stage.close();
-    }
-
-    private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Settings");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

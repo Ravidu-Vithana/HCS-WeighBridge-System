@@ -59,4 +59,34 @@ public class UserDao {
             return false;
         }
     }
+
+    public java.util.List<User> getAllUsers() {
+        java.util.List<User> users = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM users ORDER BY username";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        com.hcs.weighbridge.model.Role.fromString(rs.getString("role"))));
+            }
+        } catch (SQLException e) {
+            logger.error("Error retrieving all users", e);
+        }
+        return users;
+    }
+
+    public boolean deleteUser(int userId) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            logger.error("Error deleting user with ID: {}", userId, e);
+            return false;
+        }
+    }
 }

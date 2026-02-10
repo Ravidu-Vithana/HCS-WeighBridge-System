@@ -4,6 +4,7 @@ import com.hcs.weighbridge.MainApp;
 import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.util.UiScaler;
+import com.hcs.weighbridge.util.UiUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -52,12 +53,15 @@ public class LoginController {
     }
 
     private void handleExit() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Exit Confirmation");
-        alert.setHeaderText(null);
-        alert.setContentText("Are you sure you want to exit the application?");
+        Stage stage = (Stage) rootPane.getScene().getWindow();
 
-        if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+        boolean confirmed = UiUtils.showConfirmation(
+                stage,
+                "Exit Confirmation",
+                "Are you sure you want to exit the application?"
+        );
+
+        if (confirmed) {
             System.exit(0);
         }
     }

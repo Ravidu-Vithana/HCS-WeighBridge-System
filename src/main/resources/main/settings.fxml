@@ -70,6 +70,19 @@
                  <Button text="Add User" onAction="#addUser" styleClass="settings-button"/>
             </HBox>
         </GridPane>
+        
+        <!-- User List Table -->
+        <TableView fx:id="usersTable" minHeight="200" prefHeight="250" maxHeight="400" VBox.vgrow="ALWAYS">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            <columns>
+                <TableColumn text="Username" prefWidth="150"/>
+                <TableColumn text="Role" prefWidth="100"/>
+                <TableColumn text="Actions" prefWidth="100"/>
+            </columns>
+        </TableView>
+        
         <Separator />
     </VBox>
 

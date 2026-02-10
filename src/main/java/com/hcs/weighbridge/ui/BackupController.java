@@ -3,15 +3,17 @@ package com.hcs.weighbridge.ui;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.service.BackupService;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+
+import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class BackupController {
 
@@ -31,11 +33,13 @@ public class BackupController {
     private ConfigDao configDao;
     private BackupService backupService;
     private MainController mainController;
+    private BorderPane mainControllerRootPane;
 
     public void init(ConfigDao configDao, BackupService backupService, MainController mainController) {
         this.configDao = configDao;
         this.backupService = backupService;
         this.mainController = mainController;
+        this.mainControllerRootPane = mainController.getRootPane();
 
         setupUi();
     }
@@ -57,16 +61,6 @@ public class BackupController {
         boolean autoRestore = configDao.isAutoRestoreEnabled();
         autoRestoreToggle.setSelected(autoRestore);
         autoRestoreToggle.setText(autoRestore ? "Enabled" : "Disabled");
-        // Ensure restore button is visible if logic dictates, but requirements say:
-        // "if disabled, a restore button should appear near the toggle"
-        // Let's bind visibility/enablement or just always show "Restore from File" as
-        // per my plan,
-        // but maybe emphasize it when disabled.
-        // Actually, user said: "if disabled, a restore button should appear near the
-        // toggle".
-        // This implies if ENABLED, maybe it shouldn't be there? Or just less prominent?
-        // I'll make it visible always for manual override, but maybe highlight logic.
-        // Let's stick to simple: Always visible, but relevant.
 
         restoreFileButton.visibleProperty().bind(autoRestoreToggle.selectedProperty().not());
 
@@ -92,11 +86,17 @@ public class BackupController {
     private void handleBackupNow() {
         try {
             backupService.performBackup();
-            showAlert("Backup completed successfully!", Alert.AlertType.INFORMATION);
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "Backup completed successfully!",
+                    true);
             updateLatestBackupLabel();
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Backup failed: " + e.getMessage(), Alert.AlertType.ERROR);
+            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                    "Backup failed: " + e.getMessage(),
+                    false);
         }
     }
 
@@ -110,23 +110,18 @@ public class BackupController {
         if (selectedFile != null) {
             try {
                 backupService.restoreFromBackup(selectedFile);
-                showAlert("Restore completed! Some data might have been skipped if tables were not empty.",
-                        Alert.AlertType.INFORMATION);
-                // Ideally reload main UI data
-                // mainController.reloadTables() - assumes public or via callback
-                // But MainController tables are reloaded on init/save.
-                // We might need to force reload.
-                // Let's ignore for now or restart app recommendation.
+                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                        mainControllerRootPane,
+                        "Restore completed! Some data might have been skipped if tables were not empty.",
+                        true);
             } catch (Exception e) {
                 e.printStackTrace();
-                showAlert("Restore failed: " + e.getMessage(), Alert.AlertType.ERROR);
+                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                    mainControllerRootPane,
+                        "Restore failed: " + e.getMessage(),
+                        false);
             }
         }
     }
 
-    private void showAlert(String msg, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
 }

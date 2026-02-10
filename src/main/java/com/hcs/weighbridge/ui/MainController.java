@@ -1,11 +1,18 @@
 package com.hcs.weighbridge.ui;
 
+import com.hcs.weighbridge.MainApp;
+import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.dao.ConfigDao;
+import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.model.User;
+import com.hcs.weighbridge.serial.WeighReader;
+import com.hcs.weighbridge.service.BackupService;
 import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.UiScaler;
+import com.hcs.weighbridge.util.UiUtils;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -15,12 +22,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+
+import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class MainController {
 
@@ -61,7 +70,7 @@ public class MainController {
     @FXML
     private Button logoutButton;
     @FXML
-    private Button backupButton; // Can be null if not yet in FXML, but we will add it
+    private Button backupButton;
 
     private UiModel model;
     private WeighService weighService;
@@ -82,8 +91,8 @@ public class MainController {
     public void init(UiModel model,
             WeighService weighService,
             ConfigDao configDao,
-            com.hcs.weighbridge.service.BackupService backupService,
-            com.hcs.weighbridge.model.User currentUser) {
+            BackupService backupService,
+            User currentUser) {
 
         this.model = model;
         this.weighService = weighService;
@@ -105,8 +114,6 @@ public class MainController {
             }
         });
 
-        // initializeSampleData();
-
         settingsButton.setOnAction(e -> openSettings());
         if (backupButton != null) {
             boolean isAdmin = currentUser != null && currentUser.getRole() == com.hcs.weighbridge.model.Role.ADMIN;
@@ -126,7 +133,7 @@ public class MainController {
     }
 
     private void setupKeyboardShortcuts() {
-        rootPane.getScene().addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
+        rootPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             switch (event.getCode()) {
                 case F9:
                     resetRecord();
@@ -149,44 +156,47 @@ public class MainController {
     }
 
     private void handleExit() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Exit Confirmation");
-        alert.setHeaderText(null);
-        alert.setContentText("Are you sure you want to exit the application?");
+        Stage stage = (Stage) rootPane.getScene().getWindow();
 
-        if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+        boolean confirmed = UiUtils.showConfirmation(
+                stage,
+                "Exit Confirmation",
+                "Are you sure you want to exit the application?"
+        );
+
+        if (confirmed) {
             System.exit(0);
         }
     }
 
     private void handleLogout() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Logout Confirmation");
-        alert.setHeaderText(null);
-        alert.setContentText("Are you sure you want to logout?");
+        Stage stage = (Stage) rootPane.getScene().getWindow();
 
-        if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+        boolean confirmed = UiUtils.showConfirmation(
+                stage,
+                "Logout Confirmation",
+                "Are you sure you want to logout?"
+        );
+
+        if (!confirmed) {
             return;
         }
 
         try {
-            // Stop components
             if (weighService != null) {
-                // weighService.stop(); // If needed
+                weighService = null;
             }
-            com.hcs.weighbridge.serial.WeighReader reader = com.hcs.weighbridge.MainApp.getWeighReader();
+            WeighReader reader = MainApp.getWeighReader();
             if (reader != null) {
                 reader.stop();
             }
 
-            // Close current window
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
             currentStage.close();
 
-            // Open Login Window
             Stage loginStage = new Stage();
             loginStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
-            com.hcs.weighbridge.MainApp.getInstance().showLoginView(loginStage);
+            MainApp.getInstance().showLoginView(loginStage);
 
         } catch (Exception e) {
             System.err.println("Logout failed: " + e.getMessage());
@@ -213,7 +223,10 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Failed to open backup settings: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Failed to open backup settings: " + e.getMessage());
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Failed to open backup settings: " + e.getMessage(),
+                    false);
         }
     }
 
@@ -306,50 +319,6 @@ public class MainController {
         clearAllFields();
     }
 
-    private void initializeSampleData() {
-        for (int i = 1; i <= 8; i++) {
-            Record record = new Record(new String[] { "ABC-1234", "XYZ-5678", "LMN-9012", "PQR-3456",
-                    "STU-7890", "VWX-2345", "YZA-6789", "BCD-0123" }[i - 1]);
-            record.setId(i);
-            record.setDateIn("2026-01-25");
-            record.setTimeIn(String.format("%02d:%02d", 8 + i, (i * 15) % 60));
-            record.setLorryNumber(new String[] { "ABC-1234", "XYZ-5678", "LMN-9012", "PQR-3456",
-                    "STU-7890", "VWX-2345", "YZA-6789", "BCD-0123" }[i - 1]);
-            record.setFirstWeight(15000 - (i * 300));
-            recentRecords.add(record);
-        }
-
-        Record record1 = new Record("DEF-9012");
-        record1.setId(1);
-        record1.setDateIn("2026-01-24");
-        record1.setDateOut("2026-01-24");
-        record1.setTimeIn("10:30");
-        record1.setTimeOut("14:45");
-        record1.setLorryNumber("DEF-9012");
-        record1.setFirstWeight(18000);
-        record1.setSecondWeight(5000);
-        record1.setNetWeight(13000);
-        record1.setCustomerName("ABC Traders");
-        record1.setProductName("Cement");
-        record1.setDriverName("John Silva");
-        completeRecords.add(record1);
-
-        Record record2 = new Record("GHI-3456");
-        record2.setId(2);
-        record2.setDateIn("2026-01-24");
-        record2.setDateOut("2026-01-24");
-        record2.setTimeIn("11:00");
-        record2.setTimeOut("15:20");
-        record2.setLorryNumber("GHI-3456");
-        record2.setFirstWeight(16500);
-        record2.setSecondWeight(4500);
-        record2.setNetWeight(12000);
-        record2.setCustomerName("XYZ Industries");
-        record2.setProductName("Sand");
-        record2.setDriverName("Kamal Perera");
-        completeRecords.add(record2);
-    }
-
     private void bindUi() {
         liveWeightLabel.textProperty().bind(
                 model.liveWeightProperty().asString("%d"));
@@ -362,8 +331,7 @@ public class MainController {
             Parent settingsRoot = loader.load();
 
             SettingsController controller = loader.getController();
-            com.hcs.weighbridge.dao.UserDao userDao = new com.hcs.weighbridge.dao.UserDao(
-                    com.hcs.weighbridge.config.DatabaseConfig.getConnection());
+            UserDao userDao = new UserDao(DatabaseConfig.getConnection());
             controller.setDependencies(configDao, userDao, this, currentUser);
 
             Scene scene = new Scene(settingsRoot);
@@ -379,7 +347,10 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Failed to open settings: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Failed to open settings: " + e.getMessage());
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Failed to open settings: " + e.getMessage(),
+                    false);
         }
     }
 
@@ -447,7 +418,10 @@ public class MainController {
         String driver = driverField.getText().trim();
 
         if (lorry.isEmpty()) {
-            showAlert("Please enter the Lorry Number");
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Please enter the Lorry Number",
+                    false);
             return;
         }
         if (product.isEmpty()) {
@@ -461,21 +435,41 @@ public class MainController {
         }
         int currentWeight = model.liveWeightProperty().get();
 
+        Stage stage = (Stage) rootPane.getScene().getWindow();
+        boolean confirmed = UiUtils.showConfirmation(
+                stage,
+                "Save Changes?",
+                "Are you sure you want to change these changes?",
+                false
+        );
+        if (!confirmed) {
+            return;
+        }
+
         if (weighService.isPendingRecordAvailable(lorry) && weighService.hasFirstWeight()) {
             weighService.saveSecondWeight(currentWeight);
             printSecondTicket();
             recentRecords.remove(weighService.getActiveRecord());
             resetRecord();
-            showAlert("Second Weight saved successfully!");
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Second Weight saved successfully!",
+                    true);
         } else if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()) {
-            showAlert("Please select the lorry from the table!");
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Please select the lorry from the table!",
+                    false);
             resetRecord();
         } else {
             weighService.startTransaction(lorry, customer, product, driver);
             weighService.saveFirstWeight(currentWeight);
             printFirstTicket();
             resetRecord();
-            showAlert("First Weight saved successfully!");
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "First Weight saved successfully!",
+                    true);
         }
         loadTables();
 
@@ -485,7 +479,10 @@ public class MainController {
         Record record = weighService.getActiveRecord();
 
         if (record == null) {
-            showAlert("No active record to print");
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "No active record to print",
+                    false);
             return;
         }
 
@@ -496,7 +493,10 @@ public class MainController {
         Record record = weighService.getFullRecord();
 
         if (record == null) {
-            showAlert("No completed record to print");
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "No completed record to print",
+                    false);
             return;
         }
 
@@ -507,7 +507,10 @@ public class MainController {
         Record record = weighService.getFullRecord();
 
         if (record == null) {
-            showAlert("No completed record selected");
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "No completed record selected",
+                    false);
             return;
         }
 
@@ -522,14 +525,15 @@ public class MainController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Print failed: " + e.getMessage());
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Print failed: " + e.getMessage(),
+                    false
+            );
         }
     }
 
-    private void showAlert(String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
+    public BorderPane getRootPane() {
+        return rootPane;
     }
 }
