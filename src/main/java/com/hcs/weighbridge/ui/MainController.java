@@ -1,10 +1,14 @@
 package com.hcs.weighbridge.ui;
 
 import com.hcs.weighbridge.MainApp;
+import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.dao.ConfigDao;
+import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.model.User;
 import com.hcs.weighbridge.serial.WeighReader;
+import com.hcs.weighbridge.service.BackupService;
 import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.UiScaler;
@@ -18,6 +22,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -86,8 +91,8 @@ public class MainController {
     public void init(UiModel model,
             WeighService weighService,
             ConfigDao configDao,
-            com.hcs.weighbridge.service.BackupService backupService,
-            com.hcs.weighbridge.model.User currentUser) {
+            BackupService backupService,
+            User currentUser) {
 
         this.model = model;
         this.weighService = weighService;
@@ -128,7 +133,7 @@ public class MainController {
     }
 
     private void setupKeyboardShortcuts() {
-        rootPane.getScene().addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
+        rootPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             switch (event.getCode()) {
                 case F9:
                     resetRecord();
@@ -326,8 +331,7 @@ public class MainController {
             Parent settingsRoot = loader.load();
 
             SettingsController controller = loader.getController();
-            com.hcs.weighbridge.dao.UserDao userDao = new com.hcs.weighbridge.dao.UserDao(
-                    com.hcs.weighbridge.config.DatabaseConfig.getConnection());
+            UserDao userDao = new UserDao(DatabaseConfig.getConnection());
             controller.setDependencies(configDao, userDao, this, currentUser);
 
             Scene scene = new Scene(settingsRoot);
