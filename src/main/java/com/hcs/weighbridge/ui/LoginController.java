@@ -3,6 +3,7 @@ package com.hcs.weighbridge.ui;
 import com.hcs.weighbridge.MainApp;
 import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.UserDao;
+import com.hcs.weighbridge.util.LogUtil;
 import com.hcs.weighbridge.util.UiScaler;
 import com.hcs.weighbridge.util.UiUtils;
 import javafx.application.Platform;
@@ -12,12 +13,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.Connection;
 
 public class LoginController {
-
+    private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
     @FXML
     private TextField usernameField;
 
@@ -90,7 +92,7 @@ public class LoginController {
         } catch (Exception e) {
             errorLabel.setText("Database error: " + e.getMessage());
             errorLabel.setVisible(true);
-            e.printStackTrace();
+            logger.error("Failed to login user: {}", e.getMessage(), e);
         }
     }
 
@@ -98,7 +100,6 @@ public class LoginController {
         try {
             if (MainApp.getInstance() != null) {
                 MainApp.getInstance().showMainView(user);
-                // Close login window
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 stage.close();
             } else {
@@ -106,9 +107,9 @@ public class LoginController {
                 errorLabel.setVisible(true);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             errorLabel.setText("Error loading main application.");
             errorLabel.setVisible(true);
+            logger.error("Failed to load main screen: {}", e.getMessage(), e);
         }
     }
 }

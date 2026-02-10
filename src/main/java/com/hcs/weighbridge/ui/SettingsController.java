@@ -1,11 +1,13 @@
 package com.hcs.weighbridge.ui;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.model.Role;
 import com.hcs.weighbridge.model.SerialConfig;
 import com.hcs.weighbridge.model.User;
+import com.hcs.weighbridge.util.LogUtil;
 import com.hcs.weighbridge.util.UiUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,6 +15,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import com.hcs.weighbridge.MainApp;
+import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -22,6 +28,7 @@ import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class SettingsController implements Initializable {
 
+    private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
     @FXML
     private ComboBox<String> portCombo;
     @FXML
@@ -72,6 +79,7 @@ public class SettingsController implements Initializable {
             setupComboBoxes();
             setupScaleSlider();
         } catch (Exception e) {
+            logger.error("Failed to initialize settings: {}", e.getMessage(), e);
             System.out.println(e.getMessage());
         }
     }
@@ -143,42 +151,42 @@ public class SettingsController implements Initializable {
             loadUsersList();
         }
 
-        try {
-            double currentScale = configDao.getUiScaleFactor();
+        Task<Void> loadTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                double currentScale = configDao.getUiScaleFactor();
+                SerialConfig cfg = configDao.loadSerialConfig();
 
-            if (currentScale < 1.0 || currentScale > 3.0) {
-                currentScale = 2.0;
+                Platform.runLater(() -> {
+                    double finalScale = (currentScale < 1.0 || currentScale > 3.0) ? 2.0 : currentScale;
+                    scaleSlider.setValue(finalScale);
+                    updateScaleLabel(finalScale);
+
+                    if (cfg.getPortName() != null && !cfg.getPortName().isEmpty()) {
+                        portCombo.setValue(cfg.getPortName());
+                    }
+
+                    if (cfg.getBaudRate() > 0) {
+                        baudCombo.setValue(cfg.getBaudRate());
+                    }
+
+                    if (cfg.getDataBits() > 0) {
+                        dataBitsCombo.setValue(cfg.getDataBits());
+                    }
+
+                    if (cfg.getStopBits() > 0) {
+                        stopBitsCombo.setValue(cfg.getStopBits());
+                    }
+
+                    String parityValue = cfg.getParity() == SerialPort.EVEN_PARITY ? "EVEN"
+                            : cfg.getParity() == SerialPort.ODD_PARITY ? "ODD" : "NONE";
+                    parityCombo.setValue(parityValue);
+                });
+                return null;
             }
+        };
 
-            scaleSlider.setValue(currentScale);
-            updateScaleLabel(currentScale);
-
-            SerialConfig cfg = configDao.loadSerialConfig();
-
-            if (cfg.getPortName() != null && !cfg.getPortName().isEmpty()) {
-                portCombo.setValue(cfg.getPortName());
-            }
-
-            if (cfg.getBaudRate() > 0) {
-                baudCombo.setValue(cfg.getBaudRate());
-            }
-
-            if (cfg.getDataBits() > 0) {
-                dataBitsCombo.setValue(cfg.getDataBits());
-            }
-
-            if (cfg.getStopBits() > 0) {
-                stopBitsCombo.setValue(cfg.getStopBits());
-            }
-
-            String parityValue = cfg.getParity() == SerialPort.EVEN_PARITY ? "EVEN"
-                    : cfg.getParity() == SerialPort.ODD_PARITY ? "ODD" : "NONE";
-            parityCombo.setValue(parityValue);
-
-        } catch (Exception e) {
-            System.err.println("Failed to load settings: " + e.getMessage());
-            e.printStackTrace();
-        }
+        MainApp.getExecutorService().submit(loadTask);
     }
 
     @FXML
@@ -186,7 +194,7 @@ public class SettingsController implements Initializable {
         if (!isAdmin()) {
             showToast((Stage) mainControllerRootPane.getScene().getWindow(),
                     mainControllerRootPane,
-                    "Access Denied: You do not have permission to add users.", 
+                    "Access Denied: You do not have permission to add users.",
                     false);
             return;
         }
@@ -198,7 +206,7 @@ public class SettingsController implements Initializable {
         if (username.isEmpty() || password.isEmpty() || role == null) {
             showToast((Stage) mainControllerRootPane.getScene().getWindow(),
                     mainControllerRootPane,
-                    "Please fill in all user fields.", 
+                    "Please fill in all user fields.",
                     false);
             return;
         }
@@ -206,27 +214,38 @@ public class SettingsController implements Initializable {
         if (userDao.findByUsername(username) != null) {
             showToast((Stage) mainControllerRootPane.getScene().getWindow(),
                     mainControllerRootPane,
-                    "User already exists!", 
+                    "User already exists!",
                     false);
             return;
         }
 
         User newUser = new User(0, username, password, role);
-        if (userDao.createUser(newUser)) {
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
-                    "User created successfully!", 
-                    true);
-            usernameField.clear();
-            passwordField.clear();
-            roleCombo.setValue(Role.USER);
-            loadUsersList(); // Refresh the user list
-        } else {
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
-                    "Failed to create user.", 
-                    false);
-        }
+        Task<Boolean> addTask = new Task<Boolean>() {
+            @Override
+            protected Boolean call() throws Exception {
+                return userDao.createUser(newUser);
+            }
+        };
+
+        addTask.setOnSucceeded(e -> {
+            if (addTask.getValue()) {
+                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                        mainControllerRootPane,
+                        "User created successfully!",
+                        true);
+                usernameField.clear();
+                passwordField.clear();
+                roleCombo.setValue(Role.USER);
+                loadUsersList(); // Refresh the user list
+            } else {
+                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                        mainControllerRootPane,
+                        "Failed to create user.",
+                        false);
+            }
+        });
+
+        MainApp.getExecutorService().submit(addTask);
     }
 
     private void loadUsersList() {
@@ -234,11 +253,24 @@ public class SettingsController implements Initializable {
             return;
         }
 
-        java.util.List<User> users = userDao.getAllUsers();
-        javafx.collections.ObservableList<User> usersList = javafx.collections.FXCollections.observableArrayList(users);
-        usersTable.setItems(usersList);
+        Task<java.util.List<User>> loadUsersTask = new Task<java.util.List<User>>() {
+            @Override
+            protected java.util.List<User> call() throws Exception {
+                return userDao.getAllUsers();
+            }
+        };
 
-        // Configure columns
+        loadUsersTask.setOnSucceeded(e -> {
+            java.util.List<User> users = loadUsersTask.getValue();
+            javafx.collections.ObservableList<User> usersList = javafx.collections.FXCollections
+                    .observableArrayList(users);
+            usersTable.setItems(usersList);
+        });
+
+        MainApp.getExecutorService().submit(loadUsersTask);
+
+        // Configure columns (usually done once, but keeping it here for simplicity as
+        // per original)
         if (usersTable.getColumns().size() >= 3) {
             // Username column
             javafx.scene.control.TableColumn<User, String> usernameCol = (javafx.scene.control.TableColumn<User, String>) usersTable
@@ -295,22 +327,32 @@ public class SettingsController implements Initializable {
         boolean confirmed = UiUtils.showConfirmation(
                 stage,
                 "Delete User",
-                "Are you sure you want to delete user '" + user.getUsername() + "'?"
-        );
+                "Are you sure you want to delete user '" + user.getUsername() + "'?");
 
         if (confirmed) {
-            if (userDao.deleteUser(user.getId())) {
-                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
-                        "User deleted successfully!",
-                        true);
-                loadUsersList(); // Refresh the list
-            } else {
-                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
-                        "Failed to delete user.",
-                        false);
-            }
+            Task<Boolean> deleteTask = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    return userDao.deleteUser(user.getId());
+                }
+            };
+
+            deleteTask.setOnSucceeded(e -> {
+                if (deleteTask.getValue()) {
+                    showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                            mainControllerRootPane,
+                            "User deleted successfully!",
+                            true);
+                    loadUsersList(); // Refresh the list
+                } else {
+                    showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                            mainControllerRootPane,
+                            "Failed to delete user.",
+                            false);
+                }
+            });
+
+            MainApp.getExecutorService().submit(deleteTask);
         }
     }
 
@@ -329,8 +371,8 @@ public class SettingsController implements Initializable {
         }
 
         try {
+            SerialConfig cfg = new SerialConfig();
             if (isAdmin()) {
-                SerialConfig cfg = new SerialConfig();
                 cfg.setPortName(portCombo.getValue());
 
                 if (baudCombo.getValue() != null) {
@@ -353,24 +395,45 @@ public class SettingsController implements Initializable {
                 } else {
                     cfg.setParity(SerialPort.NO_PARITY);
                 }
-
-                configDao.saveSerialConfig(cfg);
             }
 
             double scaleFactor = scaleSlider.getValue();
-            configDao.saveUiScaleFactor(scaleFactor);
 
-            if (mainController != null) {
-                mainController.reloadWithScale(scaleFactor);
+            Task<Void> saveTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    if (isAdmin()) {
+                        configDao.saveSerialConfig(cfg);
+                    }
+                    configDao.saveUiScaleFactor(scaleFactor);
+                    return null;
+                }
+            };
+
+            saveTask.setOnSucceeded(e -> {
+                if (mainController != null) {
+                    mainController.reloadWithScale(scaleFactor);
+                    showToast((Stage) mainControllerRootPane.getScene().getWindow(),
+                            mainControllerRootPane,
+                            "Settings saved successfully!",
+                            true);
+                } else {
+                    showAlert("Settings",
+                            "Settings saved successfully!\nPlease restart the application for UI scale to take full effect.");
+                }
+                close();
+            });
+
+            saveTask.setOnFailed(e -> {
+                Throwable ex = saveTask.getException();
+                ex.printStackTrace();
                 showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
-                        "Settings saved successfully!",
-                        true);
-            } else {
-                showAlert("Settings","Settings saved successfully!\nPlease restart the application for UI scale to take full effect.");
-            }
+                        mainControllerRootPane,
+                        "Failed to save settings: " + ex.getMessage(),
+                        false);
+            });
 
-            close();
+            MainApp.getExecutorService().submit(saveTask);
 
         } catch (Exception e) {
             System.err.println("Failed to save settings: " + e.getMessage());

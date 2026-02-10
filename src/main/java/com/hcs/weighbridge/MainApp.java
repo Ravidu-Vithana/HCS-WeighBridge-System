@@ -8,19 +8,25 @@ import com.hcs.weighbridge.serial.WeighReader;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.ui.MainController;
 import com.hcs.weighbridge.ui.UiModel;
+import com.hcs.weighbridge.util.LogUtil;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainApp extends Application {
 
+    private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
     private static WeighReader weighReader; // Static to be accessible if needed, or better managed via instance
     private static MainApp instance;
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public MainApp() {
         instance = this;
@@ -32,6 +38,10 @@ public class MainApp extends Application {
 
     public static WeighReader getWeighReader() {
         return weighReader;
+    }
+
+    public static ExecutorService getExecutorService() {
+        return executorService;
     }
 
     @Override
@@ -46,7 +56,7 @@ public class MainApp extends Application {
             backupService.checkAndRunScheduledBackup();
         } catch (Exception e) {
             System.err.println("Startup database initialization failed: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Failed to initialize database: {}", e.getMessage(), e);
         }
 
         stage.initStyle(StageStyle.UNDECORATED);
@@ -62,7 +72,7 @@ public class MainApp extends Application {
             stage.setMaximized(true);
             stage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to initialize login screen: {}", e.getMessage(), e);
         }
     }
 
@@ -104,16 +114,8 @@ public class MainApp extends Application {
             stage.setMaximized(true);
             stage.show();
 
-            // Close the login stage if it's open (implied by context of calling from
-            // LoginController which has a stage)
-            // Ideally passing the stage to showMainView would be better to reuse it, but
-            // creating new one is also fine.
-            // Let's modify to reuse stage if possible or close previous.
-            // For now, let's keep it simple: Create new Main Stage. Login Stage will be
-            // closed by LoginController.
-
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to initialize main screen: {}", e.getMessage(), e);
         }
     }
 
@@ -122,6 +124,7 @@ public class MainApp extends Application {
         if (weighReader != null) {
             weighReader.stop();
         }
+        executorService.shutdown();
         DatabaseConfig.closeConnection();
         Platform.exit();
     }

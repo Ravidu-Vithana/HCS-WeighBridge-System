@@ -10,6 +10,9 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import com.hcs.weighbridge.MainApp;
 
 import java.io.File;
 
@@ -84,20 +87,32 @@ public class BackupController {
     }
 
     private void handleBackupNow() {
-        try {
-            backupService.performBackup();
+        Task<Void> backupTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                backupService.performBackup();
+                return null;
+            }
+        };
+
+        backupTask.setOnSucceeded(e -> {
             showToast((Stage) mainControllerRootPane.getScene().getWindow(),
                     mainControllerRootPane,
                     "Backup completed successfully!",
                     true);
             updateLatestBackupLabel();
-        } catch (Exception e) {
-            e.printStackTrace();
+        });
+
+        backupTask.setOnFailed(e -> {
+            Throwable ex = backupTask.getException();
+            ex.printStackTrace();
             showToast((Stage) mainControllerRootPane.getScene().getWindow(),
                     mainControllerRootPane,
-                    "Backup failed: " + e.getMessage(),
+                    "Backup failed: " + ex.getMessage(),
                     false);
-        }
+        });
+
+        MainApp.getExecutorService().submit(backupTask);
     }
 
     private void handleRestoreFromFile() {
@@ -108,19 +123,31 @@ public class BackupController {
 
         File selectedFile = fileChooser.showOpenDialog(restoreFileButton.getScene().getWindow());
         if (selectedFile != null) {
-            try {
-                backupService.restoreFromBackup(selectedFile);
+            Task<Void> restoreTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    backupService.restoreFromBackup(selectedFile);
+                    return null;
+                }
+            };
+
+            restoreTask.setOnSucceeded(e -> {
                 showToast((Stage) mainControllerRootPane.getScene().getWindow(),
                         mainControllerRootPane,
                         "Restore completed! Some data might have been skipped if tables were not empty.",
                         true);
-            } catch (Exception e) {
-                e.printStackTrace();
+            });
+
+            restoreTask.setOnFailed(e -> {
+                Throwable ex = restoreTask.getException();
+                ex.printStackTrace();
                 showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
-                        "Restore failed: " + e.getMessage(),
+                        mainControllerRootPane,
+                        "Restore failed: " + ex.getMessage(),
                         false);
-            }
+            });
+
+            MainApp.getExecutorService().submit(restoreTask);
         }
     }
 
