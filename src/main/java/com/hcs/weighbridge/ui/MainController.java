@@ -468,6 +468,9 @@ public class MainController {
             return;
         }
 
+        String finalDriver = driver;
+        String finalProduct = product;
+        String finalCustomer = customer;
         Task<Void> saveTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -491,7 +494,7 @@ public class MainController {
                         resetRecord();
                     });
                 } else {
-                    weighService.startTransaction(lorry, customer, product, driver);
+                    weighService.startTransaction(lorry, finalCustomer, finalProduct, finalDriver);
                     weighService.saveFirstWeight(currentWeight);
                     printFirstTicket();
                     Platform.runLater(() -> {
