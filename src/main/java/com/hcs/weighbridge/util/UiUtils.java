@@ -29,9 +29,12 @@ public final class UiUtils {
         alert.showAndWait();
     }
 
-    public static boolean showConfirmation(Stage owner,
-                                           String title,
-                                           String message) {
+    public static boolean showConfirmation(
+            Stage owner,
+            String title,
+            String message,
+            boolean defaultCancel
+    ) {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.initOwner(owner);
@@ -42,8 +45,8 @@ public final class UiUtils {
         Button okButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
         Button cancelButton = (Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL);
 
-        cancelButton.setDefaultButton(true);
-        okButton.setDefaultButton(false);
+        cancelButton.setDefaultButton(defaultCancel);
+        okButton.setDefaultButton(!defaultCancel);
 
         alert.getDialogPane().setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -57,6 +60,14 @@ public final class UiUtils {
 
         Optional<ButtonType> result = alert.showAndWait();
         return result.orElse(ButtonType.CANCEL) == ButtonType.OK;
+    }
+
+    public static boolean showConfirmation(
+            Stage owner,
+            String title,
+            String message
+    ) {
+        return showConfirmation(owner,title,message,true);
     }
 
     public static void showToast(Stage owner,

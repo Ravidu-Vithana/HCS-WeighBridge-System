@@ -431,6 +431,17 @@ public class MainController {
         }
         int currentWeight = model.liveWeightProperty().get();
 
+        Stage stage = (Stage) rootPane.getScene().getWindow();
+        boolean confirmed = UiUtils.showConfirmation(
+                stage,
+                "Save Changes?",
+                "Are you sure you want to change these changes?",
+                false
+        );
+        if (!confirmed) {
+            return;
+        }
+
         if (weighService.isPendingRecordAvailable(lorry) && weighService.hasFirstWeight()) {
             weighService.saveSecondWeight(currentWeight);
             printSecondTicket();
