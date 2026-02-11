@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.hcs.weighbridge.ui.BackupController"
+      spacing="20" alignment="TOP_CENTER"
+      style="-fx-background-color: #f8fafc; -fx-padding: 30;"
+      prefWidth="500">
+
+    <Label text="Backup &amp; Restore Settings" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+
+    <Separator />
+
+    <!-- Scheduled Backup Section -->
+    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 1);">
+        <Label text="Data Backup" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+        
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="Frequency:" style="-fx-text-fill: #64748b;"/>
+            <ComboBox fx:id="frequencyCombo" prefWidth="150"/>
+        </HBox>
+
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="Last Backup:" style="-fx-text-fill: #64748b;"/>
+            <Label fx:id="latestBackupLabel" text="Never" style="-fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="backupNowButton" text="Backup Now" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Restore Section -->
+    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 1);">
+        <Label text="Data Restore" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="Auto-Restore on Startup:" style="-fx-text-fill: #64748b;"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <ToggleButton fx:id="autoRestoreToggle" text="Enabled" />
+        </HBox>
+
+        <HBox fx:id="restoreFileBox" spacing="15" alignment="CENTER_RIGHT">
+             <Button fx:id="restoreFileButton" text="Restore from File..." style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-cursor: hand;"/>
+        </HBox>
+        
+        <Label text="Note: Restore is skipped for 'weigh_data' if table is not empty." wrapText="true" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-font-style: italic;"/>
+    </VBox>
+    
+    <Separator />
+    
+    <Button fx:id="closeButton" text="Close" style="-fx-background-color: #cbd5e1; -fx-text-fill: #1e293b; -fx-cursor: hand;" prefWidth="100"/>
+
+</VBox>

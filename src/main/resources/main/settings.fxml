@@ -20,31 +20,77 @@
     <Separator />
 
     <!-- Serial Port Settings Section -->
-    <Label text="Serial Port Settings" styleClass="settings-section-title" />
+    <VBox fx:id="serialSettingsContainer" spacing="10">
+        <Label text="Serial Port Settings" styleClass="settings-section-title" />
 
-    <GridPane hgap="15" vgap="12">
-        <columnConstraints>
-            <ColumnConstraints minWidth="100" />
-            <ColumnConstraints minWidth="200" />
-        </columnConstraints>
+        <GridPane hgap="15" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints minWidth="100" />
+                <ColumnConstraints minWidth="200" />
+            </columnConstraints>
 
-        <Label text="COM Port:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <ComboBox fx:id="portCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity"/>
+            <Label text="COM Port:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <ComboBox fx:id="portCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity"/>
 
-        <Label text="Baud Rate:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <ComboBox fx:id="baudCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity"/>
+            <Label text="Baud Rate:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <ComboBox fx:id="baudCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity"/>
 
-        <Label text="Data Bits:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-        <ComboBox fx:id="dataBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
+            <Label text="Data Bits:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <ComboBox fx:id="dataBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
 
-        <Label text="Stop Bits:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-        <ComboBox fx:id="stopBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" maxWidth="Infinity"/>
+            <Label text="Stop Bits:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <ComboBox fx:id="stopBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" maxWidth="Infinity"/>
 
-        <Label text="Parity:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-        <ComboBox fx:id="parityCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" maxWidth="Infinity"/>
-    </GridPane>
+            <Label text="Parity:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <ComboBox fx:id="parityCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" maxWidth="Infinity"/>
+        </GridPane>
+        <Separator />
+    </VBox>
 
-    <Separator />
+    <!-- User Management Section (ADMIN Only) -->
+    <VBox fx:id="userManagementContainer" spacing="10">
+        <Label text="User Management" styleClass="settings-section-title" />
+
+        <GridPane hgap="15" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints minWidth="100" />
+                <ColumnConstraints minWidth="200" />
+            </columnConstraints>
+
+            <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <TextField fx:id="usernameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+            <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <Label text="Role:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <ComboBox fx:id="roleCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
+            
+            <HBox GridPane.columnIndex="1" GridPane.rowIndex="3" alignment="CENTER_RIGHT">
+                 <Button text="Add User" onAction="#addUser" styleClass="settings-button"/>
+            </HBox>
+        </GridPane>
+        
+        <!-- User List Table -->
+        <TableView fx:id="usersTable" minHeight="200" prefHeight="250" maxHeight="400" VBox.vgrow="ALWAYS">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            <columns>
+                <TableColumn text="Username" prefWidth="150"/>
+                <TableColumn text="Role" prefWidth="100"/>
+                <TableColumn text="Actions" prefWidth="100"/>
+            </columns>
+        </TableView>
+        
+        <Separator />
+    </VBox>
+
+    <!-- System Settings Section -->
+    <VBox fx:id="systemSettingsContainer" spacing="8">
+        <Label text="System Settings" styleClass="settings-section-title" />
+        <CheckBox fx:id="startupCheckBox" text="Start application on computer boot" styleClass="settings-checkbox"/>
+    </VBox>
 
     <!-- UI Scale Settings Section -->
     <Label text="User Interface Settings" styleClass="settings-section-title" />

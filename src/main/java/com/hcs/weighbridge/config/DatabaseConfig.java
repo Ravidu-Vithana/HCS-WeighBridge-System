@@ -2,6 +2,7 @@ package com.hcs.weighbridge.config;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.hcs.weighbridge.util.LogUtil;
+import com.hcs.weighbridge.util.SecurityUtil;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -72,7 +74,8 @@ public final class DatabaseConfig {
             CHARACTER_ENCODING = props.getProperty("db.characterEncoding", CHARACTER_ENCODING);
 
             logger.info("Configuration loaded successfully from file");
-            logger.debug("Database settings - Host: {}, Port: {}, Database: {}, User: {}, SSL: {}, Unicode: {}, Encoding: {}",
+            logger.debug(
+                    "Database settings - Host: {}, Port: {}, Database: {}, User: {}, SSL: {}, Unicode: {}, Encoding: {}",
                     DB_HOST, DB_PORT, DB_NAME, DB_USER, USE_SSL, USE_UNICODE, CHARACTER_ENCODING);
             System.out.println("Database configuration loaded successfully.");
 
@@ -112,12 +115,10 @@ public final class DatabaseConfig {
 
             try (
                     Connection baseConn = DriverManager.getConnection(getBaseUrl(), DB_USER, DB_PASSWORD);
-                    Statement stmt = baseConn.createStatement()
-            ) {
+                    Statement stmt = baseConn.createStatement()) {
                 String createDBSQL = String.format(
                         "CREATE DATABASE IF NOT EXISTS %s CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-                        DB_NAME
-                );
+                        DB_NAME);
                 logger.debug("Executing database creation SQL: {}", createDBSQL);
                 stmt.executeUpdate(createDBSQL);
                 logger.info("Database '{}' checked/created successfully", DB_NAME);
@@ -176,6 +177,15 @@ public final class DatabaseConfig {
                 "INDEX idx_config_key (config_key)" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
+        String createUsersTable = "CREATE TABLE IF NOT EXISTS users (" +
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "username VARCHAR(50) NOT NULL UNIQUE," +
+                "password VARCHAR(100) NOT NULL," +
+                "role VARCHAR(20) DEFAULT 'USER'," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "INDEX idx_username (username)" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
         try (Statement stmt = connection.createStatement()) {
             logger.debug("Creating 'weigh_data' table if not exists");
             stmt.executeUpdate(createWeighDataTable);
@@ -186,6 +196,11 @@ public final class DatabaseConfig {
             stmt.executeUpdate(createAppConfigTable);
             logger.info("Table 'app_config' checked/created successfully");
             System.out.println("Table 'app_config' checked/created successfully.");
+
+            logger.debug("Creating 'users' table if not exists");
+            stmt.executeUpdate(createUsersTable);
+            logger.info("Table 'users' checked/created successfully");
+            System.out.println("Table 'users' checked/created successfully.");
 
             insertDefaultConfigurations();
         } catch (SQLException e) {
@@ -200,11 +215,17 @@ public final class DatabaseConfig {
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('com_port', 'COM1')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('baud_rate', '2400')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('data_bits', '7')",
-                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('stop_bits', '"+ SerialPort.ONE_STOP_BIT +"')",
-                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('parity', '"+SerialPort.EVEN_PARITY+"')",
-                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('ui_scale_factor', '1.0')",
+                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('stop_bits', '"
+                        + SerialPort.ONE_STOP_BIT + "')",
+                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('parity', '" + SerialPort.EVEN_PARITY
+                        + "')",
+                "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('ui_scale_factor', '2.0')",
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('receipt_counter', '1')"
         };
+
+        String insertDefaultUser = String.format(
+                "INSERT IGNORE INTO users (username, password, role) VALUES ('root', '%s', 'ADMIN')",
+                SecurityUtil.hashPassword("admin"));
 
         try (Statement stmt = connection.createStatement()) {
             int successCount = 0;
@@ -221,6 +242,20 @@ public final class DatabaseConfig {
             }
             logger.info("Inserted {} default configurations into app_config", successCount);
             System.out.println("Default configurations inserted/checked.");
+
+            // Insert default user
+            try {
+                int userRows = stmt.executeUpdate(insertDefaultUser);
+                if (userRows > 0) {
+                    logger.info("Default admin user 'root' created successfully");
+                    System.out.println("Default admin user 'root' created.");
+                } else {
+                    logger.debug("Default admin user 'root' already exists");
+                }
+            } catch (SQLException e) {
+                logger.warn("Failed to insert default user: {}", e.getMessage());
+            }
+
         } catch (SQLException e) {
             logger.warn("Could not insert default configurations: {}", e.getMessage(), e);
             System.err.println("Warning: Could not insert default configurations: " + e.getMessage());
@@ -309,6 +344,62 @@ public final class DatabaseConfig {
             }
         } catch (SQLException e) {
             logger.error("Error checking connection status: {}", e.getMessage(), e);
+        }
+    }
+
+    public static boolean isTableEmpty(String tableName) {
+        String query = "SELECT COUNT(*) FROM " + tableName;
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
+        } catch (SQLException e) {
+            logger.error("Error checking if table {} is empty: {}", tableName, e.getMessage());
+        }
+        return false;
+    }
+
+    public static void executeScript(String scriptPath) throws IOException, SQLException {
+        logger.info("Executing SQL script from: {}", scriptPath);
+        File file = new File(scriptPath);
+        if (!file.exists()) {
+            throw new IOException("Script file not found: " + scriptPath);
+        }
+
+        StringBuilder script = new StringBuilder();
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                script.append(line).append("\n");
+            }
+        }
+
+        String[] statements = script.toString().split(";");
+        try (Statement stmt = connection.createStatement()) {
+            int count = 0;
+            for (String sql : statements) {
+                String trimmed = sql.trim();
+                if (!trimmed.isEmpty()) {
+                    try {
+                        // Skip INSERTs for weigh_data if it already has data?
+                        // Actually, the BackupService will handle the logic of deciding WHAT to run or
+                        // if to run at all.
+                        // This method just executes blindly.
+                        // However, strictly speaking, the BackupService might need to parse this
+                        // manually to skip specific tables.
+                        // But for now, let's keep a generic execute method.
+                        stmt.execute(trimmed);
+                        count++;
+                    } catch (SQLException e) {
+                        // Log but maybe don't stop everything? Or should we?
+                        // For auto-restore, we probably want to continue on non-fatal errors (like
+                        // duplicate keys)
+                        logger.warn("Error executing statement: {} - Error: {}", trimmed, e.getMessage());
+                    }
+                }
+            }
+            logger.info("Executed {} SQL statements from script", count);
         }
     }
 }

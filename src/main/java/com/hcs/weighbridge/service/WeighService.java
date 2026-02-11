@@ -1,10 +1,12 @@
 package com.hcs.weighbridge.service;
 
+import com.hcs.weighbridge.constants.RecordStatus;
 import com.hcs.weighbridge.dao.WeighDataDao;
 import com.hcs.weighbridge.model.Record;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class WeighService {
 
@@ -18,8 +20,8 @@ public class WeighService {
         this.dao = dao;
     }
 
-    public Record startTransaction(String lorryNo, String customerName,
-                                   String productName, String driverName) {
+    public void startTransaction(String lorryNo, String customerName,
+                                 String productName, String driverName) {
 
         activeRecord = new Record(lorryNo);
         activeRecord.setCustomerName(customerName);
@@ -27,12 +29,11 @@ public class WeighService {
         activeRecord.setDriverName(driverName);
         dao.createTransaction(activeRecord);
 
-        return activeRecord;
     }
 
     public void saveFirstWeight(int weight) {
         if (activeRecord == null) {
-            throw new IllegalStateException("No active transaction");
+            return;
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -46,9 +47,9 @@ public class WeighService {
         dao.saveFirstWeight(activeRecord.getId(), weight, date, time);
     }
 
-    public Record saveSecondWeight(int weight) {
+    public void saveSecondWeight(int weight) {
         if (activeRecord == null) {
-            throw new IllegalStateException("No active transaction");
+            return;
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -64,11 +65,16 @@ public class WeighService {
 
         dao.saveSecondWeightAndComplete(activeRecord.getId(), weight, dateOut, timeOut);
 
-        Record completedRecord = activeRecord;
         fullRecord = activeRecord;
         activeRecord = null;
+    }
 
-        return completedRecord;
+    public ArrayList<Record> getAllPendingRecords() {
+        return dao.getAllRecordsFromStatus(RecordStatus.PENDING);
+    }
+
+    public ArrayList<Record> getAllCompletedRecords() {
+        return dao.getAllRecordsFromStatus(RecordStatus.COMPLETED);
     }
 
     public Record loadRecord(long id) {
@@ -76,7 +82,7 @@ public class WeighService {
         return activeRecord;
     }
 
-    public Boolean isPendingRecordAvailble(String lorryNo) { return dao.isPendingRecordAvailable(lorryNo); }
+    public Boolean isPendingRecordAvailable(String lorryNo) { return dao.isPendingRecordAvailable(lorryNo); }
 
     public Record getActiveRecord() {
         return activeRecord;
@@ -91,7 +97,7 @@ public class WeighService {
     }
 
     public boolean hasFirstWeight() {
-        return activeRecord != null && activeRecord.getFirstWeight() > 0;
+        return activeRecord != null;
     }
 
     public void setFirstWeightRecord(Record record) {

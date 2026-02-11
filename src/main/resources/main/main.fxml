@@ -47,8 +47,21 @@
 
             <!-- Settings and Exit Buttons -->
             <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="backupButton"
+                        text="Backup"
+                        styleClass="settings-button"
+                        visible="false"
+                        managed="false">
+                    <!-- Reusing settings-button style for now, or create new one -->
+                </Button>
+
                 <Button fx:id="settingsButton"
                         text="Settings"
+                        styleClass="settings-button">
+                </Button>
+
+                <Button fx:id="logoutButton"
+                        text="Logout"
                         styleClass="settings-button">
                 </Button>
 
@@ -64,6 +77,7 @@
     <center>
         <ScrollPane fx:id="mainScrollPane"
                     fitToWidth="true"
+                    fitToHeight="true"
                     hbarPolicy="NEVER"
                     vbarPolicy="AS_NEEDED"
                     style="-fx-background: transparent;
@@ -173,9 +187,11 @@
                                        styleClass="section-header" />
 
                                 <!-- Table View for Recent Weighings -->
-                                <TableView fx:id="recentWeighingsTable"
-                                           styleClass="table-view"
-                                           VBox.vgrow="ALWAYS">
+                                <TableView fx:id="recentRecordsTable"
+                                           VBox.vgrow="ALWAYS"
+                                           prefHeight="300"
+                                           minHeight="200"
+                                           styleClass="table-view">
 
                                     <columns>
                                         <TableColumn text="Date" prefWidth="100"/>
@@ -200,22 +216,22 @@
                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
 
                                 <Button fx:id="newButton"
-                                        text="New"
+                                        text="New (F9)"
                                         styleClass="new-button">
                                 </Button>
 
                                 <Button fx:id="saveButton"
-                                        text="Save"
+                                        text="Save (F12)"
                                         styleClass="save-button">
                                 </Button>
 
                                 <Button fx:id="printFirstButton"
-                                        text="Print First Ticket"
+                                        text="Print First Ticket (F10)"
                                         styleClass="print-first-button">
                                 </Button>
 
                                 <Button fx:id="printFullButton"
-                                        text="Print Full Ticket"
+                                        text="Print Full Ticket (F11)"
                                         styleClass="print-full-button">
                                 </Button>
                             </HBox>
@@ -226,14 +242,18 @@
                     <VBox style="-fx-background-color: rgba(255, 255, 255, 0.95);
                                  -fx-background-radius: 8;
                                  -fx-padding: 10;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);"
+                          VBox.vgrow="ALWAYS">
 
                         <Label text="Complete Records"
                                styleClass="section-header" />
 
                         <!-- Table View for Complete Records -->
                         <TableView fx:id="completeRecordsTable"
-                                   styleClass="table-view, complete-records-table">
+                                   VBox.vgrow="ALWAYS"
+                                   prefHeight="300"
+                                   minHeight="200"
+                                   styleClass="table-view">
 
                             <columns>
                                 <TableColumn text="Date In" prefWidth="80"/>
