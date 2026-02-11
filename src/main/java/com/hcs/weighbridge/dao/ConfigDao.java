@@ -1,10 +1,12 @@
 package com.hcs.weighbridge.dao;
 
 import com.hcs.weighbridge.model.SerialConfig;
+import com.hcs.weighbridge.util.AppException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ConfigDao {
 
@@ -44,7 +46,7 @@ public class ConfigDao {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load config", e);
+            throw new AppException("Failed to load serial configuration", e);
         }
 
         return cfg;
@@ -67,9 +69,10 @@ public class ConfigDao {
             if (rs.next()) {
                 return Double.parseDouble(rs.getString("config_value"));
             }
+        } catch (SQLException e) {
+            throw new AppException("Failed to load UI scale factor", e);
         } catch (Exception e) {
-            // If not found or error, return default
-            System.err.println("Failed to load UI scale factor: " + e.getMessage());
+            throw new AppException("Unexpected error loading UI scale factor", e);
         }
         return 1.0; // Default scale
     }
@@ -111,8 +114,8 @@ public class ConfigDao {
             if (rs.next()) {
                 return rs.getString("config_value");
             }
-        } catch (Exception e) {
-            System.err.println("Failed to load config for key " + key + ": " + e.getMessage());
+        } catch (SQLException e) {
+            throw new AppException("Failed to load config for key: " + key, e);
         }
         return defaultValue;
     }
@@ -124,8 +127,8 @@ public class ConfigDao {
             ps.setString(1, key);
             ps.setString(2, value);
             ps.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new AppException("Failed to save config key: " + key, e);
         }
     }
 }

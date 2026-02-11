@@ -38,7 +38,7 @@ import java.util.List;
 import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class MainController {
-    private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
+    private static final Logger logger = LogUtil.getLogger(MainController.class);
 
     // ---------- FXML Components ----------
     @FXML
@@ -168,8 +168,7 @@ public class MainController {
         boolean confirmed = UiUtils.showConfirmation(
                 stage,
                 "Exit and Shutdown?",
-                "Are you sure you want to exit? The computer will SHUTDOWN."
-        );
+                "Are you sure you want to exit? The computer will SHUTDOWN.");
 
         if (confirmed) {
             Platform.runLater(() -> {
@@ -199,8 +198,7 @@ public class MainController {
         boolean confirmed = UiUtils.showConfirmation(
                 stage,
                 "Logout Confirmation",
-                "Are you sure you want to logout?"
-        );
+                "Are you sure you want to logout?");
 
         if (!confirmed) {
             return;
@@ -484,8 +482,7 @@ public class MainController {
                 stage,
                 "Save Changes?",
                 "Are you sure you want to change these changes?",
-                false
-        );
+                false);
         if (!confirmed) {
             return;
         }
@@ -605,12 +602,10 @@ public class MainController {
         });
 
         printTask.setOnSucceeded(e -> {
-            if (!printTask.getValue()) {
-                showToast((Stage) rootPane.getScene().getWindow(),
-                        rootPane,
-                        "Print failed (see logs)",
-                        false);
-            }
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Print job sent successfully",
+                    true);
         });
 
         MainApp.getExecutorService().submit(printTask);
