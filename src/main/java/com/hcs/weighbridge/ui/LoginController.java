@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.sql.Connection;
 
+import static com.hcs.weighbridge.util.UiUtils.showToast;
+
 public class LoginController {
     private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
     @FXML

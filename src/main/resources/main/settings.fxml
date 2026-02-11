@@ -87,8 +87,8 @@
     </VBox>
 
     <!-- System Settings Section -->
-    <Label text="System Settings" styleClass="settings-section-title" />
     <VBox fx:id="systemSettingsContainer" spacing="8">
+        <Label text="System Settings" styleClass="settings-section-title" />
         <CheckBox fx:id="startupCheckBox" text="Start application on computer boot" styleClass="settings-checkbox"/>
     </VBox>
 
