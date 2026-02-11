@@ -46,11 +46,6 @@ public class MainApp extends Application {
     public static ExecutorService getExecutorService() {
         return executorService;
     }
-
-    @Override
-    public void init() throws Exception {
-        initializeApplication();
-    }
     
     private void initializeApplication() {
         try {
@@ -92,7 +87,15 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         stage.initStyle(StageStyle.UNDECORATED);
-        showLoginView(stage);
+        try {
+            initializeApplication();
+            showLoginView(stage);
+        } catch (Exception e) {
+            logger.fatal("Fatal startup error", e);
+            UiUtils.showAlert("Fatal Error", "Application failed to start.");
+            Platform.exit();
+            System.exit(1);
+        }
     }
 
     public void showLoginView(Stage stage) {

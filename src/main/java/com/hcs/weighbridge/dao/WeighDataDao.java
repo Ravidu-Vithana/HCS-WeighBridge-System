@@ -32,6 +32,8 @@ public class WeighDataDao {
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create transaction", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -87,6 +89,8 @@ public class WeighDataDao {
 
         } catch (SQLException e) {
             return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -105,6 +109,8 @@ public class WeighDataDao {
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load record by ID", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -120,10 +126,12 @@ public class WeighDataDao {
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load record by ID", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private Record getRecordFromResultSet(ResultSet rs) throws SQLException {
+    private Record getRecordFromResultSet(ResultSet rs) throws Exception {
         Record record = new Record(SecurityUtil.decrypt(rs.getString("lorry_no")));
         record.setId(rs.getLong("id"));
         record.setDateIn(rs.getString("date_in"));
