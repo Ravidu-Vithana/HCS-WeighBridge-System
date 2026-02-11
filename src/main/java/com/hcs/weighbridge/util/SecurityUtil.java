@@ -64,12 +64,13 @@ public class SecurityUtil {
             // Build path to keys folder
             File keysDir = new File(appDir, "keys");
 
+            logger.info("Loading .env from: {}", keysDir.getAbsolutePath());
             dotenv = Dotenv.configure()
                     .directory(keysDir.getAbsolutePath())
                     .ignoreIfMissing()
                     .load();
 
-            logger.info("Loading .env from: {}", keysDir.getAbsolutePath());
+            logger.info("Loading .env success.");
 
         } catch (URISyntaxException e) {
             throw new RuntimeException("Failed to locate application directory", e);
