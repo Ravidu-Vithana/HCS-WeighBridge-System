@@ -12,12 +12,14 @@ import com.hcs.weighbridge.util.UiUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import com.hcs.weighbridge.MainApp;
+import com.hcs.weighbridge.util.SystemUtils;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
@@ -44,9 +46,13 @@ public class SettingsController implements Initializable {
     private Slider scaleSlider;
     @FXML
     private Label scaleLabel;
+    @FXML
+    private CheckBox startupCheckBox;
 
     @FXML
     private VBox serialSettingsContainer;
+    @FXML
+    private VBox systemSettingsContainer;
     @FXML
     private VBox userManagementContainer;
     @FXML
@@ -145,6 +151,10 @@ public class SettingsController implements Initializable {
             userManagementContainer.setVisible(isAdmin);
             userManagementContainer.setManaged(isAdmin);
         }
+        if (systemSettingsContainer != null) {
+            systemSettingsContainer.setVisible(isAdmin);
+            systemSettingsContainer.setManaged(isAdmin);
+        }
 
         // Load users list if admin
         if (isAdmin) {
@@ -181,6 +191,10 @@ public class SettingsController implements Initializable {
                     String parityValue = cfg.getParity() == SerialPort.EVEN_PARITY ? "EVEN"
                             : cfg.getParity() == SerialPort.ODD_PARITY ? "ODD" : "NONE";
                     parityCombo.setValue(parityValue);
+
+                    if (startupCheckBox != null) {
+                        startupCheckBox.setSelected(SystemUtils.isRunOnStartupEnabled());
+                    }
                 });
                 return null;
             }
@@ -406,6 +420,9 @@ public class SettingsController implements Initializable {
                         configDao.saveSerialConfig(cfg);
                     }
                     configDao.saveUiScaleFactor(scaleFactor);
+                    if (startupCheckBox != null) {
+                        SystemUtils.setRunOnStartup(startupCheckBox.isSelected());
+                    }
                     return null;
                 }
             };
