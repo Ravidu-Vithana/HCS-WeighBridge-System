@@ -28,6 +28,7 @@
                 <transformer>
                   <mainClass>com.hcs.weighbridge.Launcher</mainClass>
                 </transformer>
+                <transformer />
               </transformers>
               <filters>
                 <filter>
