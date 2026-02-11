@@ -39,4 +39,4 @@ build/
 
 /logs
 /backups
-.env
+/keys
