@@ -96,8 +96,8 @@ public class BackupController {
         };
 
         backupTask.setOnSucceeded(e -> {
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
+            showToast((Stage) frequencyCombo.getScene().getWindow(),
+                    frequencyCombo,
                     "Backup completed successfully!",
                     true);
             updateLatestBackupLabel();
@@ -106,8 +106,8 @@ public class BackupController {
         backupTask.setOnFailed(e -> {
             Throwable ex = backupTask.getException();
             ex.printStackTrace();
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
+            showToast((Stage) frequencyCombo.getScene().getWindow(),
+                    frequencyCombo,
                     "Backup failed: " + ex.getMessage(),
                     false);
         });
@@ -132,8 +132,8 @@ public class BackupController {
             };
 
             restoreTask.setOnSucceeded(e -> {
-                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                        mainControllerRootPane,
+                showToast((Stage) frequencyCombo.getScene().getWindow(),
+                        frequencyCombo,
                         "Restore completed! Some data might have been skipped if tables were not empty.",
                         true);
             });
@@ -141,8 +141,8 @@ public class BackupController {
             restoreTask.setOnFailed(e -> {
                 Throwable ex = restoreTask.getException();
                 ex.printStackTrace();
-                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                        mainControllerRootPane,
+                showToast((Stage) frequencyCombo.getScene().getWindow(),
+                        frequencyCombo,
                         "Restore failed: " + ex.getMessage(),
                         false);
             });

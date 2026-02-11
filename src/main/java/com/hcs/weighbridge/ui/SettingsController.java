@@ -206,8 +206,8 @@ public class SettingsController implements Initializable {
     @FXML
     private void addUser() {
         if (!isAdmin()) {
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
+            showToast((Stage) portCombo.getScene().getWindow(),
+                    portCombo,
                     "Access Denied: You do not have permission to add users.",
                     false);
             return;
@@ -218,16 +218,16 @@ public class SettingsController implements Initializable {
         Role role = roleCombo.getValue();
 
         if (username.isEmpty() || password.isEmpty() || role == null) {
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
+            showToast((Stage) portCombo.getScene().getWindow(),
+                    portCombo,
                     "Please fill in all user fields.",
                     false);
             return;
         }
 
         if (userDao.findByUsername(username) != null) {
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
+            showToast((Stage) portCombo.getScene().getWindow(),
+                    portCombo,
                     "User already exists!",
                     false);
             return;
@@ -243,8 +243,8 @@ public class SettingsController implements Initializable {
 
         addTask.setOnSucceeded(e -> {
             if (addTask.getValue()) {
-                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                        mainControllerRootPane,
+                showToast((Stage) portCombo.getScene().getWindow(),
+                        portCombo,
                         "User created successfully!",
                         true);
                 usernameField.clear();
@@ -252,8 +252,8 @@ public class SettingsController implements Initializable {
                 roleCombo.setValue(Role.USER);
                 loadUsersList(); // Refresh the user list
             } else {
-                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                        mainControllerRootPane,
+                showToast((Stage) portCombo.getScene().getWindow(),
+                        portCombo,
                         "Failed to create user.",
                         false);
             }
@@ -329,8 +329,8 @@ public class SettingsController implements Initializable {
     private void deleteUser(User user) {
         // Prevent deleting current user
         if (currentUser != null && currentUser.getId() == user.getId()) {
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
+            showToast((Stage) portCombo.getScene().getWindow(),
+                    portCombo,
                     "Cannot delete the currently logged in user!",
                     false);
             return;
@@ -353,14 +353,14 @@ public class SettingsController implements Initializable {
 
             deleteTask.setOnSucceeded(e -> {
                 if (deleteTask.getValue()) {
-                    showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                            mainControllerRootPane,
+                    showToast((Stage) portCombo.getScene().getWindow(),
+                            portCombo,
                             "User deleted successfully!",
                             true);
                     loadUsersList(); // Refresh the list
                 } else {
-                    showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                            mainControllerRootPane,
+                    showToast((Stage) portCombo.getScene().getWindow(),
+                            portCombo,
                             "Failed to delete user.",
                             false);
                 }
@@ -377,8 +377,8 @@ public class SettingsController implements Initializable {
     @FXML
     private void save() {
         if (configDao == null) {
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
+            showToast((Stage) scaleSlider.getScene().getWindow(),
+                    scaleSlider,
                     "Configuration DAO not initialized!",
                     false);
             return;
@@ -430,8 +430,8 @@ public class SettingsController implements Initializable {
             saveTask.setOnSucceeded(e -> {
                 if (mainController != null) {
                     mainController.reloadWithScale(scaleFactor);
-                    showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                            mainControllerRootPane,
+                    showToast((Stage) scaleSlider.getScene().getWindow(),
+                            scaleSlider,
                             "Settings saved successfully!",
                             true);
                 } else {
@@ -444,8 +444,8 @@ public class SettingsController implements Initializable {
             saveTask.setOnFailed(e -> {
                 Throwable ex = saveTask.getException();
                 ex.printStackTrace();
-                showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                        mainControllerRootPane,
+                showToast((Stage) scaleSlider.getScene().getWindow(),
+                        scaleSlider,
                         "Failed to save settings: " + ex.getMessage(),
                         false);
             });
@@ -455,8 +455,8 @@ public class SettingsController implements Initializable {
         } catch (Exception e) {
             System.err.println("Failed to save settings: " + e.getMessage());
             e.printStackTrace();
-            showToast((Stage) mainControllerRootPane.getScene().getWindow(),
-                    mainControllerRootPane,
+            showToast((Stage) scaleSlider.getScene().getWindow(),
+                    scaleSlider,
                     "Failed to save settings: " + e.getMessage(),
                     false);
         }
