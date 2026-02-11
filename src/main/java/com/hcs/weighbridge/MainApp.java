@@ -27,7 +27,7 @@ import java.util.concurrent.Executors;
 public class MainApp extends Application {
 
     private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
-    private static WeighReader weighReader; // Static to be accessible if needed, or better managed via instance
+    private static WeighReader weighReader;
     private static MainApp instance;
     private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
