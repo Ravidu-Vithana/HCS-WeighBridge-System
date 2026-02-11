@@ -49,12 +49,8 @@ public class BackupService {
         File backupFile = new File(BACKUP_DIR, filename);
 
         try (FileWriter writer = new FileWriter(backupFile)) {
-            // Backup Users
             exportTable(writer, "users");
-            // Backup App Config (excluding session specific if any, but currently all
-            // valid)
             exportTable(writer, "app_config");
-            // Backup Weigh Data
             exportTable(writer, "weigh_data");
 
             logger.info("Backup completed successfully: {}", backupFile.getAbsolutePath());
@@ -106,19 +102,6 @@ public class BackupService {
             DatabaseConfig.executeScript(backupFile.getAbsolutePath());
         } else {
             logger.warn("weigh_data is NOT empty. Skipping restore to prevent data overwrite.");
-            // We could parse the file and only restore other tables, but for safety as per
-            // requirements:
-            // "restore of weigh_data will be ignored if any record in it is already
-            // present"
-            // The simplest safe way is to tell the user we skipped it, or parse and
-            // selectively run.
-            // Since our executeScript is dumb, let's implement a smarter selective restore
-            // here or rely on INSERT IGNORE?
-            // User requirement: "restore of weigh_data will be ignored if any record in it
-            // is already present"
-            // This implies we should NOT run INSERTs for weigh_data if table has data.
-            // But we MIGHT want to restore config or users.
-            // Parsing the SQL line by line and checking table name is safer.
 
             restoreSelectively(backupFile);
         }
@@ -127,12 +110,6 @@ public class BackupService {
     private void restoreSelectively(File backupFile) throws Exception {
         boolean skipWeighData = !DatabaseConfig.isTableEmpty("weigh_data");
         logger.info("Selective restore started. Skipping weigh_data: {}", skipWeighData);
-
-        // This acts as a wrapper to read file and execute lines, filtering out
-        // weigh_data inserts if needed.
-        // Since we don't have a complex parser, strict line checking based on our
-        // export format is needed.
-        // Export format: "INSERT IGNORE INTO tableName ..."
 
         try (java.util.Scanner scanner = new java.util.Scanner(backupFile)) {
             try (Statement stmt = connection.createStatement()) {
@@ -185,7 +162,6 @@ public class BackupService {
         String lastBackupDateStr = configDao.getLastBackupDate();
 
         if (lastBackupDateStr == null) {
-            // Never backed up, do it now? Or wait? Let's back up now to be safe.
             try {
                 performBackup();
             } catch (Exception e) {

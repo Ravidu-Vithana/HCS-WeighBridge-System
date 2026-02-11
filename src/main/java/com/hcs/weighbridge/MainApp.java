@@ -9,6 +9,9 @@ import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.ui.MainController;
 import com.hcs.weighbridge.ui.UiModel;
 import com.hcs.weighbridge.util.LogUtil;
+import com.hcs.weighbridge.util.SecurityUtil;
+import com.hcs.weighbridge.util.UiUtils;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +27,7 @@ import java.util.concurrent.Executors;
 public class MainApp extends Application {
 
     private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
-    private static WeighReader weighReader; // Static to be accessible if needed, or better managed via instance
+    private static WeighReader weighReader;
     private static MainApp instance;
     private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
@@ -43,24 +46,56 @@ public class MainApp extends Application {
     public static ExecutorService getExecutorService() {
         return executorService;
     }
-
+    
+    private void initializeApplication() {
+        try {
+            logger.info("Initializing WeighBridge Application...");
+            
+            // Initialize security configuration
+            SecurityUtil.initialize();
+            logger.info("Security configuration initialized");
+            
+            // Initialize database connection
+            Connection connection = DatabaseConfig.getConnection();
+            logger.info("Database connection established");
+            
+            // Initialize configuration DAO
+            ConfigDao configDao = new ConfigDao(connection);
+            
+            // Initialize backup service
+            com.hcs.weighbridge.service.BackupService backupService = 
+                new com.hcs.weighbridge.service.BackupService(connection, configDao);
+            
+            // Perform auto-restore if enabled
+            backupService.autoRestoreIfEnabled();
+            logger.info("Auto-restore check completed");
+            
+            // Check for scheduled backups
+            backupService.checkAndRunScheduledBackup();
+            logger.info("Scheduled backup check completed");
+            
+            logger.info("Application initialization completed successfully");
+            
+        } catch (Exception e) {
+            logger.error("FATAL: Failed to initialize application: {}", e.getMessage(), e);
+            UiUtils.showAlert("Fatal Error", "Application initialization failed: " + e.getMessage());
+            Platform.exit();
+            System.exit(1);
+        }
+    }
+    
     @Override
     public void start(Stage stage) throws Exception {
-        try {
-            Connection connection = DatabaseConfig.getConnection();
-            ConfigDao configDao = new ConfigDao(connection);
-            com.hcs.weighbridge.service.BackupService backupService = new com.hcs.weighbridge.service.BackupService(
-                    connection, configDao);
-
-            backupService.autoRestoreIfEnabled();
-            backupService.checkAndRunScheduledBackup();
-        } catch (Exception e) {
-            System.err.println("Startup database initialization failed: " + e.getMessage());
-            logger.error("Failed to initialize database: {}", e.getMessage(), e);
-        }
-
         stage.initStyle(StageStyle.UNDECORATED);
-        showLoginView(stage);
+        try {
+            initializeApplication();
+            showLoginView(stage);
+        } catch (Exception e) {
+            logger.fatal("Fatal startup error", e);
+            UiUtils.showAlert("Fatal Error", "Application failed to start.");
+            Platform.exit();
+            System.exit(1);
+        }
     }
 
     public void showLoginView(Stage stage) {

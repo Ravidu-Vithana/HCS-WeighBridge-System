@@ -2,6 +2,7 @@ package com.hcs.weighbridge.config;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.hcs.weighbridge.util.LogUtil;
+import com.hcs.weighbridge.util.SecurityUtil;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -222,7 +223,9 @@ public final class DatabaseConfig {
                 "INSERT IGNORE INTO app_config (config_key, config_value) VALUES ('receipt_counter', '1')"
         };
 
-        String insertDefaultUser = "INSERT IGNORE INTO users (username, password, role) VALUES ('root', 'admin', 'ADMIN')";
+        String insertDefaultUser = String.format(
+                "INSERT IGNORE INTO users (username, password, role) VALUES ('root', '%s', 'ADMIN')",
+                SecurityUtil.hashPassword("admin"));
 
         try (Statement stmt = connection.createStatement()) {
             int successCount = 0;
