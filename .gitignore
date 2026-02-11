@@ -36,5 +36,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
 /logs
 /backups
+.env

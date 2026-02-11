@@ -9,6 +9,9 @@ import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.ui.MainController;
 import com.hcs.weighbridge.ui.UiModel;
 import com.hcs.weighbridge.util.LogUtil;
+import com.hcs.weighbridge.util.SecurityUtil;
+import com.hcs.weighbridge.util.UiUtils;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -45,20 +48,49 @@ public class MainApp extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void init() throws Exception {
+        initializeApplication();
+    }
+    
+    private void initializeApplication() {
         try {
+            logger.info("Initializing WeighBridge Application...");
+            
+            // Initialize security configuration
+            SecurityUtil.initialize();
+            logger.info("Security configuration initialized");
+            
+            // Initialize database connection
             Connection connection = DatabaseConfig.getConnection();
+            logger.info("Database connection established");
+            
+            // Initialize configuration DAO
             ConfigDao configDao = new ConfigDao(connection);
-            com.hcs.weighbridge.service.BackupService backupService = new com.hcs.weighbridge.service.BackupService(
-                    connection, configDao);
-
+            
+            // Initialize backup service
+            com.hcs.weighbridge.service.BackupService backupService = 
+                new com.hcs.weighbridge.service.BackupService(connection, configDao);
+            
+            // Perform auto-restore if enabled
             backupService.autoRestoreIfEnabled();
+            logger.info("Auto-restore check completed");
+            
+            // Check for scheduled backups
             backupService.checkAndRunScheduledBackup();
+            logger.info("Scheduled backup check completed");
+            
+            logger.info("Application initialization completed successfully");
+            
         } catch (Exception e) {
-            System.err.println("Startup database initialization failed: " + e.getMessage());
-            logger.error("Failed to initialize database: {}", e.getMessage(), e);
+            logger.error("FATAL: Failed to initialize application: {}", e.getMessage(), e);
+            UiUtils.showAlert("Fatal Error", "Application initialization failed: " + e.getMessage());
+            Platform.exit();
+            System.exit(1);
         }
-
+    }
+    
+    @Override
+    public void start(Stage stage) throws Exception {
         stage.initStyle(StageStyle.UNDECORATED);
         showLoginView(stage);
     }

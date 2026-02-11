@@ -2,6 +2,7 @@ package com.hcs.weighbridge.dao;
 
 import com.hcs.weighbridge.model.User;
 import com.hcs.weighbridge.util.LogUtil;
+import com.hcs.weighbridge.util.SecurityUtil;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
@@ -40,8 +41,7 @@ public class UserDao {
     public boolean validateUser(String username, String password) {
         User user = findByUsername(username);
         if (user != null) {
-            // In a real application, you should hash passwords.
-            return user.getPassword().equals(password);
+            return SecurityUtil.checkPassword(password, user.getPassword());
         }
         return false;
     }
@@ -50,7 +50,7 @@ public class UserDao {
         String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, user.getUsername());
-            pstmt.setString(2, user.getPassword());
+            pstmt.setString(2, SecurityUtil.hashPassword(user.getPassword()));
             pstmt.setString(3, user.getRole().name());
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;

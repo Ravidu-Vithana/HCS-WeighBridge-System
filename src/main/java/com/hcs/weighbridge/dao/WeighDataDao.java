@@ -2,6 +2,7 @@ package com.hcs.weighbridge.dao;
 
 import com.hcs.weighbridge.constants.RecordStatus;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.util.SecurityUtil;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -17,10 +18,10 @@ public class WeighDataDao {
         String sql = "INSERT INTO weigh_data (lorry_no, customer_name, product_name, driver_name) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, record.getLorryNumber());
-            ps.setString(2, record.getCustomerName());
-            ps.setString(3, record.getProductName());
-            ps.setString(4, record.getDriverName());
+            ps.setString(1, SecurityUtil.encrypt(record.getLorryNumber()));
+            ps.setString(2, SecurityUtil.encrypt(record.getCustomerName()));
+            ps.setString(3, SecurityUtil.encrypt(record.getProductName()));
+            ps.setString(4, SecurityUtil.encrypt(record.getDriverName()));
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
@@ -111,7 +112,7 @@ public class WeighDataDao {
         String sql = "SELECT * FROM weigh_data WHERE lorry_no = ? AND status=?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, lorryNumber);
+            ps.setString(1, SecurityUtil.encrypt(lorryNumber));
             ps.setString(2, RecordStatus.PENDING.toString());
             ResultSet rs = ps.executeQuery();
 
@@ -123,7 +124,7 @@ public class WeighDataDao {
     }
 
     private Record getRecordFromResultSet(ResultSet rs) throws SQLException {
-        Record record = new Record(rs.getString("lorry_no"));
+        Record record = new Record(SecurityUtil.decrypt(rs.getString("lorry_no")));
         record.setId(rs.getLong("id"));
         record.setDateIn(rs.getString("date_in"));
         record.setDateOut(rs.getString("date_out"));
@@ -132,9 +133,9 @@ public class WeighDataDao {
         record.setFirstWeight(rs.getInt("first_weight"));
         record.setSecondWeight(rs.getInt("second_weight"));
         record.setNetWeight(rs.getInt("net_weight"));
-        record.setCustomerName(rs.getString("customer_name"));
-        record.setProductName(rs.getString("product_name"));
-        record.setDriverName(rs.getString("driver_name"));
+        record.setCustomerName(SecurityUtil.decrypt(rs.getString("customer_name")));
+        record.setProductName(SecurityUtil.decrypt(rs.getString("product_name")));
+        record.setDriverName(SecurityUtil.decrypt(rs.getString("driver_name")));
         return record;
     }
 
