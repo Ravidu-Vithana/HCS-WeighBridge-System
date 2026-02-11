@@ -6,6 +6,7 @@ import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.util.LogUtil;
 import com.hcs.weighbridge.util.UiScaler;
 import com.hcs.weighbridge.util.UiUtils;
+import com.hcs.weighbridge.util.SystemUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +18,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.Connection;
+
+import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class LoginController {
     private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
@@ -59,11 +62,28 @@ public class LoginController {
 
         boolean confirmed = UiUtils.showConfirmation(
                 stage,
-                "Exit Confirmation",
-                "Are you sure you want to exit the application?"
+                "Exit and Shutdown?",
+                "Are you sure you want to exit? The computer will SHUTDOWN."
         );
 
         if (confirmed) {
+            Platform.runLater(() -> {
+                showToast((Stage) rootPane.getScene().getWindow(),
+                        rootPane,
+                        "Shuting down....",
+                        true);
+            });
+            try {
+                SystemUtils.shutdownPC();
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    showToast((Stage) rootPane.getScene().getWindow(),
+                            rootPane,
+                            "Failed to shutdown PC",
+                            false);
+                });
+                logger.error("Failed to shutdown PC: {}", e.getMessage(), e);
+            }
             System.exit(0);
         }
     }

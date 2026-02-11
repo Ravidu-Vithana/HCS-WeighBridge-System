@@ -12,6 +12,7 @@ import com.hcs.weighbridge.service.BackupService;
 import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.LogUtil;
+import com.hcs.weighbridge.util.SystemUtils;
 import com.hcs.weighbridge.util.UiScaler;
 import com.hcs.weighbridge.util.UiUtils;
 import javafx.application.Platform;
@@ -166,11 +167,28 @@ public class MainController {
 
         boolean confirmed = UiUtils.showConfirmation(
                 stage,
-                "Exit Confirmation",
-                "Are you sure you want to exit the application?"
+                "Exit and Shutdown?",
+                "Are you sure you want to exit? The computer will SHUTDOWN."
         );
 
         if (confirmed) {
+            Platform.runLater(() -> {
+                showToast((Stage) rootPane.getScene().getWindow(),
+                        rootPane,
+                        "Shuting down....",
+                        true);
+            });
+            try {
+                SystemUtils.shutdownPC();
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    showToast((Stage) rootPane.getScene().getWindow(),
+                            rootPane,
+                            "Failed to shutdown PC",
+                            false);
+                });
+                logger.error("Failed to shutdown PC: {}", e.getMessage(), e);
+            }
             System.exit(0);
         }
     }

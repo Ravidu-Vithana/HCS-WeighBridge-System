@@ -86,6 +86,12 @@
         <Separator />
     </VBox>
 
+    <!-- System Settings Section -->
+    <VBox fx:id="systemSettingsContainer" spacing="8">
+        <Label text="System Settings" styleClass="settings-section-title" />
+        <CheckBox fx:id="startupCheckBox" text="Start application on computer boot" styleClass="settings-checkbox"/>
+    </VBox>
+
     <!-- UI Scale Settings Section -->
     <Label text="User Interface Settings" styleClass="settings-section-title" />
 
