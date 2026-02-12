@@ -1,3 +1,5 @@
+![Weighbridge Management System](https://github.com/Ravidu-Vithana/HCS-WeighBridge-System/raw/main/Weighbridge%20Github%20Repo%20Card.png)
+
 # Weighbridge Management System
 
 **Weighbridge Management System** is a production-grade desktop application built with **Java 8** and **JavaFX**, designed as a stable and maintainable replacement for legacy weighbridge software (including Windows 7) while remaining compatible with modern Windows environments.  
