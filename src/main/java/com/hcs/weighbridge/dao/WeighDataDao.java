@@ -2,6 +2,7 @@ package com.hcs.weighbridge.dao;
 
 import com.hcs.weighbridge.constants.RecordStatus;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.SecurityUtil;
 import java.sql.*;
 import java.util.ArrayList;
@@ -31,9 +32,9 @@ public class WeighDataDao {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to create transaction", e);
+            throw new AppException("Failed to create transaction", e);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new AppException("Critical error creating transaction", e);
         }
     }
 
@@ -48,7 +49,7 @@ public class WeighDataDao {
             ps.setLong(5, recordId);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to save first weight", e);
+            throw new AppException("Failed to save first weight", e);
         }
     }
 
@@ -69,7 +70,7 @@ public class WeighDataDao {
             ps.setLong(5, recordId);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to complete transaction", e);
+            throw new AppException("Failed to complete transaction", e);
         }
     }
 
@@ -88,9 +89,9 @@ public class WeighDataDao {
             return records;
 
         } catch (SQLException e) {
-            return null;
+            throw new AppException("Failed to retrieve " + status + " records", e);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new AppException("Unexpected error retrieving records", e);
         }
     }
 
@@ -108,26 +109,32 @@ public class WeighDataDao {
             return null;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to load record by ID", e);
+            throw new AppException("Failed to load record by ID: " + id, e);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new AppException("Unexpected error loading record", e);
         }
     }
 
     public Boolean isPendingRecordAvailable(String lorryNumber) {
-        String sql = "SELECT * FROM weigh_data WHERE lorry_no = ? AND status=?";
+        String sql = "SELECT lorry_no FROM weigh_data WHERE status=?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, SecurityUtil.encrypt(lorryNumber));
-            ps.setString(2, RecordStatus.PENDING.toString());
+            ps.setString(1, RecordStatus.PENDING.toString());
             ResultSet rs = ps.executeQuery();
 
-            return rs.next();
+            while (rs.next()) {
+                String encryptedLorry = rs.getString("lorry_no");
+                String decryptedLorry = SecurityUtil.decrypt(encryptedLorry);
+                if (decryptedLorry != null && decryptedLorry.equalsIgnoreCase(lorryNumber)) {
+                    return true;
+                }
+            }
+            return false;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to load record by ID", e);
+            throw new AppException("Failed to check pending record for lorry: " + lorryNumber, e);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new AppException("Unexpected error checking pending record", e);
         }
     }
 

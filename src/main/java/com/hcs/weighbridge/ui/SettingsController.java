@@ -242,21 +242,22 @@ public class SettingsController implements Initializable {
         };
 
         addTask.setOnSucceeded(e -> {
-            if (addTask.getValue()) {
-                showToast((Stage) portCombo.getScene().getWindow(),
-                        portCombo,
-                        "User created successfully!",
-                        true);
-                usernameField.clear();
-                passwordField.clear();
-                roleCombo.setValue(Role.USER);
-                loadUsersList(); // Refresh the user list
-            } else {
-                showToast((Stage) portCombo.getScene().getWindow(),
-                        portCombo,
-                        "Failed to create user.",
-                        false);
-            }
+            showToast((Stage) portCombo.getScene().getWindow(),
+                    portCombo,
+                    "User created successfully!",
+                    true);
+            usernameField.clear();
+            passwordField.clear();
+            roleCombo.setValue(Role.USER);
+            loadUsersList(); // Refresh the user list
+        });
+
+        addTask.setOnFailed(e -> {
+            Throwable ex = addTask.getException();
+            showToast((Stage) portCombo.getScene().getWindow(),
+                    portCombo,
+                    "Failed to create user: " + ex.getMessage(),
+                    false);
         });
 
         MainApp.getExecutorService().submit(addTask);
@@ -279,6 +280,15 @@ public class SettingsController implements Initializable {
             javafx.collections.ObservableList<User> usersList = javafx.collections.FXCollections
                     .observableArrayList(users);
             usersTable.setItems(usersList);
+        });
+
+        loadUsersTask.setOnFailed(e -> {
+            Throwable ex = loadUsersTask.getException();
+            logger.error("Failed to load users", ex);
+            showToast((Stage) usersTable.getScene().getWindow(),
+                    usersTable,
+                    "Failed to load users: " + ex.getMessage(),
+                    false);
         });
 
         MainApp.getExecutorService().submit(loadUsersTask);
@@ -352,18 +362,19 @@ public class SettingsController implements Initializable {
             };
 
             deleteTask.setOnSucceeded(e -> {
-                if (deleteTask.getValue()) {
-                    showToast((Stage) portCombo.getScene().getWindow(),
-                            portCombo,
-                            "User deleted successfully!",
-                            true);
-                    loadUsersList(); // Refresh the list
-                } else {
-                    showToast((Stage) portCombo.getScene().getWindow(),
-                            portCombo,
-                            "Failed to delete user.",
-                            false);
-                }
+                showToast((Stage) portCombo.getScene().getWindow(),
+                        portCombo,
+                        "User deleted successfully!",
+                        true);
+                loadUsersList(); // Refresh the list
+            });
+
+            deleteTask.setOnFailed(e -> {
+                Throwable ex = deleteTask.getException();
+                showToast((Stage) portCombo.getScene().getWindow(),
+                        portCombo,
+                        "Failed to delete user: " + ex.getMessage(),
+                        false);
             });
 
             MainApp.getExecutorService().submit(deleteTask);

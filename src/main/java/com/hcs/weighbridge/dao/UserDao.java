@@ -1,9 +1,8 @@
 package com.hcs.weighbridge.dao;
 
 import com.hcs.weighbridge.model.User;
-import com.hcs.weighbridge.util.LogUtil;
+import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.SecurityUtil;
-import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +11,6 @@ import java.sql.SQLException;
 
 public class UserDao {
 
-    private static final Logger logger = LogUtil.getLogger(UserDao.class);
     private final Connection connection;
 
     public UserDao(Connection connection) {
@@ -33,7 +31,7 @@ public class UserDao {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Error finding user by username: {}", username, e);
+            throw new AppException("Error finding user by username: " + username, e);
         }
         return null;
     }
@@ -55,8 +53,7 @@ public class UserDao {
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
-            logger.error("Error creating user: {}", user.getUsername(), e);
-            return false;
+            throw new AppException("Error creating user: " + user.getUsername(), e);
         }
     }
 
@@ -73,7 +70,7 @@ public class UserDao {
                         com.hcs.weighbridge.model.Role.fromString(rs.getString("role"))));
             }
         } catch (SQLException e) {
-            logger.error("Error retrieving all users", e);
+            throw new AppException("Error retrieving all users", e);
         }
         return users;
     }
@@ -85,8 +82,7 @@ public class UserDao {
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
-            logger.error("Error deleting user with ID: {}", userId, e);
-            return false;
+            throw new AppException("Error deleting user with ID: " + userId, e);
         }
     }
 }
