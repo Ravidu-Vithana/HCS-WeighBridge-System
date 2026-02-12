@@ -1,84 +1,68 @@
 # Weighbridge Management System
 
-A production-grade desktop Weighbridge Management System built using Java and JavaFX.  
-Designed as a stable and maintainable replacement for legacy weighbridge systems (including those running on Windows 7), while remaining compatible with modern Windows environments.
+**Weighbridge Management System** is a production-grade desktop application built with **Java 8** and **JavaFX**, designed as a stable and maintainable replacement for legacy weighbridge software (including Windows 7) while remaining compatible with modern Windows environments.  
 
-This system provides real-time serial device integration, structured weighment workflow management, secure authentication, receipt printing, and automated database backup functionality.
+This system provides real-time serial device integration, structured weighment workflow management, secure authentication, receipt printing, and automated database backup functionality. Ideal for **industrial weighbridge operations** and **dedicated weighbridge terminals**.
 
 ---
 
 ## Overview
 
-The application is optimized for deployment on **dedicated weighbridge computers** used exclusively for weighment operations. It focuses on:
+The **Weighbridge Management System** is built for **dedicated industrial weighbridge computers**, providing a reliable, secure, and maintainable workflow for managing all weighment operations.  
 
-- Operational stability
-- Clean architecture
-- Security best practices
-- Maintainability
-- Ease of deployment in industrial environments
+Key benefits include:
+
+- **Operational stability** for industrial and commercial weighing environments
+- **Secure and maintainable architecture** with centralized configuration
+- **Clear separation of concerns** using MVC-based JavaFX design
+- **Ease of deployment** with automatic startup and controlled shutdown
+- **Scalable design** for future enhancements such as cloud synchronization or multi-terminal support
 
 ---
 
 ## Core Features
 
 ### Authentication & Security
-- Secure login system
-- Password hashing using BCrypt
-- AES encryption utilities
-- Environment-based secret management using `.env`
-- Externalized configuration for sensitive credentials
-
----
+- **Secure login system** with password hashing using BCrypt
+- **AES encryption** for sensitive data
+- **Environment-based secret management** using `.env`
+- Centralized configuration for database and serial port credentials
 
 ### Weighment Workflow
-- Real-time weight display from connected scale
-- First Weight / Second Weight workflow
-- Automatic net weight calculation
-- Record validation before persistence
-- Structured record storage
-
----
+- **Real-time weight display** from connected industrial scales
+- **Two-step weighing workflow** (First Weight / Second Weight)
+- Automatic **net weight calculation**
+- Input validation and structured record storage
+- Persistent storage of weighment data in MySQL database
 
 ### Serial Port Integration
-- Live weight reading from weighbridge device
-- Configurable serial port settings (baud rate, port selection, etc.)
-- Continuous device listening support
-- Serial configuration stored in database
-
----
+- Live weight reading from industrial weighbridge devices
+- Configurable **serial port settings** (baud rate, port selection)
+- Continuous device listening for real-time updates
+- Dynamic serial configuration stored in database
 
 ### Database & Backup Management
-- MySQL-based persistent storage
-- Layered architecture:
-Controller → Service → DAO → DatabaseConfig
-- Clean exception propagation to UI layer
-- Automatic backups (Daily / Weekly / Monthly)
-- Manual and automatic restore support
-
----
+- MySQL 5.7+ database integration for **secure, persistent storage**
+- Layered architecture: `Controller → Service → DAO → DatabaseConfig`
+- Exception propagation for better **UI-level feedback**
+- Automatic and manual backups (Daily / Weekly / Monthly)
+- Easy restoration for operational continuity
 
 ### Receipt Printing
-- JasperReports-based receipt generation
-- Structured printable receipt layout
-- Configurable print modes
-
----
+- **JasperReports**-based receipt generation
+- Structured, **professional printable receipt layout**
+- Configurable print modes for different business needs
 
 ### Dedicated System Mode
-
-Designed for weighbridge terminals that operate solely for this application.
-
-- Optional automatic application startup on system boot
-- Controlled system shutdown via Exit action
-- Reduced operator misuse
-- Optimized for single-terminal environments
-
----
+- Optimized for computers dedicated solely to weighbridge operations
+- Optional **automatic application startup**
+- Controlled **system shutdown via Exit action**
+- Minimizes operator misuse and ensures workflow consistency
 
 ### Logging & Diagnostics
-- Log4j integration
-- Structured error logging
-- Improved exception traceability across layers
+- **Log4j integration** for detailed logging
+- Structured error reporting
+- Traceability across Controller, Service, and DAO layers
 
 ---
 
