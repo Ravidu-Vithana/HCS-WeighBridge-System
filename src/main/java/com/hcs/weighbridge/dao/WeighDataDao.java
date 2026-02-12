@@ -116,14 +116,20 @@ public class WeighDataDao {
     }
 
     public Boolean isPendingRecordAvailable(String lorryNumber) {
-        String sql = "SELECT * FROM weigh_data WHERE lorry_no = ? AND status=?";
+        String sql = "SELECT lorry_no FROM weigh_data WHERE status=?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, SecurityUtil.encrypt(lorryNumber));
-            ps.setString(2, RecordStatus.PENDING.toString());
+            ps.setString(1, RecordStatus.PENDING.toString());
             ResultSet rs = ps.executeQuery();
 
-            return rs.next();
+            while (rs.next()) {
+                String encryptedLorry = rs.getString("lorry_no");
+                String decryptedLorry = SecurityUtil.decrypt(encryptedLorry);
+                if (decryptedLorry != null && decryptedLorry.equalsIgnoreCase(lorryNumber)) {
+                    return true;
+                }
+            }
+            return false;
 
         } catch (SQLException e) {
             throw new AppException("Failed to check pending record for lorry: " + lorryNumber, e);
