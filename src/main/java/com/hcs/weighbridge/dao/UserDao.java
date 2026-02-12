@@ -1,7 +1,7 @@
 package com.hcs.weighbridge.dao;
 
 import com.hcs.weighbridge.model.User;
-import com.hcs.weighbridge.util.AppException;
+import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.SecurityUtil;
 
 import java.sql.Connection;

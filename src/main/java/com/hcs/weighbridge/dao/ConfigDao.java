@@ -1,7 +1,7 @@
 package com.hcs.weighbridge.dao;
 
 import com.hcs.weighbridge.model.SerialConfig;
-import com.hcs.weighbridge.util.AppException;
+import com.hcs.weighbridge.exceptions.AppException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

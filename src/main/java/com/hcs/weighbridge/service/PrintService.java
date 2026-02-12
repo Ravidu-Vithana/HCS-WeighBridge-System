@@ -2,7 +2,7 @@ package com.hcs.weighbridge.service;
 
 import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.model.Record;
-import com.hcs.weighbridge.util.AppException;
+import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.LogUtil;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;

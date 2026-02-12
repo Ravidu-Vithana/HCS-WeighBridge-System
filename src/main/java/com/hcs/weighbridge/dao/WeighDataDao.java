@@ -2,7 +2,7 @@ package com.hcs.weighbridge.dao;
 
 import com.hcs.weighbridge.constants.RecordStatus;
 import com.hcs.weighbridge.model.Record;
-import com.hcs.weighbridge.util.AppException;
+import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.SecurityUtil;
 import java.sql.*;
 import java.util.ArrayList;

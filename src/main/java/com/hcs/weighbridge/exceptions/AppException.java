@@ -1,4 +1,4 @@
-package com.hcs.weighbridge.util;
+package com.hcs.weighbridge.exceptions;
 
 /**
  * Custom exception class for the Weighbridge application.

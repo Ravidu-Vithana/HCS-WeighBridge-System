@@ -2,7 +2,7 @@ package com.hcs.weighbridge.service;
 
 import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.ConfigDao;
-import com.hcs.weighbridge.util.AppException;
+import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.LogUtil;
 import org.apache.logging.log4j.Logger;
 
