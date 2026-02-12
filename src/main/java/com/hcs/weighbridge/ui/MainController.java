@@ -477,6 +477,17 @@ public class MainController {
         }
         int currentWeight = model.liveWeightProperty().get();
 
+        if (weighService.isPendingRecordAvailable(lorry) && !weighService.hasFirstWeight()) {
+            Platform.runLater(() -> {
+                showToast((Stage) rootPane.getScene().getWindow(),
+                        rootPane,
+                        "A pending record already exists!",
+                        false);
+                resetRecord();
+            });
+            return;
+        }
+
         Stage stage = (Stage) rootPane.getScene().getWindow();
         boolean confirmed = UiUtils.showConfirmation(
                 stage,
@@ -508,7 +519,7 @@ public class MainController {
                     Platform.runLater(() -> {
                         showToast((Stage) rootPane.getScene().getWindow(),
                                 rootPane,
-                                "Please select the lorry from the table!",
+                                "A pending record already exists!",
                                 false);
                         resetRecord();
                     });
