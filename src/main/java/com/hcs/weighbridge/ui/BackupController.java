@@ -31,6 +31,8 @@ public class BackupController {
     @FXML
     private Label latestBackupLabel;
     @FXML
+    private Button testConnectionButton;
+    @FXML
     private Button closeButton;
 
     private ConfigDao configDao;
@@ -77,6 +79,9 @@ public class BackupController {
 
         // Latest Backup
         updateLatestBackupLabel();
+
+        // Test Connection
+        testConnectionButton.setOnAction(e -> handleTestConnection());
 
         closeButton.setOnAction(e -> ((Stage) closeButton.getScene().getWindow()).close());
     }
@@ -149,6 +154,45 @@ public class BackupController {
 
             MainApp.getExecutorService().submit(restoreTask);
         }
+    }
+
+    private void handleTestConnection() {
+        testConnectionButton.setDisable(true);
+
+        Task<String> testTask = new Task<String>() {
+            @Override
+            protected String call() throws Exception {
+                try (java.sql.Connection conn = com.hcs.weighbridge.config.DatabaseConfig.getConnection();
+                        java.sql.Statement stmt = conn.createStatement()) {
+                    stmt.executeQuery("SELECT 1");
+                    return "Connection Successful";
+                }
+            }
+        };
+
+        testTask.setOnSucceeded(e -> {
+            testConnectionButton.setDisable(false);
+            showToast((Stage) testConnectionButton.getScene().getWindow(),
+                    testConnectionButton,
+                    testTask.getValue(),
+                    true);
+        });
+
+        testTask.setOnFailed(e -> {
+            testConnectionButton.setDisable(false);
+            Throwable ex = testTask.getException();
+            String errorMessage = ex.getMessage();
+            if (ex.getCause() != null) {
+                errorMessage = ex.getCause().getMessage();
+            }
+
+            showToast((Stage) testConnectionButton.getScene().getWindow(),
+                    testConnectionButton,
+                    "Connection Failed: " + errorMessage,
+                    false);
+        });
+
+        MainApp.getExecutorService().submit(testTask);
     }
 
 }
