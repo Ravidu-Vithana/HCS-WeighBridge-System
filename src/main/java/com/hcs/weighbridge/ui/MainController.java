@@ -584,11 +584,12 @@ public class MainController {
     }
 
     private void printReceipt(Record record, PrintMode mode) {
-        Task<Boolean> printTask = new Task<Boolean>() {
+        Task<Void> printTask = new Task<Void>() {
             @Override
-            protected Boolean call() throws Exception {
+            protected Void call() throws Exception {
                 PrintService printService = new PrintService();
-                return printService.printReceiptSilent(record, mode);
+                printService.printReceiptSilent(record, mode);
+                return null;
             }
         };
 

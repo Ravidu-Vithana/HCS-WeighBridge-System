@@ -41,7 +41,6 @@ public class PrintService {
      *
      * @param record The record to print
      * @param mode   The print mode (FIRST_WEIGHT, SECOND_WEIGHT, or FULL)
-     * @return true if printing was successful, false otherwise
      */
     public void printReceipt(Record record, PrintMode mode) {
         printReceiptInternal(record, mode, null, true);
@@ -53,7 +52,6 @@ public class PrintService {
      *
      * @param record The record to print
      * @param mode   The print mode
-     * @return true if successful
      */
     public void printReceiptSilent(Record record, PrintMode mode) {
         printReceiptInternal(record, mode, null, false);
@@ -65,7 +63,6 @@ public class PrintService {
      * @param record      The record to print
      * @param mode        The print mode
      * @param printerName Name of the printer to use
-     * @return true if successful
      */
     public void printReceiptWithPrinter(Record record, PrintMode mode, String printerName) {
         javax.print.PrintService selectedPrinter = findPrinter(printerName);
