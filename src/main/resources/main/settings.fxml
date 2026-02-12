@@ -4,126 +4,128 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox spacing="15"
+<VBox spacing="0"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.hcs.weighbridge.ui.SettingsController"
       prefWidth="450"
-      prefHeight="400"
+      prefHeight="500"
       styleClass="settings-container">
 
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
+    <ScrollPane fx:id="settingsScrollPane" fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;">
+        <VBox spacing="15">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
 
-    <Label text="Settings" styleClass="settings-title" />
+            <Label text="Settings" styleClass="settings-title" />
 
-    <Separator />
+            <Separator />
 
-    <!-- Serial Port Settings Section -->
-    <VBox fx:id="serialSettingsContainer" spacing="10">
-        <Label text="Serial Port Settings" styleClass="settings-section-title" />
+            <!-- Serial Port Settings Section -->
+            <VBox fx:id="serialSettingsContainer" spacing="10">
+                <Label text="Serial Port Settings" styleClass="settings-section-title" />
 
-        <GridPane hgap="15" vgap="12">
-            <columnConstraints>
-                <ColumnConstraints minWidth="100" />
-                <ColumnConstraints minWidth="200" />
-            </columnConstraints>
+                <GridPane hgap="15" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="100" />
+                        <ColumnConstraints minWidth="200" />
+                    </columnConstraints>
 
-            <Label text="COM Port:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-            <ComboBox fx:id="portCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity"/>
+                    <Label text="COM Port:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <ComboBox fx:id="portCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity"/>
 
-            <Label text="Baud Rate:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-            <ComboBox fx:id="baudCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity"/>
+                    <Label text="Baud Rate:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <ComboBox fx:id="baudCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity"/>
 
-            <Label text="Data Bits:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="dataBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
+                    <Label text="Data Bits:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <ComboBox fx:id="dataBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
 
-            <Label text="Stop Bits:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-            <ComboBox fx:id="stopBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" maxWidth="Infinity"/>
+                    <Label text="Stop Bits:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <ComboBox fx:id="stopBitsCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" maxWidth="Infinity"/>
 
-            <Label text="Parity:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-            <ComboBox fx:id="parityCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" maxWidth="Infinity"/>
-        </GridPane>
-        <Separator />
-    </VBox>
+                    <Label text="Parity:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                    <ComboBox fx:id="parityCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" maxWidth="Infinity"/>
+                </GridPane>
+                <Separator />
+            </VBox>
 
-    <!-- User Management Section (ADMIN Only) -->
-    <VBox fx:id="userManagementContainer" spacing="10">
-        <Label text="User Management" styleClass="settings-section-title" />
+            <!-- User Management Section (ADMIN Only) -->
+            <VBox fx:id="userManagementContainer" spacing="10">
+                <Label text="User Management" styleClass="settings-section-title" />
 
-        <GridPane hgap="15" vgap="12">
-            <columnConstraints>
-                <ColumnConstraints minWidth="100" />
-                <ColumnConstraints minWidth="200" />
-            </columnConstraints>
+                <GridPane hgap="15" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="100" />
+                        <ColumnConstraints minWidth="200" />
+                    </columnConstraints>
 
-            <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-            <TextField fx:id="usernameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="usernameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-            <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-            <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-            <Label text="Role:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="roleCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
-            
-            <HBox GridPane.columnIndex="1" GridPane.rowIndex="3" alignment="CENTER_RIGHT">
-                 <Button text="Add User" onAction="#addUser" styleClass="settings-button"/>
-            </HBox>
-        </GridPane>
-        
-        <!-- User List Table -->
-        <TableView fx:id="usersTable" minHeight="200" prefHeight="250" maxHeight="400" VBox.vgrow="ALWAYS">
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
-            <columns>
-                <TableColumn text="Username" prefWidth="150"/>
-                <TableColumn text="Role" prefWidth="100"/>
-                <TableColumn text="Actions" prefWidth="100"/>
-            </columns>
-        </TableView>
-        
-        <Separator />
-    </VBox>
+                    <Label text="Role:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <ComboBox fx:id="roleCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
+                    
+                    <HBox GridPane.columnIndex="1" GridPane.rowIndex="3" alignment="CENTER_RIGHT">
+                         <Button text="Add User" onAction="#addUser" styleClass="settings-button"/>
+                    </HBox>
+                </GridPane>
+                
+                <!-- User List Table -->
+                <TableView fx:id="usersTable" minHeight="200" prefHeight="250" maxHeight="400" VBox.vgrow="ALWAYS">
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                    <columns>
+                        <TableColumn text="Username" prefWidth="150"/>
+                        <TableColumn text="Role" prefWidth="100"/>
+                        <TableColumn text="Actions" prefWidth="100"/>
+                    </columns>
+                </TableView>
+                
+                <Separator />
+            </VBox>
 
-    <!-- System Settings Section -->
-    <VBox fx:id="systemSettingsContainer" spacing="8">
-        <Label text="System Settings" styleClass="settings-section-title" />
-        <CheckBox fx:id="startupCheckBox" text="Start application on computer boot" styleClass="settings-checkbox"/>
-    </VBox>
+            <!-- System Settings Section -->
+            <VBox fx:id="systemSettingsContainer" spacing="8">
+                <Label text="System Settings" styleClass="settings-section-title" />
+                <CheckBox fx:id="startupCheckBox" text="Start application on computer boot" styleClass="settings-checkbox"/>
+            </VBox>
 
-    <!-- UI Scale Settings Section -->
-    <Label text="User Interface Settings" styleClass="settings-section-title" />
+            <!-- UI Scale Settings Section -->
+            <Label text="User Interface Settings" styleClass="settings-section-title" />
 
-    <VBox spacing="8">
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="UI Scale:" minWidth="100"/>
-            <Slider fx:id="scaleSlider"
-                    min="1.0"
-                    max="3.0"
-                    value="2.0"
-                    showTickLabels="true"
-                    showTickMarks="true"
-                    majorTickUnit="0.5"
-                    minorTickCount="0"
-                    snapToTicks="true"
-                    prefWidth="200"
-                    HBox.hgrow="ALWAYS"/>
-            <Label fx:id="scaleLabel"
-                   text="Normal"
-                   minWidth="80"
-                   styleClass="scale-value-label"/>
-        </HBox>
+            <VBox spacing="8">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="UI Scale:" minWidth="100"/>
+                    <Slider fx:id="scaleSlider"
+                            min="1.0"
+                            max="3.0"
+                            value="2.0"
+                            showTickLabels="true"
+                            showTickMarks="true"
+                            majorTickUnit="0.5"
+                            minorTickCount="0"
+                            snapToTicks="true"
+                            prefWidth="200"
+                            HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="scaleLabel"
+                           text="Normal"
+                           minWidth="80"
+                           styleClass="scale-value-label"/>
+                </HBox>
 
-        <Label text="Choose UI size: Very Small (1.0) | Small (1.5) | Normal (2.0) | Large (2.5) | Very Large (3.0)"
-               styleClass="settings-hint"
-               wrapText="true"/>
-    </VBox>
+                <Label text="Choose UI size: Very Small (1.0) | Small (1.5) | Normal (2.0) | Large (2.5) | Very Large (3.0)"
+                       styleClass="settings-hint"
+                       wrapText="true"/>
+            </VBox>
+        </VBox>
+    </ScrollPane>
 
-    <Region VBox.vgrow="ALWAYS"/>
-
-    <!-- Action Buttons -->
-    <HBox spacing="10" alignment="CENTER_RIGHT">
+    <!-- Action Buttons (Fixed at bottom) -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 15 20;">
         <Button text="Save"
                 onAction="#save"
                 styleClass="settings-save-button"/>
