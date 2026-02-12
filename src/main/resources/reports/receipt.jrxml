@@ -83,12 +83,12 @@
                 <staticText><reportElement x="50" y="50" width="80" height="20" uuid="7e58df9b-c8c3-4d43-987d-81523924f7e2"/><text><![CDATA[Vehicle No:]]></text></staticText>
                 <textField isBlankWhenNull="true"><reportElement x="140" y="50" width="150" height="20" uuid="ef8c3461-f090-4824-a28c-0359bdfd2062"/><textFieldExpression><![CDATA[$F{lorryNumber}]]></textFieldExpression></textField>
 
-                <staticText><reportElement x="50" y="75" width="80" height="20" uuid="f0464f15-325d-40d0-be74-83957eb03c14"/><text><![CDATA[First Weight:]]></text></staticText>
-                <textField isBlankWhenNull="true"><reportElement x="140" y="75" width="150" height="20" uuid="b194fb84-1845-423c-a901-db263fc02183"/><textFieldExpression><![CDATA[$F{firstWeight} + " kg"]]></textFieldExpression></textField>
+                <staticText><reportElement x="50" y="75" width="80" height="20" uuid="f0464f15-325d-40d0-be74-83957eb03c14"/><text><![CDATA[Receipt No:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="140" y="75" width="150" height="20" uuid="b194fb84-1845-423c-a901-db263fc02183"/><textFieldExpression><![CDATA[$F{id}]]></textFieldExpression></textField>
 
                 <!-- RIGHT COLUMN : Shifted Left by 5px -->
-                <staticText><reportElement x="275" y="0" width="80" height="20" uuid="55e9ba7c-7835-43a0-9e6e-21ef655079a4"/><text><![CDATA[Receipt No:]]></text></staticText>
-                <textField isBlankWhenNull="true"><reportElement x="365" y="0" width="150" height="20" uuid="c121e25e-044f-4d93-9c59-f14d8d472288"/><textFieldExpression><![CDATA[$F{id}]]></textFieldExpression></textField>
+                <staticText><reportElement x="275" y="0" width="80" height="20" uuid="55e9ba7c-7835-43a0-9e6e-21ef655079a4"/><text><![CDATA[Driver:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="365" y="0" width="150" height="20" uuid="c121e25e-044f-4d93-9c59-f14d8d472288"/><textFieldExpression><![CDATA[$F{driverName}]]></textFieldExpression></textField>
 
                 <staticText><reportElement x="275" y="25" width="80" height="20" uuid="0944063c-3837-4f6c-85a7-951590fb69e6"/><text><![CDATA[Customer:]]></text></staticText>
                 <textField isBlankWhenNull="true"><reportElement x="365" y="25" width="150" height="20" uuid="ec30e060-f111-4712-ba9a-e274a742a0fe"/><textFieldExpression><![CDATA[$F{customerName}]]></textFieldExpression></textField>
@@ -96,8 +96,8 @@
                 <staticText><reportElement x="275" y="50" width="80" height="20" uuid="88439396-e17f-4424-9b04-f57db5b7e3e4"/><text><![CDATA[Product:]]></text></staticText>
                 <textField isBlankWhenNull="true"><reportElement x="365" y="50" width="150" height="20" uuid="169c4f14-5d51-46ca-a5bf-8f2c00dd2274"/><textFieldExpression><![CDATA[$F{productName}]]></textFieldExpression></textField>
 
-                <staticText><reportElement x="275" y="75" width="80" height="20" uuid="a7102061-0d3a-4467-8af2-8c1d53350165"/><text><![CDATA[Driver:]]></text></staticText>
-                <textField isBlankWhenNull="true"><reportElement x="365" y="75" width="150" height="20" uuid="b5c46e01-2e63-4fc1-bec3-0e31bd2810cd"/><textFieldExpression><![CDATA[$F{driverName}]]></textFieldExpression></textField>
+                <staticText><reportElement x="275" y="75" width="80" height="20" uuid="a7102061-0d3a-4467-8af2-8c1d53350165"/><text><![CDATA[First Weight:]]></text></staticText>
+                <textField isBlankWhenNull="true"><reportElement x="365" y="75" width="150" height="20" uuid="b5c46e01-2e63-4fc1-bec3-0e31bd2810cd"/><textFieldExpression><![CDATA[$F{firstWeight} + " kg"]]></textFieldExpression></textField>
 
                 <line>
                     <reportElement x="0" y="98" width="555" height="1" uuid="6e4ec6df-fc7c-471b-a496-d2ef84a70b43"/>

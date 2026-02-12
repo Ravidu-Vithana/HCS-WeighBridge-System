@@ -2,6 +2,7 @@ package com.hcs.weighbridge.service;
 
 import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.ConfigDao;
+import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.LogUtil;
 import org.apache.logging.log4j.Logger;
 
@@ -10,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -56,8 +58,9 @@ public class BackupService {
             logger.info("Backup completed successfully: {}", backupFile.getAbsolutePath());
             configDao.setLastBackupDate(LocalDate.now().toString());
         } catch (IOException e) {
-            logger.error("Backup failed", e);
-            throw e;
+            throw new AppException("Database backup failed: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new AppException("Unexpected error during backup: " + e.getMessage(), e);
         }
     }
 
@@ -107,7 +110,7 @@ public class BackupService {
         }
     }
 
-    private void restoreSelectively(File backupFile) throws Exception {
+    private void restoreSelectively(File backupFile) {
         boolean skipWeighData = !DatabaseConfig.isTableEmpty("weigh_data");
         logger.info("Selective restore started. Skipping weigh_data: {}", skipWeighData);
 
@@ -128,7 +131,11 @@ public class BackupService {
                         logger.warn("Failed to execute line: {}", line, e);
                     }
                 }
+            } catch (SQLException e) {
+                throw new AppException("SQL error during selective restore", e);
             }
+        } catch (IOException e) {
+            throw new AppException("Failed to read backup file", e);
         }
     }
 

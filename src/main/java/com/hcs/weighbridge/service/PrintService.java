@@ -2,6 +2,7 @@ package com.hcs.weighbridge.service;
 
 import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.LogUtil;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -40,10 +41,9 @@ public class PrintService {
      *
      * @param record The record to print
      * @param mode   The print mode (FIRST_WEIGHT, SECOND_WEIGHT, or FULL)
-     * @return true if printing was successful, false otherwise
      */
-    public boolean printReceipt(Record record, PrintMode mode) {
-        return printReceiptInternal(record, mode, null, true);
+    public void printReceipt(Record record, PrintMode mode) {
+        printReceiptInternal(record, mode, null, true);
     }
 
     /**
@@ -52,10 +52,9 @@ public class PrintService {
      *
      * @param record The record to print
      * @param mode   The print mode
-     * @return true if successful
      */
-    public boolean printReceiptSilent(Record record, PrintMode mode) {
-        return printReceiptInternal(record, mode, null, false);
+    public void printReceiptSilent(Record record, PrintMode mode) {
+        printReceiptInternal(record, mode, null, false);
     }
 
     /**
@@ -64,19 +63,17 @@ public class PrintService {
      * @param record      The record to print
      * @param mode        The print mode
      * @param printerName Name of the printer to use
-     * @return true if successful
      */
-    public boolean printReceiptWithPrinter(Record record, PrintMode mode, String printerName) {
+    public void printReceiptWithPrinter(Record record, PrintMode mode, String printerName) {
         javax.print.PrintService selectedPrinter = findPrinter(printerName);
         if (selectedPrinter == null) {
-            logger.error("Printer not found: {}", printerName);
-            return false;
+            throw new AppException("Printer not found: " + printerName);
         }
-        return printReceiptInternal(record, mode, selectedPrinter, false);
+        printReceiptInternal(record, mode, selectedPrinter, false);
     }
 
-    private boolean printReceiptInternal(Record record, PrintMode mode,
-                                         javax.print.PrintService specificPrinter, boolean showDialog) {
+    private void printReceiptInternal(Record record, PrintMode mode,
+            javax.print.PrintService specificPrinter, boolean showDialog) {
         logger.info("=== Starting JasperReports print job ===");
         logger.info("Record ID: {}, Mode: {}", record.getId(), mode);
 
@@ -84,8 +81,7 @@ public class PrintService {
             // 1. Compile Report
             InputStream reportStream = getClass().getResourceAsStream(RECEIPT_JRXML_PATH);
             if (reportStream == null) {
-                logger.error("Could not find report template: {}", RECEIPT_JRXML_PATH);
-                return false;
+                throw new AppException("Could not find report template: " + RECEIPT_JRXML_PATH);
             }
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
 
@@ -105,7 +101,9 @@ public class PrintService {
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
             if (showDialog) {
-                return JasperPrintManager.printReport(jasperPrint, true);
+                if (!JasperPrintManager.printReport(jasperPrint, true)) {
+                    throw new AppException("Printing cancelled or failed by user");
+                }
             } else {
                 JRPrintServiceExporter exporter = new JRPrintServiceExporter();
                 exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
@@ -137,15 +135,14 @@ public class PrintService {
                 exporter.exportReport();
 
                 logger.info("Print job sent successfully");
-                return true;
             }
 
         } catch (JRException e) {
-            logger.error("JasperReports error: {}", e.getMessage(), e);
-            return false;
+            throw new AppException("JasperReports error: " + e.getMessage(), e);
+        } catch (AppException e) {
+            throw e;
         } catch (Exception e) {
-            logger.error("Unexpected error: {}", e.getMessage(), e);
-            return false;
+            throw new AppException("Unexpected printing error: " + e.getMessage(), e);
         }
     }
 
