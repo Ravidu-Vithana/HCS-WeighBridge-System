@@ -350,12 +350,14 @@ public class MainController {
 
     private void handleRecentWeighingClick(Record newSelection) {
         completeRecordsTable.getSelectionModel().clearSelection();
+        weighService.clearFullRecord();
         loadRecordToFields(newSelection);
         weighService.setFirstWeightRecord(newSelection);
     }
 
     private void handleCompleteRecordClick(Record newSelection) {
         recentRecordsTable.getSelectionModel().clearSelection();
+        weighService.clearActiveRecord();
         weighService.setFullRecord(newSelection);
         clearAllFields();
     }
