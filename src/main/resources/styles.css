@@ -634,23 +634,39 @@
 }
 
 /* ========== SETTINGS DIALOG STYLES ========== */
-.settings-title {
+.settings-container {
+    -fx-background-color: #f8fafc;
+}
+
+.settings-container Label {
+    -fx-text-fill: #1e293b;
+}
+
+.settings-container .settings-title {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
 }
 
-.settings-section-title {
+.settings-container .settings-section-title {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+    -fx-padding: 5 0;
 }
 
-.settings-hint {
+.settings-container .settings-hint {
     -fx-font-size: 10px;
-    -fx-text-fill: gray;
+    -fx-text-fill: #64748b;
 }
 
-.scale-value-label {
+.settings-container .scale-value-label {
     -fx-font-weight: bold;
+    -fx-text-fill: #3b82f6;
+}
+
+.settings-container .settings-checkbox {
+    -fx-text-fill: #1e293b;
 }
 
 .settings-save-button {
