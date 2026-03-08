@@ -6,6 +6,7 @@ import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.model.SerialConfig;
 import com.hcs.weighbridge.model.User;
 import com.hcs.weighbridge.serial.WeighReader;
 import com.hcs.weighbridge.service.BackupService;
@@ -452,6 +453,26 @@ public class MainController {
         if (rootPane.getScene() != null) {
             rootPane.getScene().getRoot().applyCss();
         }
+    }
+
+    public void restartWeighReader(SerialConfig cfg) {
+        WeighReader oldReader = MainApp.getWeighReader();
+        if (oldReader != null) {
+            oldReader.stop();
+        }
+
+        WeighReader newReader = new WeighReader(
+                cfg,
+                (weight, status) -> Platform.runLater(() -> updateLiveWeight(weight, status)));
+
+        MainApp.setWeighReader(newReader);
+
+        Thread serialThread = new Thread(newReader::start, "WeighReader-Thread");
+        serialThread.setDaemon(true);
+        serialThread.start();
+
+        logger.info("WeighReader restarted with new serial config: port={}, baud={}",
+                cfg.getPortName(), cfg.getBaudRate());
     }
 
     public void updateLiveWeight(int weight, char statusChar) {

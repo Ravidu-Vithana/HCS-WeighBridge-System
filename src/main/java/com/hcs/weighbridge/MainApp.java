@@ -43,6 +43,10 @@ public class MainApp extends Application {
         return weighReader;
     }
 
+    public static void setWeighReader(WeighReader reader) {
+        weighReader = reader;
+    }
+
     public static ExecutorService getExecutorService() {
         return executorService;
     }

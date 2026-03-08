@@ -441,6 +441,9 @@ public class SettingsController implements Initializable {
             saveTask.setOnSucceeded(e -> {
                 if (mainController != null) {
                     mainController.reloadWithScale(scaleFactor);
+                    if (isAdmin()) {
+                        mainController.restartWeighReader(cfg);
+                    }
                     showToast((Stage) scaleSlider.getScene().getWindow(),
                             scaleSlider,
                             "Settings saved successfully!",
