@@ -318,6 +318,46 @@ public class MainController {
                         handleCompleteRecordClick(newSelection);
                     }
                 });
+
+        setupTableColumnResize();
+    }
+
+    private void setupTableColumnResize() {
+        double[] recentPrefWidths = {100, 80, 100, 120, 120};
+        double recentTotalMin = 0;
+        for (double w : recentPrefWidths) recentTotalMin += w;
+        final double recentMin = recentTotalMin;
+
+        recentRecordsTable.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double tableWidth = newVal.doubleValue();
+            if (tableWidth <= 0) return;
+            if (tableWidth >= recentMin) {
+                recentRecordsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            } else {
+                recentRecordsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+                for (int i = 0; i < recentRecordsTable.getColumns().size(); i++) {
+                    recentRecordsTable.getColumns().get(i).setPrefWidth(recentPrefWidths[i]);
+                }
+            }
+        });
+        
+        double[] completePrefWidths = {80, 80, 70, 70, 90, 100, 90, 90, 90, 120, 120, 120};
+        double completeTotalMin = 0;
+        for (double w : completePrefWidths) completeTotalMin += w;
+        final double completeMin = completeTotalMin;
+
+        completeRecordsTable.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double tableWidth = newVal.doubleValue();
+            if (tableWidth <= 0) return;
+            if (tableWidth >= completeMin) {
+                completeRecordsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            } else {
+                completeRecordsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+                for (int i = 0; i < completeRecordsTable.getColumns().size(); i++) {
+                    completeRecordsTable.getColumns().get(i).setPrefWidth(completePrefWidths[i]);
+                }
+            }
+        });
     }
 
     private void loadTables() {
