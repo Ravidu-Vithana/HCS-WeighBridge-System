@@ -23,7 +23,7 @@
               alignment="CENTER_LEFT"
               style="-fx-background-color: linear-gradient(to right, #334155, #475569); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
             <padding>
-                <Insets top="10" right="30" bottom="10" left="30"/>
+                <Insets top="30" right="30" bottom="30" left="30"/>
             </padding>
             <Button fx:id="backButton"
                     text="Back To Home"

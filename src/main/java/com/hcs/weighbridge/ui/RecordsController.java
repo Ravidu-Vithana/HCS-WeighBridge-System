@@ -46,7 +46,7 @@ public class RecordsController {
     private final ObservableList<Record> completeRecords = FXCollections.observableArrayList();
 
     private int currentPage = 1;
-    private int rowsPerPage = 20;
+    private final int rowsPerPage = 20;
     private int totalRecords = 0;
     private int totalPages = 1;
 
