@@ -29,6 +29,12 @@
                     text="Back To Home"
                     styleClass="exit-button">
             </Button>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="printFullButton"
+                    text="Print Full Ticket"
+                    styleClass="print-full-button">
+            </Button>
         </HBox>
     </top>
 

@@ -2,7 +2,9 @@ package com.hcs.weighbridge.ui;
 
 import com.hcs.weighbridge.MainApp;
 import com.hcs.weighbridge.dao.ConfigDao;
+import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.LogUtil;
 import com.hcs.weighbridge.util.UiScaler;
@@ -28,6 +30,8 @@ public class RecordsController {
     @FXML
     private Button backButton;
     @FXML
+    private Button printFullButton;
+    @FXML
     private TableView<Record> completeRecordsTable;
     @FXML
     private Button prevButton;
@@ -37,7 +41,6 @@ public class RecordsController {
     private Label pageLabel;
 
     private WeighService weighService;
-    private ConfigDao configDao;
     private UiScaler uiScaler;
 
     private final ObservableList<Record> completeRecords = FXCollections.observableArrayList();
@@ -49,7 +52,6 @@ public class RecordsController {
 
     public void init(WeighService weighService, ConfigDao configDao) {
         this.weighService = weighService;
-        this.configDao = configDao;
 
         double scaleFactor = configDao.getUiScaleFactor();
         this.uiScaler = new UiScaler(scaleFactor);
@@ -68,6 +70,7 @@ public class RecordsController {
 
     private void bindEvents() {
         backButton.setOnAction(e -> handleBack());
+        printFullButton.setOnAction(e -> printFullTicket());
         prevButton.setOnAction(e -> {
             if (currentPage > 1) {
                 currentPage--;
@@ -91,6 +94,49 @@ public class RecordsController {
     private void handleBack() {
         Stage stage = (Stage) rootPane.getScene().getWindow();
         stage.close();
+    }
+
+    private void printFullTicket() {
+        Record selectedRecord = completeRecordsTable.getSelectionModel().getSelectedItem();
+
+        if (selectedRecord == null) {
+            UiUtils.showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "No completed record selected",
+                    false);
+            return;
+        }
+
+        printReceipt(selectedRecord, PrintMode.FULL);
+    }
+
+    private void printReceipt(Record record, PrintMode mode) {
+        Task<Void> printTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                PrintService printService = new PrintService();
+                printService.printReceiptSilent(record, mode);
+                return null;
+            }
+        };
+
+        printTask.setOnFailed(e -> {
+            Throwable ex = printTask.getException();
+            logger.error("Print task failed", ex);
+            Platform.runLater(() -> UiUtils.showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Print failed: " + ex.getMessage(),
+                    false));
+        });
+
+        printTask.setOnSucceeded(e -> {
+            UiUtils.showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Print job sent successfully",
+                    true);
+        });
+
+        MainApp.getExecutorService().submit(printTask);
     }
 
     private void setupTable() {
