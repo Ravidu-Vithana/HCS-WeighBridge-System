@@ -79,6 +79,8 @@ public class MainController {
     private Button logoutButton;
     @FXML
     private Button backupButton;
+    @FXML
+    private Button recordsButton;
 
     private UiModel model;
     private WeighService weighService;
@@ -128,6 +130,10 @@ public class MainController {
             backupButton.setVisible(isAdmin);
             backupButton.setManaged(isAdmin);
             backupButton.setOnAction(e -> openBackupSettings());
+        }
+        
+        if (recordsButton != null) {
+            recordsButton.setOnAction(e -> openRecordsScreen());
         }
 
         newButton.setOnAction(e -> resetRecord());
@@ -253,6 +259,33 @@ public class MainController {
         }
     }
 
+    private void openRecordsScreen() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/records.fxml"));
+            Parent root = loader.load();
+
+            RecordsController controller = loader.getController();
+            controller.init(weighService, configDao);
+
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setTitle("All Records");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            stage.setScene(scene);
+            stage.setMaximized(true);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("Failed to open records screen: " + e.getMessage());
+            logger.error("Failed to open records screen: {}", e.getMessage(), e);
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Failed to open records screen: " + e.getMessage(),
+                    false);
+        }
+    }
+
     private void setupTables() {
         recentRecordsTable.setItems(recentRecords);
 
@@ -366,7 +399,7 @@ public class MainController {
             @Override
             protected List<ArrayList<Record>> call() throws Exception {
                 ArrayList<Record> pendingRecords = weighService.getAllPendingRecords();
-                ArrayList<Record> completedRecords = weighService.getAllCompletedRecords();
+                ArrayList<Record> completedRecords = weighService.getRecentCompletedRecords(10);
                 return Arrays.asList(pendingRecords, completedRecords);
             }
         };

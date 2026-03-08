@@ -95,6 +95,67 @@ public class WeighDataDao {
         }
     }
 
+    public ArrayList<Record> getRecentCompletedRecords(int limit) {
+        String sql = "SELECT * FROM weigh_data WHERE status = ? ORDER BY id DESC LIMIT ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, RecordStatus.COMPLETED.toString());
+            ps.setInt(2, limit);
+
+            ArrayList<Record> records = new ArrayList<>();
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                records.add(getRecordFromResultSet(rs));
+            }
+            return records;
+
+        } catch (SQLException e) {
+            throw new AppException("Failed to retrieve recent COMPLETED records", e);
+        } catch (Exception e) {
+            throw new AppException("Unexpected error retrieving recent records", e);
+        }
+    }
+
+    public ArrayList<Record> getCompletedRecordsWithPagination(int offset, int limit) {
+        String sql = "SELECT * FROM weigh_data WHERE status = ? ORDER BY id DESC LIMIT ? OFFSET ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, RecordStatus.COMPLETED.toString());
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+
+            ArrayList<Record> records = new ArrayList<>();
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                records.add(getRecordFromResultSet(rs));
+            }
+            return records;
+
+        } catch (SQLException e) {
+            throw new AppException("Failed to retrieve paginated COMPLETED records", e);
+        } catch (Exception e) {
+            throw new AppException("Unexpected error retrieving paginated records", e);
+        }
+    }
+
+    public int getCompletedRecordsCount() {
+        String sql = "SELECT COUNT(*) FROM weigh_data WHERE status = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, RecordStatus.COMPLETED.toString());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+
+        } catch (SQLException e) {
+            throw new AppException("Failed to get COMPLETED records count", e);
+        }
+    }
+
     public Record findById(long id) {
         String sql = "SELECT * FROM weigh_data WHERE id = ?";
 

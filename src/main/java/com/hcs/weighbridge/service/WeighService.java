@@ -77,6 +77,18 @@ public class WeighService {
         return dao.getAllRecordsFromStatus(RecordStatus.COMPLETED);
     }
 
+    public ArrayList<Record> getRecentCompletedRecords(int limit) {
+        return dao.getRecentCompletedRecords(limit);
+    }
+
+    public ArrayList<Record> getCompletedRecordsWithPagination(int offset, int limit) {
+        return dao.getCompletedRecordsWithPagination(offset, limit);
+    }
+
+    public int getCompletedRecordsCount() {
+        return dao.getCompletedRecordsCount();
+    }
+
     public Record loadRecord(long id) {
         activeRecord = dao.findById(id);
         return activeRecord;
