@@ -253,6 +253,7 @@ public class SettingsController implements Initializable {
 
         addTask.setOnFailed(e -> {
             Throwable ex = addTask.getException();
+            logger.error("Failed to create user: {}", ex.getMessage(), ex);
             showToast((Stage) portCombo.getScene().getWindow(),
                     portCombo,
                     "Failed to create user: " + ex.getMessage(),
@@ -370,6 +371,7 @@ public class SettingsController implements Initializable {
 
             deleteTask.setOnFailed(e -> {
                 Throwable ex = deleteTask.getException();
+                logger.error("Failed to delete user: {}", ex.getMessage(), ex);
                 showToast((Stage) portCombo.getScene().getWindow(),
                         portCombo,
                         "Failed to delete user: " + ex.getMessage(),
@@ -456,7 +458,7 @@ public class SettingsController implements Initializable {
 
             saveTask.setOnFailed(e -> {
                 Throwable ex = saveTask.getException();
-                ex.printStackTrace();
+                logger.error("Failed to save settings: {}", ex.getMessage(), ex);
                 showToast((Stage) scaleSlider.getScene().getWindow(),
                         scaleSlider,
                         "Failed to save settings: " + ex.getMessage(),
@@ -466,8 +468,7 @@ public class SettingsController implements Initializable {
             MainApp.getExecutorService().submit(saveTask);
 
         } catch (Exception e) {
-            System.err.println("Failed to save settings: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Failed to save settings: {}", e.getMessage(), e);
             showToast((Stage) scaleSlider.getScene().getWindow(),
                     scaleSlider,
                     "Failed to save settings: " + e.getMessage(),

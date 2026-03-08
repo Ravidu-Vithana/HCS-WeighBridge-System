@@ -2,6 +2,7 @@ package com.hcs.weighbridge.ui;
 
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.service.BackupService;
+import com.hcs.weighbridge.util.LogUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -13,13 +14,14 @@ import javafx.stage.Stage;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import com.hcs.weighbridge.MainApp;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
 import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class BackupController {
-
+    private static final Logger logger = LogUtil.getLogger(BackupController.class);
     @FXML
     private ComboBox<String> frequencyCombo;
     @FXML
@@ -110,7 +112,7 @@ public class BackupController {
 
         backupTask.setOnFailed(e -> {
             Throwable ex = backupTask.getException();
-            ex.printStackTrace();
+            logger.error("Backup failed: {}", ex.getMessage(), ex);
             showToast((Stage) frequencyCombo.getScene().getWindow(),
                     frequencyCombo,
                     "Backup failed: " + ex.getMessage(),
@@ -145,7 +147,7 @@ public class BackupController {
 
             restoreTask.setOnFailed(e -> {
                 Throwable ex = restoreTask.getException();
-                ex.printStackTrace();
+                logger.error("Restore data failed: {}", ex.getMessage(), ex);
                 showToast((Stage) frequencyCombo.getScene().getWindow(),
                         frequencyCombo,
                         "Restore failed: " + ex.getMessage(),
@@ -182,6 +184,7 @@ public class BackupController {
             testConnectionButton.setDisable(false);
             Throwable ex = testTask.getException();
             String errorMessage = ex.getMessage();
+            logger.error("Connection Failed: {}", errorMessage, ex);
             if (ex.getCause() != null) {
                 errorMessage = ex.getCause().getMessage();
             }
