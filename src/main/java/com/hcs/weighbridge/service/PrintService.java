@@ -2,6 +2,7 @@ package com.hcs.weighbridge.service;
 
 import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.model.CompanyInfo;
 import com.hcs.weighbridge.exceptions.AppException;
 import com.hcs.weighbridge.util.LogUtil;
 import net.sf.jasperreports.engine.*;
@@ -42,8 +43,8 @@ public class PrintService {
      * @param record The record to print
      * @param mode   The print mode (FIRST_WEIGHT, SECOND_WEIGHT, or FULL)
      */
-    public void printReceipt(Record record, PrintMode mode) {
-        printReceiptInternal(record, mode, null, true);
+    public void printReceipt(Record record, PrintMode mode, CompanyInfo companyInfo) {
+        printReceiptInternal(record, mode, null, true, companyInfo);
     }
 
     /**
@@ -53,8 +54,8 @@ public class PrintService {
      * @param record The record to print
      * @param mode   The print mode
      */
-    public void printReceiptSilent(Record record, PrintMode mode) {
-        printReceiptInternal(record, mode, null, false);
+    public void printReceiptSilent(Record record, PrintMode mode, CompanyInfo companyInfo) {
+        printReceiptInternal(record, mode, null, false, companyInfo);
     }
 
     /**
@@ -64,16 +65,16 @@ public class PrintService {
      * @param mode        The print mode
      * @param printerName Name of the printer to use
      */
-    public void printReceiptWithPrinter(Record record, PrintMode mode, String printerName) {
+    public void printReceiptWithPrinter(Record record, PrintMode mode, String printerName, CompanyInfo companyInfo) {
         javax.print.PrintService selectedPrinter = findPrinter(printerName);
         if (selectedPrinter == null) {
             throw new AppException("Printer not found: " + printerName);
         }
-        printReceiptInternal(record, mode, selectedPrinter, false);
+        printReceiptInternal(record, mode, selectedPrinter, false, companyInfo);
     }
 
     private void printReceiptInternal(Record record, PrintMode mode,
-            javax.print.PrintService specificPrinter, boolean showDialog) {
+            javax.print.PrintService specificPrinter, boolean showDialog, CompanyInfo companyInfo) {
         logger.info("=== Starting JasperReports print job ===");
         logger.info("Record ID: {}, Mode: {}", record.getId(), mode);
 
@@ -88,10 +89,18 @@ public class PrintService {
             // 2. Prepare Parameters
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("PrintMode", mode.name());
-            parameters.put("CompanyName", "HORAWADUNNA COPRA STORES WEIGHBRIDGE");
-            parameters.put("CompanyAddress", "283/1, Bammanna Road, Kudalupoththa, Narangoda.");
-            parameters.put("CompanyContactNumber1", "0776136447");
-            parameters.put("CompanyContactNumber2", "0372246292");
+            
+            if (companyInfo != null) {
+                parameters.put("CompanyName", companyInfo.getCompanyName());
+                parameters.put("CompanyAddress", companyInfo.getCompanyAddress());
+                parameters.put("CompanyContactNumber1", companyInfo.getContactNumber1());
+                parameters.put("CompanyContactNumber2", companyInfo.getContactNumber2());
+            } else {
+                parameters.put("CompanyName", "YOUR COMPANY NAME");
+                parameters.put("CompanyAddress", "Your company address");
+                parameters.put("CompanyContactNumber1", "Contact number 1");
+                parameters.put("CompanyContactNumber2", "Contact number 2");
+            }
             parameters.put("Technology", "Technology Provided by HCS Solutions +94 76 3738202");
 
             // 3. Prepare Data Source
