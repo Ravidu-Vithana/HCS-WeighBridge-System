@@ -63,10 +63,10 @@
                     </columnConstraints>
 
                     <Label text="From Date:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <DatePicker fx:id="fromDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity"/>
+                    <DatePicker fx:id="fromDatePicker" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity"/>
 
                     <Label text="To Date:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <DatePicker fx:id="toDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity"/>
+                    <DatePicker fx:id="toDatePicker" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity"/>
                 </GridPane>
             </VBox>
 

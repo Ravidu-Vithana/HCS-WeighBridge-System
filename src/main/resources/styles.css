@@ -61,6 +61,31 @@
     -fx-font-size: 12px;
 }
 
+/* DatePicker */
+.date-picker.form-field {
+    -fx-padding: 0;
+}
+
+.date-picker.form-field > .text-field {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-padding: 6 8;
+    -fx-font-size: 12px;
+}
+
+.date-picker.form-field > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0 8;
+}
+
+.date-picker.form-field > .arrow-button > .calendar-icon {
+    -fx-background-color: #64748b;
+}
+
 .settings-button {
     -fx-background-color: rgba(51, 65, 85, 0.5);
     -fx-text-fill: white;
