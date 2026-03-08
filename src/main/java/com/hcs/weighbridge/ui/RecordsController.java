@@ -18,6 +18,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
@@ -29,6 +33,8 @@ public class RecordsController {
     private BorderPane rootPane;
     @FXML
     private Button backButton;
+    @FXML
+    private Button setFiltersButton;
     @FXML
     private Button printFullButton;
     @FXML
@@ -50,6 +56,11 @@ public class RecordsController {
     private int totalRecords = 0;
     private int totalPages = 1;
 
+    private String currentLorryFilter = null;
+    private String currentTicketFilter = null;
+    private String currentFromDate = null;
+    private String currentToDate = null;
+
     public void init(WeighService weighService, ConfigDao configDao) {
         this.weighService = weighService;
 
@@ -70,6 +81,7 @@ public class RecordsController {
 
     private void bindEvents() {
         backButton.setOnAction(e -> handleBack());
+        setFiltersButton.setOnAction(e -> openFiltersModal());
         printFullButton.setOnAction(e -> printFullTicket());
         prevButton.setOnAction(e -> {
             if (currentPage > 1) {
@@ -94,6 +106,45 @@ public class RecordsController {
     private void handleBack() {
         Stage stage = (Stage) rootPane.getScene().getWindow();
         stage.close();
+    }
+
+    private void openFiltersModal() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/filters.fxml"));
+            Parent root = loader.load();
+
+            FiltersController controller = loader.getController();
+            controller.init(this, currentLorryFilter, currentTicketFilter, currentFromDate, currentToDate);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initOwner(rootPane.getScene().getWindow());
+            stage.setTitle("Set Filters");
+
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+
+            if (uiScaler != null) {
+                uiScaler.applyScaling(root);
+            }
+
+            stage.showAndWait();
+        } catch (Exception e) {
+            logger.error("Failed to open filters modal", e);
+            UiUtils.showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Failed to open filters: " + e.getMessage(),
+                    false);
+        }
+    }
+
+    public void applyFilters(String lorryNo, String ticketNo, String fromDate, String toDate) {
+        this.currentLorryFilter = lorryNo;
+        this.currentTicketFilter = ticketNo;
+        this.currentFromDate = fromDate;
+        this.currentToDate = toDate;
+        this.currentPage = 1;
+        loadData();
     }
 
     private void printFullTicket() {
@@ -208,7 +259,7 @@ public class RecordsController {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                totalRecords = weighService.getCompletedRecordsCount();
+                totalRecords = weighService.getFilteredCompletedRecordsCount(currentLorryFilter, currentTicketFilter, currentFromDate, currentToDate);
                 totalPages = (int) Math.ceil((double) totalRecords / rowsPerPage);
                 if (totalPages == 0) totalPages = 1;
 
@@ -217,7 +268,7 @@ public class RecordsController {
                 }
 
                 int offset = (currentPage - 1) * rowsPerPage;
-                ArrayList<Record> records = weighService.getCompletedRecordsWithPagination(offset, rowsPerPage);
+                ArrayList<Record> records = weighService.getFilteredCompletedRecords(currentLorryFilter, currentTicketFilter, currentFromDate, currentToDate, offset, rowsPerPage);
 
                 Platform.runLater(() -> {
                     completeRecords.setAll(records);
