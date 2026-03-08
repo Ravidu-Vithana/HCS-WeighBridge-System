@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox spacing="0"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.hcs.weighbridge.ui.FiltersController"
+      prefWidth="450"
+      prefHeight="500"
+      styleClass="settings-container"
+      style="-fx-background-color: #f8fafc;">
+
+    <stylesheets>
+        <java.net.URL value="@../styles.css"/>
+    </stylesheets>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;">
+        <VBox spacing="15">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Set Filters" styleClass="settings-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <Button text="Clear All" onAction="#clearAllFilters" styleClass="settings-button" />
+            </HBox>
+
+            <Separator />
+
+            <VBox spacing="10">
+                <Label text="Search Criteria" styleClass="settings-section-title" />
+
+                <GridPane hgap="15" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="100" />
+                        <ColumnConstraints minWidth="200" hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <Label text="Lorry Number:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="lorryField" promptText="Enter lorry number" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Ticket Number:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="ticketField" promptText="Enter ticket number" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                </GridPane>
+            </VBox>
+
+            <Separator />
+            
+            <VBox spacing="10">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Date Range" styleClass="settings-section-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button text="Clear" onAction="#clearDates" styleClass="settings-button" />
+                </HBox>
+
+                <GridPane hgap="15" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="100" />
+                        <ColumnConstraints minWidth="200" hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <Label text="From Date:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <DatePicker fx:id="fromDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity"/>
+
+                    <Label text="To Date:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <DatePicker fx:id="toDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity"/>
+                </GridPane>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+
+    <!-- Action Buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 15 20;">
+        <Button text="Apply"
+                onAction="#applyFilters"
+                styleClass="settings-save-button"/>
+        <Button text="Cancel"
+                onAction="#close"
+                styleClass="settings-cancel-button"/>
+    </HBox>
+
+</VBox>
