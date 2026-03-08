@@ -41,10 +41,6 @@ public class CompanyDao {
     }
 
     public void saveCompanyInfo(CompanyInfo info) {
-        // We ensure there is only one row by always updating id 1 or inserting into id 1 if not exists.
-        // Or we could truncate and insert. A simple approach is update, if row count 0, then insert.
-        // Let's use INSERT ... ON DUPLICATE KEY UPDATE but we need a primary key (e.g., id)
-        // Let's assume table has an 'id' INT DEFAULT 1 PRIMARY KEY
         String sql = "INSERT INTO company_info (id, company_name, company_address, contact_number1, contact_number2) " +
                      "VALUES (1, ?, ?, ?, ?) " +
                      "ON DUPLICATE KEY UPDATE " +
