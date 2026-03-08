@@ -5,7 +5,10 @@ import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.dao.UserDao;
+import com.hcs.weighbridge.dao.CompanyDao;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.model.SerialConfig;
+import com.hcs.weighbridge.model.CompanyInfo;
 import com.hcs.weighbridge.model.User;
 import com.hcs.weighbridge.serial.WeighReader;
 import com.hcs.weighbridge.service.BackupService;
@@ -78,10 +81,13 @@ public class MainController {
     private Button logoutButton;
     @FXML
     private Button backupButton;
+    @FXML
+    private Button recordsButton;
 
     private UiModel model;
     private WeighService weighService;
     private ConfigDao configDao;
+    private CompanyDao companyDao;
     private com.hcs.weighbridge.service.BackupService backupService;
     private com.hcs.weighbridge.model.User currentUser;
     private UiScaler uiScaler;
@@ -104,6 +110,7 @@ public class MainController {
         this.model = model;
         this.weighService = weighService;
         this.configDao = configDao;
+        this.companyDao = new CompanyDao(DatabaseConfig.getConnection());
         this.backupService = backupService;
         this.currentUser = currentUser;
 
@@ -127,6 +134,10 @@ public class MainController {
             backupButton.setVisible(isAdmin);
             backupButton.setManaged(isAdmin);
             backupButton.setOnAction(e -> openBackupSettings());
+        }
+        
+        if (recordsButton != null) {
+            recordsButton.setOnAction(e -> openRecordsScreen());
         }
 
         newButton.setOnAction(e -> resetRecord());
@@ -252,6 +263,33 @@ public class MainController {
         }
     }
 
+    private void openRecordsScreen() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/records.fxml"));
+            Parent root = loader.load();
+
+            RecordsController controller = loader.getController();
+            controller.init(weighService, configDao);
+
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setTitle("All Records");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            stage.setScene(scene);
+            stage.setMaximized(true);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("Failed to open records screen: " + e.getMessage());
+            logger.error("Failed to open records screen: {}", e.getMessage(), e);
+            showToast((Stage) rootPane.getScene().getWindow(),
+                    rootPane,
+                    "Failed to open records screen: " + e.getMessage(),
+                    false);
+        }
+    }
+
     private void setupTables() {
         recentRecordsTable.setItems(recentRecords);
 
@@ -318,6 +356,46 @@ public class MainController {
                         handleCompleteRecordClick(newSelection);
                     }
                 });
+
+        setupTableColumnResize();
+    }
+
+    private void setupTableColumnResize() {
+        double[] recentPrefWidths = {100, 80, 100, 120, 120};
+        double recentTotalMin = 0;
+        for (double w : recentPrefWidths) recentTotalMin += w;
+        final double recentMin = recentTotalMin;
+
+        recentRecordsTable.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double tableWidth = newVal.doubleValue();
+            if (tableWidth <= 0) return;
+            if (tableWidth >= recentMin) {
+                recentRecordsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            } else {
+                recentRecordsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+                for (int i = 0; i < recentRecordsTable.getColumns().size(); i++) {
+                    recentRecordsTable.getColumns().get(i).setPrefWidth(recentPrefWidths[i]);
+                }
+            }
+        });
+        
+        double[] completePrefWidths = {80, 80, 70, 70, 90, 100, 90, 90, 90, 120, 120, 120};
+        double completeTotalMin = 0;
+        for (double w : completePrefWidths) completeTotalMin += w;
+        final double completeMin = completeTotalMin;
+
+        completeRecordsTable.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double tableWidth = newVal.doubleValue();
+            if (tableWidth <= 0) return;
+            if (tableWidth >= completeMin) {
+                completeRecordsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            } else {
+                completeRecordsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+                for (int i = 0; i < completeRecordsTable.getColumns().size(); i++) {
+                    completeRecordsTable.getColumns().get(i).setPrefWidth(completePrefWidths[i]);
+                }
+            }
+        });
     }
 
     private void loadTables() {
@@ -325,7 +403,7 @@ public class MainController {
             @Override
             protected List<ArrayList<Record>> call() throws Exception {
                 ArrayList<Record> pendingRecords = weighService.getAllPendingRecords();
-                ArrayList<Record> completedRecords = weighService.getAllCompletedRecords();
+                ArrayList<Record> completedRecords = weighService.getRecentCompletedRecords(10);
                 return Arrays.asList(pendingRecords, completedRecords);
             }
         };
@@ -338,7 +416,7 @@ public class MainController {
 
         task.setOnFailed(e -> {
             Throwable ex = task.getException();
-            ex.printStackTrace();
+            logger.error("Failed to load data: {}", ex.getMessage(), ex);
             showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Failed to load data: " + ex.getMessage(),
@@ -375,7 +453,8 @@ public class MainController {
 
             SettingsController controller = loader.getController();
             UserDao userDao = new UserDao(DatabaseConfig.getConnection());
-            controller.setDependencies(configDao, userDao, this, currentUser);
+            CompanyDao companyDao = new CompanyDao(DatabaseConfig.getConnection());
+            controller.setDependencies(configDao, userDao, companyDao, this, currentUser);
 
             Scene scene = new Scene(settingsRoot);
 
@@ -390,7 +469,6 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Failed to open settings: " + e.getMessage());
             logger.error("Failed to open settings: {}", e.getMessage(), e);
-            e.printStackTrace();
             showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Failed to open settings: " + e.getMessage(),
@@ -412,6 +490,26 @@ public class MainController {
         if (rootPane.getScene() != null) {
             rootPane.getScene().getRoot().applyCss();
         }
+    }
+
+    public void restartWeighReader(SerialConfig cfg) {
+        WeighReader oldReader = MainApp.getWeighReader();
+        if (oldReader != null) {
+            oldReader.stop();
+        }
+
+        WeighReader newReader = new WeighReader(
+                cfg,
+                (weight, status) -> Platform.runLater(() -> updateLiveWeight(weight, status)));
+
+        MainApp.setWeighReader(newReader);
+
+        Thread serialThread = new Thread(newReader::start, "WeighReader-Thread");
+        serialThread.setDaemon(true);
+        serialThread.start();
+
+        logger.info("WeighReader restarted with new serial config: port={}, baud={}",
+                cfg.getPortName(), cfg.getBaudRate());
     }
 
     public void updateLiveWeight(int weight, char statusChar) {
@@ -544,7 +642,7 @@ public class MainController {
 
         saveTask.setOnFailed(e -> {
             Throwable ex = saveTask.getException();
-            ex.printStackTrace();
+            logger.error("Save failed: {}", ex.getMessage(), ex);
             Platform.runLater(() -> showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Save failed: " + ex.getMessage(),
@@ -601,14 +699,15 @@ public class MainController {
             @Override
             protected Void call() throws Exception {
                 PrintService printService = new PrintService();
-                printService.printReceiptSilent(record, mode);
+                CompanyInfo companyInfo = companyDao.getCompanyInfo();
+                printService.printReceiptSilent(record, mode, companyInfo);
                 return null;
             }
         };
 
         printTask.setOnFailed(e -> {
             Throwable ex = printTask.getException();
-            ex.printStackTrace();
+            logger.error("Print failed: {}", ex.getMessage(), ex);
             Platform.runLater(() -> showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Print failed: " + ex.getMessage(),

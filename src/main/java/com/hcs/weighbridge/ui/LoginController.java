@@ -22,7 +22,7 @@ import java.sql.Connection;
 import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class LoginController {
-    private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
+    private static final Logger logger = LogUtil.getLogger(LoginController.class);
     @FXML
     private TextField usernameField;
 

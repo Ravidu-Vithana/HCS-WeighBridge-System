@@ -95,6 +95,67 @@ public class WeighDataDao {
         }
     }
 
+    public ArrayList<Record> getRecentCompletedRecords(int limit) {
+        String sql = "SELECT * FROM weigh_data WHERE status = ? ORDER BY id DESC LIMIT ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, RecordStatus.COMPLETED.toString());
+            ps.setInt(2, limit);
+
+            ArrayList<Record> records = new ArrayList<>();
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                records.add(getRecordFromResultSet(rs));
+            }
+            return records;
+
+        } catch (SQLException e) {
+            throw new AppException("Failed to retrieve recent COMPLETED records", e);
+        } catch (Exception e) {
+            throw new AppException("Unexpected error retrieving recent records", e);
+        }
+    }
+
+    public ArrayList<Record> getCompletedRecordsWithPagination(int offset, int limit) {
+        String sql = "SELECT * FROM weigh_data WHERE status = ? ORDER BY id DESC LIMIT ? OFFSET ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, RecordStatus.COMPLETED.toString());
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+
+            ArrayList<Record> records = new ArrayList<>();
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                records.add(getRecordFromResultSet(rs));
+            }
+            return records;
+
+        } catch (SQLException e) {
+            throw new AppException("Failed to retrieve paginated COMPLETED records", e);
+        } catch (Exception e) {
+            throw new AppException("Unexpected error retrieving paginated records", e);
+        }
+    }
+
+    public int getCompletedRecordsCount() {
+        String sql = "SELECT COUNT(*) FROM weigh_data WHERE status = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, RecordStatus.COMPLETED.toString());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+
+        } catch (SQLException e) {
+            throw new AppException("Failed to get COMPLETED records count", e);
+        }
+    }
+
     public Record findById(long id) {
         String sql = "SELECT * FROM weigh_data WHERE id = ?";
 
@@ -135,6 +196,143 @@ public class WeighDataDao {
             throw new AppException("Failed to check pending record for lorry: " + lorryNumber, e);
         } catch (Exception e) {
             throw new AppException("Unexpected error checking pending record", e);
+        }
+    }
+
+    public ArrayList<Record> getFilteredCompletedRecords(String lorryNo, String ticketNo, String fromDate, String toDate, int offset, int limit) {
+        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM weigh_data WHERE status = ?");
+        ArrayList<Object> params = new ArrayList<>();
+        params.add(RecordStatus.COMPLETED.toString());
+
+        if (ticketNo != null && !ticketNo.trim().isEmpty()) {
+            sqlBuilder.append(" AND id = ?");
+            try {
+                params.add(Long.parseLong(ticketNo.trim()));
+            } catch (NumberFormatException e) {
+                return new ArrayList<>(); // invalid ticket number format
+            }
+        }
+
+        if (fromDate != null && !fromDate.trim().isEmpty()) {
+            sqlBuilder.append(" AND date_in >= ?");
+            params.add(fromDate.trim());
+        }
+
+        if (toDate != null && !toDate.trim().isEmpty()) {
+            sqlBuilder.append(" AND date_in <= ?");
+            params.add(toDate.trim());
+        }
+
+        sqlBuilder.append(" ORDER BY id DESC");
+
+        boolean applyPagingInSql = (lorryNo == null || lorryNo.trim().isEmpty());
+
+        if (applyPagingInSql) {
+            sqlBuilder.append(" LIMIT ? OFFSET ?");
+            params.add(limit);
+            params.add(offset);
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sqlBuilder.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ArrayList<Record> records = new ArrayList<>();
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Record record = getRecordFromResultSet(rs);
+
+                if (!applyPagingInSql) {
+                    String decryptedLorry = record.getLorryNumber();
+                    if (decryptedLorry != null && decryptedLorry.toLowerCase().contains(lorryNo.trim().toLowerCase())) {
+                        records.add(record);
+                    }
+                } else {
+                    records.add(record);
+                }
+            }
+
+            if (!applyPagingInSql) {
+                int toIndex = Math.min(offset + limit, records.size());
+                if (offset >= records.size()) {
+                    return new ArrayList<>();
+                }
+                return new ArrayList<>(records.subList(offset, toIndex));
+            }
+
+            return records;
+
+        } catch (SQLException e) {
+            throw new AppException("Failed to retrieve filtered COMPLETED records", e);
+        } catch (Exception e) {
+            throw new AppException("Unexpected error retrieving filtered records", e);
+        }
+    }
+
+    public int getFilteredCompletedRecordsCount(String lorryNo, String ticketNo, String fromDate, String toDate) {
+        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM weigh_data WHERE status = ?");
+        ArrayList<Object> params = new ArrayList<>();
+        params.add(RecordStatus.COMPLETED.toString());
+
+        if (ticketNo != null && !ticketNo.trim().isEmpty()) {
+            sqlBuilder.append(" AND id = ?");
+            try {
+                params.add(Long.parseLong(ticketNo.trim()));
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+
+        if (fromDate != null && !fromDate.trim().isEmpty()) {
+            sqlBuilder.append(" AND date_in >= ?");
+            params.add(fromDate.trim());
+        }
+
+        if (toDate != null && !toDate.trim().isEmpty()) {
+            sqlBuilder.append(" AND date_in <= ?");
+            params.add(toDate.trim());
+        }
+
+        boolean hasLorryFilter = (lorryNo != null && !lorryNo.trim().isEmpty());
+
+        if (hasLorryFilter) {
+            try (PreparedStatement ps = connection.prepareStatement(sqlBuilder.toString())) {
+                for (int i = 0; i < params.size(); i++) {
+                    ps.setObject(i + 1, params.get(i));
+                }
+
+                int count = 0;
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    String encryptedLorry = rs.getString("lorry_no");
+                    String decryptedLorry = SecurityUtil.decrypt(encryptedLorry);
+                    if (decryptedLorry != null && decryptedLorry.toLowerCase().contains(lorryNo.trim().toLowerCase())) {
+                        count++;
+                    }
+                }
+                return count;
+            } catch (SQLException e) {
+                throw new AppException("Failed to get filtered COMPLETED records count", e);
+            } catch (Exception e) {
+                throw new AppException("Unexpected error getting filtered count", e);
+            }
+
+        } else {
+            String countSql = sqlBuilder.toString().replace("SELECT *", "SELECT COUNT(*)");
+            try (PreparedStatement ps = connection.prepareStatement(countSql)) {
+                for (int i = 0; i < params.size(); i++) {
+                    ps.setObject(i + 1, params.get(i));
+                }
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
+            } catch (SQLException e) {
+                throw new AppException("Failed to get count for filtered COMPLETED records", e);
+            }
         }
     }
 
