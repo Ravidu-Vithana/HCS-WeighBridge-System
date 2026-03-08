@@ -34,7 +34,7 @@
             <HBox spacing="10">
                 <Button fx:id="setFiltersButton"
                         text="Set Filters"
-                        styleClass="save-button">
+                        styleClass="new-button">
                 </Button>
                 <Button fx:id="printFullButton"
                         text="Print Full Ticket"
