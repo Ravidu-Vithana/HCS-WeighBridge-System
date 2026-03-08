@@ -242,7 +242,7 @@ public final class DatabaseConfig {
                 SecurityUtil.hashPassword("admin"));
 
         String insertDefaultCompany = "INSERT IGNORE INTO company_info (id, company_name, company_address, contact_number1, contact_number2) " +
-                "VALUES (1, 'HORAWADUNNA COPRA STORES WEIGHBRIDGE', '283/1, Bammanna Road, Kudalupoththa, Narangoda.', '0776136447', '0372246292')";
+                "VALUES (1, 'YOUR COMPANY NAME', 'Your Company Address', 'Contact number 1', 'Contact number 2')";
 
         try (Statement stmt = connection.createStatement()) {
             int successCount = 0;

@@ -66,16 +66,16 @@
                     </columnConstraints>
 
                     <Label text="Company Name:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="companyNameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="companyNameField" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
                     <Label text="Company Address:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <TextField fx:id="companyAddressField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <TextField fx:id="companyAddressField" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
                     <Label text="Contact Number 1:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                    <TextField fx:id="contactNumber1Field" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <TextField fx:id="contactNumber1Field" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
                     <Label text="Contact Number 2:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                    <TextField fx:id="contactNumber2Field" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    <TextField fx:id="contactNumber2Field" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
                 </GridPane>
                 <Separator />
             </VBox>
@@ -91,10 +91,10 @@
                     </columnConstraints>
 
                     <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="usernameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="usernameField" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
                     <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <PasswordField fx:id="passwordField" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
                     <Label text="Role:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                     <ComboBox fx:id="roleCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" maxWidth="Infinity"/>
