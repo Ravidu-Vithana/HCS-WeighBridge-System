@@ -29,10 +29,10 @@ public class CompanyDao {
                 info.setContactNumber2(rs.getString("contact_number2"));
             } else {
                 // Return default hardcoded values if no row exists yet to prevent empty fields on UI load
-                info.setCompanyName("HORAWADUNNA COPRA STORES WEIGHBRIDGE");
-                info.setCompanyAddress("283/1, Bammanna Road, Kudalupoththa, Narangoda.");
-                info.setContactNumber1("0776136447");
-                info.setContactNumber2("0372246292");
+                info.setCompanyName("YOUR COMPANY NAME");
+                info.setCompanyAddress("Your Company Address");
+                info.setContactNumber1("Contact Number 1");
+                info.setContactNumber2("Contact Number 2");
             }
         } catch (SQLException e) {
             throw new AppException("Failed to load company info", e);
