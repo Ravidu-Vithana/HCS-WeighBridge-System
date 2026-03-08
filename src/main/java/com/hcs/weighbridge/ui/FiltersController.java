@@ -37,6 +37,8 @@ public class FiltersController {
         if (currentToDate != null && !currentToDate.trim().isEmpty()) {
             toDatePicker.setValue(LocalDate.parse(currentToDate, dateFormatter));
         }
+        fromDatePicker.setEditable(false);
+        toDatePicker.setEditable(false);
     }
 
     @FXML

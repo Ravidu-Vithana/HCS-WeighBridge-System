@@ -40,10 +40,10 @@
                     </columnConstraints>
 
                     <Label text="Lorry Number:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="lorryField" promptText="Enter lorry number" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="lorryField" styleClass="form-field" promptText="Enter lorry number" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
                     <Label text="Ticket Number:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <TextField fx:id="ticketField" promptText="Enter ticket number" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <TextField fx:id="ticketField" styleClass="form-field" promptText="Enter ticket number" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 </GridPane>
             </VBox>
 
