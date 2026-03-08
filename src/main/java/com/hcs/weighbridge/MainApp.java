@@ -16,11 +16,13 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -92,6 +94,9 @@ public class MainApp extends Application {
     public void start(Stage stage) throws Exception {
         stage.initStyle(StageStyle.UNDECORATED);
         try {
+            stage.getIcons().add(
+                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/app_icon.png")))
+            );
             initializeApplication();
             showLoginView(stage);
         } catch (Exception e) {
