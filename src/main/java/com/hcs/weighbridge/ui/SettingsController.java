@@ -1,7 +1,6 @@
 package com.hcs.weighbridge.ui;
 
 import com.fazecast.jSerialComm.SerialPort;
-import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.dao.UserDao;
 import com.hcs.weighbridge.model.Role;
@@ -30,7 +29,7 @@ import static com.hcs.weighbridge.util.UiUtils.showToast;
 
 public class SettingsController implements Initializable {
 
-    private static final Logger logger = LogUtil.getLogger(DatabaseConfig.class);
+    private static final Logger logger = LogUtil.getLogger(SettingsController.class);
     @FXML
     private ComboBox<String> portCombo;
     @FXML
