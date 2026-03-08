@@ -207,34 +207,40 @@
                                 </TableView>
                             </VBox>
 
-                            <!-- Action Buttons -->
-                            <HBox spacing="15"
-                                  alignment="CENTER"
-                                  style="-fx-background-color: rgba(255, 255, 255, 0.8);
-                                         -fx-background-radius: 8;
-                                         -fx-padding: 12;
-                                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                            <TilePane prefColumns="4"
+                                      hgap="10"
+                                      vgap="10"
+                                      alignment="CENTER"
+                                      tileAlignment="CENTER"
+                                      style="-fx-background-color: rgba(255, 255, 255, 0.8);
+                                             -fx-background-radius: 8;
+                                             -fx-padding: 12;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
 
                                 <Button fx:id="newButton"
                                         text="New (F9)"
-                                        styleClass="new-button">
+                                        styleClass="new-button"
+                                        maxWidth="Infinity">
                                 </Button>
 
                                 <Button fx:id="saveButton"
                                         text="Save (F12)"
-                                        styleClass="save-button">
+                                        styleClass="save-button"
+                                        maxWidth="Infinity">
                                 </Button>
 
                                 <Button fx:id="printFirstButton"
                                         text="Print First Ticket (F10)"
-                                        styleClass="print-first-button">
+                                        styleClass="print-first-button"
+                                        maxWidth="Infinity">
                                 </Button>
 
                                 <Button fx:id="printFullButton"
                                         text="Print Full Ticket (F11)"
-                                        styleClass="print-full-button">
+                                        styleClass="print-full-button"
+                                        maxWidth="Infinity">
                                 </Button>
-                            </HBox>
+                            </TilePane>
                         </VBox>
                     </GridPane>
 
