@@ -107,6 +107,11 @@ public class RecordsController {
             return;
         }
 
+        UiUtils.showToast((Stage) rootPane.getScene().getWindow(),
+                rootPane,
+                "Please wait...",
+                true);
+
         printReceipt(selectedRecord, PrintMode.FULL);
     }
 
