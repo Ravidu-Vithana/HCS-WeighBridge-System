@@ -412,7 +412,7 @@ public class MainController {
 
         task.setOnFailed(e -> {
             Throwable ex = task.getException();
-            ex.printStackTrace();
+            logger.error("Failed to load data: {}", ex.getMessage(), ex);
             showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Failed to load data: " + ex.getMessage(),
@@ -464,7 +464,6 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Failed to open settings: " + e.getMessage());
             logger.error("Failed to open settings: {}", e.getMessage(), e);
-            e.printStackTrace();
             showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Failed to open settings: " + e.getMessage(),
@@ -638,7 +637,7 @@ public class MainController {
 
         saveTask.setOnFailed(e -> {
             Throwable ex = saveTask.getException();
-            ex.printStackTrace();
+            logger.error("Save failed: {}", ex.getMessage(), ex);
             Platform.runLater(() -> showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Save failed: " + ex.getMessage(),
@@ -702,7 +701,7 @@ public class MainController {
 
         printTask.setOnFailed(e -> {
             Throwable ex = printTask.getException();
-            ex.printStackTrace();
+            logger.error("Print failed: {}", ex.getMessage(), ex);
             Platform.runLater(() -> showToast((Stage) rootPane.getScene().getWindow(),
                     rootPane,
                     "Print failed: " + ex.getMessage(),
