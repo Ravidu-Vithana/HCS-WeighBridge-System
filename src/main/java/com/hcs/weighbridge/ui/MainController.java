@@ -5,8 +5,10 @@ import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.dao.UserDao;
+import com.hcs.weighbridge.dao.CompanyDao;
 import com.hcs.weighbridge.model.Record;
 import com.hcs.weighbridge.model.SerialConfig;
+import com.hcs.weighbridge.model.CompanyInfo;
 import com.hcs.weighbridge.model.User;
 import com.hcs.weighbridge.serial.WeighReader;
 import com.hcs.weighbridge.service.BackupService;
@@ -85,6 +87,7 @@ public class MainController {
     private UiModel model;
     private WeighService weighService;
     private ConfigDao configDao;
+    private CompanyDao companyDao;
     private com.hcs.weighbridge.service.BackupService backupService;
     private com.hcs.weighbridge.model.User currentUser;
     private UiScaler uiScaler;
@@ -107,6 +110,7 @@ public class MainController {
         this.model = model;
         this.weighService = weighService;
         this.configDao = configDao;
+        this.companyDao = new CompanyDao(DatabaseConfig.getConnection());
         this.backupService = backupService;
         this.currentUser = currentUser;
 
@@ -449,7 +453,8 @@ public class MainController {
 
             SettingsController controller = loader.getController();
             UserDao userDao = new UserDao(DatabaseConfig.getConnection());
-            controller.setDependencies(configDao, userDao, this, currentUser);
+            CompanyDao companyDao = new CompanyDao(DatabaseConfig.getConnection());
+            controller.setDependencies(configDao, userDao, companyDao, this, currentUser);
 
             Scene scene = new Scene(settingsRoot);
 
@@ -694,7 +699,8 @@ public class MainController {
             @Override
             protected Void call() throws Exception {
                 PrintService printService = new PrintService();
-                printService.printReceiptSilent(record, mode);
+                CompanyInfo companyInfo = companyDao.getCompanyInfo();
+                printService.printReceiptSilent(record, mode, companyInfo);
                 return null;
             }
         };

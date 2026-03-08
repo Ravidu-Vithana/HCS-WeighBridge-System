@@ -55,6 +55,31 @@
                 <Separator />
             </VBox>
 
+            <!-- Company Settings Section (ADMIN Only) -->
+            <VBox fx:id="companySettingsContainer" spacing="10">
+                <Label text="Company Settings" styleClass="settings-section-title" />
+
+                <GridPane hgap="15" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="110" />
+                        <ColumnConstraints minWidth="200" />
+                    </columnConstraints>
+
+                    <Label text="Company Name:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="companyNameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Company Address:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="companyAddressField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Contact Number 1:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <TextField fx:id="contactNumber1Field" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Contact Number 2:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <TextField fx:id="contactNumber2Field" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                </GridPane>
+                <Separator />
+            </VBox>
+
             <!-- User Management Section (ADMIN Only) -->
             <VBox fx:id="userManagementContainer" spacing="10">
                 <Label text="User Management" styleClass="settings-section-title" />

@@ -186,6 +186,15 @@ public final class DatabaseConfig {
                 "INDEX idx_username (username)" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
+        String createCompanyInfoTable = "CREATE TABLE IF NOT EXISTS company_info (" +
+                "id INT DEFAULT 1 PRIMARY KEY," +
+                "company_name VARCHAR(255) NOT NULL," +
+                "company_address VARCHAR(255)," +
+                "contact_number1 VARCHAR(50)," +
+                "contact_number2 VARCHAR(50)," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
         try (Statement stmt = connection.createStatement()) {
             logger.debug("Creating 'weigh_data' table if not exists");
             stmt.executeUpdate(createWeighDataTable);
@@ -201,6 +210,11 @@ public final class DatabaseConfig {
             stmt.executeUpdate(createUsersTable);
             logger.info("Table 'users' checked/created successfully");
             System.out.println("Table 'users' checked/created successfully.");
+
+            logger.debug("Creating 'company_info' table if not exists");
+            stmt.executeUpdate(createCompanyInfoTable);
+            logger.info("Table 'company_info' checked/created successfully");
+            System.out.println("Table 'company_info' checked/created successfully.");
 
             insertDefaultConfigurations();
         } catch (SQLException e) {
@@ -226,6 +240,9 @@ public final class DatabaseConfig {
         String insertDefaultUser = String.format(
                 "INSERT IGNORE INTO users (username, password, role) VALUES ('root', '%s', 'ADMIN')",
                 SecurityUtil.hashPassword("admin"));
+
+        String insertDefaultCompany = "INSERT IGNORE INTO company_info (id, company_name, company_address, contact_number1, contact_number2) " +
+                "VALUES (1, 'HORAWADUNNA COPRA STORES WEIGHBRIDGE', '283/1, Bammanna Road, Kudalupoththa, Narangoda.', '0776136447', '0372246292')";
 
         try (Statement stmt = connection.createStatement()) {
             int successCount = 0;
@@ -254,6 +271,16 @@ public final class DatabaseConfig {
                 }
             } catch (SQLException e) {
                 logger.warn("Failed to insert default user: {}", e.getMessage());
+            }
+
+            try {
+                int companyRows = stmt.executeUpdate(insertDefaultCompany);
+                if (companyRows > 0) {
+                    logger.info("Default company info created successfully");
+                    System.out.println("Default company info created.");
+                }
+            } catch (SQLException e) {
+                logger.warn("Failed to insert default company info: {}", e.getMessage());
             }
 
         } catch (SQLException e) {

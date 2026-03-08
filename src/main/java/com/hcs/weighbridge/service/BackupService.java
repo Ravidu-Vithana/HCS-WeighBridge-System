@@ -53,6 +53,7 @@ public class BackupService {
         try (FileWriter writer = new FileWriter(backupFile)) {
             exportTable(writer, "users");
             exportTable(writer, "app_config");
+            exportTable(writer, "company_info");
             exportTable(writer, "weigh_data");
 
             logger.info("Backup completed successfully: {}", backupFile.getAbsolutePath());

@@ -1,9 +1,12 @@
 package com.hcs.weighbridge.ui;
 
 import com.hcs.weighbridge.MainApp;
+import com.hcs.weighbridge.config.DatabaseConfig;
 import com.hcs.weighbridge.dao.ConfigDao;
+import com.hcs.weighbridge.dao.CompanyDao;
 import com.hcs.weighbridge.constants.PrintMode;
 import com.hcs.weighbridge.model.Record;
+import com.hcs.weighbridge.model.CompanyInfo;
 import com.hcs.weighbridge.service.PrintService;
 import com.hcs.weighbridge.service.WeighService;
 import com.hcs.weighbridge.util.LogUtil;
@@ -171,7 +174,9 @@ public class RecordsController {
             @Override
             protected Void call() throws Exception {
                 PrintService printService = new PrintService();
-                printService.printReceiptSilent(record, mode);
+                CompanyDao companyDao = new CompanyDao(DatabaseConfig.getConnection());
+                CompanyInfo companyInfo = companyDao.getCompanyInfo();
+                printService.printReceiptSilent(record, mode, companyInfo);
                 return null;
             }
         };

@@ -3,6 +3,8 @@ package com.hcs.weighbridge.ui;
 import com.fazecast.jSerialComm.SerialPort;
 import com.hcs.weighbridge.dao.ConfigDao;
 import com.hcs.weighbridge.dao.UserDao;
+import com.hcs.weighbridge.dao.CompanyDao;
+import com.hcs.weighbridge.model.CompanyInfo;
 import com.hcs.weighbridge.model.Role;
 import com.hcs.weighbridge.model.SerialConfig;
 import com.hcs.weighbridge.model.User;
@@ -51,9 +53,19 @@ public class SettingsController implements Initializable {
     @FXML
     private VBox serialSettingsContainer;
     @FXML
+    private VBox companySettingsContainer;
+    @FXML
     private VBox systemSettingsContainer;
     @FXML
     private VBox userManagementContainer;
+    @FXML
+    private TextField companyNameField;
+    @FXML
+    private TextField companyAddressField;
+    @FXML
+    private TextField contactNumber1Field;
+    @FXML
+    private TextField contactNumber2Field;
     @FXML
     private TextField usernameField;
     @FXML
@@ -65,13 +77,15 @@ public class SettingsController implements Initializable {
 
     private ConfigDao configDao;
     private UserDao userDao;
+    private CompanyDao companyDao;
     private MainController mainController;
     private BorderPane mainControllerRootPane;
     private User currentUser;
 
-    public void setDependencies(ConfigDao configDao, UserDao userDao, MainController mainController, User currentUser) {
+    public void setDependencies(ConfigDao configDao, UserDao userDao, CompanyDao companyDao, MainController mainController, User currentUser) {
         this.configDao = configDao;
         this.userDao = userDao;
+        this.companyDao = companyDao;
         this.mainController = mainController;
         this.mainControllerRootPane = mainController.getRootPane();
         this.currentUser = currentUser;
@@ -146,6 +160,10 @@ public class SettingsController implements Initializable {
             serialSettingsContainer.setVisible(isAdmin);
             serialSettingsContainer.setManaged(isAdmin);
         }
+        if (companySettingsContainer != null) {
+            companySettingsContainer.setVisible(isAdmin);
+            companySettingsContainer.setManaged(isAdmin);
+        }
         if (userManagementContainer != null) {
             userManagementContainer.setVisible(isAdmin);
             userManagementContainer.setManaged(isAdmin);
@@ -165,6 +183,11 @@ public class SettingsController implements Initializable {
             protected Void call() throws Exception {
                 double currentScale = configDao.getUiScaleFactor();
                 SerialConfig cfg = configDao.loadSerialConfig();
+                CompanyInfo companyInfo = null;
+                if (isAdmin() && companyDao != null) {
+                    companyInfo = companyDao.getCompanyInfo();
+                }
+                final CompanyInfo finalCompanyInfo = companyInfo;
 
                 Platform.runLater(() -> {
                     double finalScale = (currentScale < 1.0 || currentScale > 3.0) ? 2.0 : currentScale;
@@ -193,6 +216,13 @@ public class SettingsController implements Initializable {
 
                     if (startupCheckBox != null) {
                         startupCheckBox.setSelected(SystemUtils.isRunOnStartupEnabled());
+                    }
+
+                    if (finalCompanyInfo != null) {
+                        companyNameField.setText(finalCompanyInfo.getCompanyName());
+                        companyAddressField.setText(finalCompanyInfo.getCompanyAddress());
+                        contactNumber1Field.setText(finalCompanyInfo.getContactNumber1());
+                        contactNumber2Field.setText(finalCompanyInfo.getContactNumber2());
                     }
                 });
                 return null;
@@ -398,6 +428,7 @@ public class SettingsController implements Initializable {
 
         try {
             SerialConfig cfg = new SerialConfig();
+            CompanyInfo companyInfo = new CompanyInfo();
             if (isAdmin()) {
                 cfg.setPortName(portCombo.getValue());
 
@@ -421,6 +452,11 @@ public class SettingsController implements Initializable {
                 } else {
                     cfg.setParity(SerialPort.NO_PARITY);
                 }
+
+                companyInfo.setCompanyName(companyNameField.getText().trim().toUpperCase());
+                companyInfo.setCompanyAddress(companyAddressField.getText().trim());
+                companyInfo.setContactNumber1(contactNumber1Field.getText().trim());
+                companyInfo.setContactNumber2(contactNumber2Field.getText().trim());
             }
 
             double scaleFactor = scaleSlider.getValue();
@@ -430,6 +466,9 @@ public class SettingsController implements Initializable {
                 protected Void call() throws Exception {
                     if (isAdmin()) {
                         configDao.saveSerialConfig(cfg);
+                        if (companyDao != null) {
+                            companyDao.saveCompanyInfo(companyInfo);
+                        }
                     }
                     configDao.saveUiScaleFactor(scaleFactor);
                     if (startupCheckBox != null) {
