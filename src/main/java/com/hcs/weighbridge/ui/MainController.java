@@ -583,7 +583,7 @@ public class MainController {
         boolean confirmed = UiUtils.showConfirmation(
                 stage,
                 "Save Changes?",
-                "Are you sure you want to change these changes?",
+                "Are you sure you want to save these changes?",
                 false);
         if (!confirmed) {
             return;
