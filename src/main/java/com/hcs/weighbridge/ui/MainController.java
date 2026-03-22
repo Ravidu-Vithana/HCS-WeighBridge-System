@@ -515,15 +515,6 @@ public class MainController {
     public void updateLiveWeight(int weight, char statusChar) {
         boolean stable = (statusChar == 'P' || statusChar == 'T');
         model.updateLive(weight, stable ? "STABLE" : "UNSTABLE");
-
-        if (stable) {
-            if (weighService.isCompleted()) {
-                Record completed = weighService.getActiveRecord();
-                completeRecords.add(completed);
-                recentRecords.remove(completed);
-                weighService.clearActiveRecord();
-            }
-        }
     }
 
     private void resetRecord() {
@@ -608,7 +599,6 @@ public class MainController {
                     weighService.saveSecondWeight(currentWeight);
                     printSecondTicket();
                     Platform.runLater(() -> {
-                        recentRecords.remove(weighService.getActiveRecord());
                         resetRecord();
                         showToast((Stage) rootPane.getScene().getWindow(),
                                 rootPane,
