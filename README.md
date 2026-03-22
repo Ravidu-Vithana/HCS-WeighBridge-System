@@ -4,13 +4,13 @@
 
 **Weighbridge Management System** is a production-grade desktop application built with **Java 8** and **JavaFX**, designed as a stable and maintainable replacement for legacy weighbridge software (including Windows 7) while remaining compatible with modern Windows environments.  
 
-This system provides real-time serial device integration, structured weighment workflow management, secure authentication, receipt printing, and automated database backup functionality. Ideal for **industrial weighbridge operations** and **dedicated weighbridge terminals**.
+This system provides real-time serial device integration, structured weighing workflow management, secure authentication, receipt printing, and automated database backup functionality. Ideal for **industrial weighbridge operations** and **dedicated weighbridge terminals**.
 
 ---
 
 ## Overview
 
-The **Weighbridge Management System** is built for **dedicated industrial weighbridge computers**, providing a reliable, secure, and maintainable workflow for managing all weighment operations.  
+The **Weighbridge Management System** is built for **dedicated industrial weighbridge computers**, providing a reliable, secure, and maintainable workflow for managing all weighing operations.  
 
 Key benefits include:
 
@@ -30,12 +30,13 @@ Key benefits include:
 - **Environment-based secret management** using `.env`
 - Centralized configuration for database and serial port credentials
 
-### Weighment Workflow
+### Weighing Workflow
 - **Real-time weight display** from connected industrial scales
 - **Two-step weighing workflow** (First Weight / Second Weight)
 - Automatic **net weight calculation**
 - Input validation and structured record storage
-- Persistent storage of weighment data in MySQL database
+- Persistent storage of weighing data in MySQL database 
+- Full record history management with filters.
 
 ### Serial Port Integration
 - Live weight reading from industrial weighbridge devices
@@ -162,7 +163,6 @@ Future versions may include distributed and cloud-based capabilities.
 ## Roadmap
 - Print preview support
 - Manual printer selection
-- Full record history management
 - Cloud synchronization
 - Multi-terminal deployment support
 - Modern OS optimized replica
